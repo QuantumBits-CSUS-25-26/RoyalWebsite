@@ -1,0 +1,20 @@
+superuser credentials:
+username = User 
+password = Pass 
+
+in top backend folder:
+    run the following:
+        pip install django
+        pip install djangorestframework
+            # i needed to use pip install django-rest-framework for it to work
+        pip install django-cors-headers
+
+        py manage.py makemigrations
+        py manage.py migrate
+        and finally, to run locally
+        py manage.py runserver
+            find in browser on one of two
+            http://localhost:8000/wel/
+            http://localhost:8000/admin/
+
+        
