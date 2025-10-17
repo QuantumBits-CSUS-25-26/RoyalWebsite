@@ -36,3 +36,36 @@
     transform: rotate(360deg);
   }
 }
+
+.Navbar {
+  left: 0;
+  height: 100%;
+  width: 75px;
+  background-color: #2F6DAB;
+  left: 0;
+  position: fixed;
+}
+
+.Navbar .btn-group {
+  position: flex;
+  flex-direction: column;
+}
+
+.Navbar .btn-group button {
+  background-color: #2F6DAB;
+  color: white;
+  font-size: 15px;
+  text-align: center;
+  display: block;
+  border: 0px;
+  padding: 5px;
+  width: 100%;
+  height: 100%;
+}
+
+.Navbar .btn-group button:hover {
+  background-color: #151F27;
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
