@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '../Components/Navbar';
+import Header from '../Components/Header';
 import AboutServices from '../Components/AboutServices/AboutServices';
 import './Homepage.css';
 
@@ -8,17 +9,11 @@ const Homepage = () => {
     <div className="homepage">
       <Navbar />
       <div className="homepage-content">
-<<<<<<< HEAD
-        Homepage
-      </div>
-    </div>
-  )
-=======
+        <Header />
         <AboutServices />
       </div>
     </div>
   );
->>>>>>> feature/about-services
 }
 
 export default Homepage;
