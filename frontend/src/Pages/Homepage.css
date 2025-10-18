@@ -1,0 +1,9 @@
+.homepage {
+  display: flex;
+  min-height: 100vh;
+}
+
+.homepage-content {
+  flex: 1;
+  padding: 20px;
+}
