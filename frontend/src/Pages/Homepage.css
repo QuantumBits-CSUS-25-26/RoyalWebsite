@@ -1,9 +1,16 @@
 .homepage {
   display: flex;
   min-height: 100vh;
+  background: #fff;
+  color: #111;
 }
 
 .homepage-content {
   flex: 1;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
