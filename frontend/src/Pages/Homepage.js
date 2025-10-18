@@ -7,9 +7,9 @@ import './Homepage.css';
 const Homepage = () => {
   return (
     <div className="homepage">
+      <Header />
       <Navbar />
       <div className="homepage-content">
-        <Header />
         <AboutServices />
       </div>
     </div>
