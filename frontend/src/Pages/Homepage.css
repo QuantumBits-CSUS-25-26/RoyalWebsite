@@ -1,0 +1,4 @@
+.homepage {  display: flex;  min-height: 100vh;  background: #fff;  color: #111;}.homepage-content {  flex: 1;
+
+  box-sizing: border-box;
+}
