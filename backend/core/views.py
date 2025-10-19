@@ -1,25 +1,14 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from . models import *
-from rest_framework.response import Response
-from . serializer import *
+import requests
+from django.http import JsonResponse
 
-# Create your views here.
+def place_reviews(request):
+    place_id = request.GET.get("place_id")
+    if not place_id:
+        return JsonResponse({"error": "place_id parameter is required"}, status=400)
 
-class ReactView(APIView):
+    api_key = "YOUR_GOOGLE_API_KEY" 
+    url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=name,rating,reviews&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
 
-    serializer_class = ReactSerializer
-
-    def get(self, request):
-        detail = [ {"name": detail.name, "detail": detail.detail}
-        for detail in React.objects.all()]
-        return Response(detail)
-    
-    def post(self, request):
-
-        serializer = ReactSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
-        
-    
+    return JsonResponse(data)
