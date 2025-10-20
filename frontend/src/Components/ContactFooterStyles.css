@@ -1,0 +1,42 @@
+.bar {
+    background: "#3b5b8a";
+    border-top: "4px solid #2b4366";
+    color: "#fff";
+    padding: "8px 16px";
+    display: "flex";
+    justify-content: "center";
+    font-family: "Georgia, 'Times New Roman', Times, serif";
+}
+
+.container {
+    width: "100%";
+    max-width: 1200;
+    display: "flex";
+    justify-content: "space-between";
+    align-items: "center",;
+    gap: 20;
+}
+
+.block {
+    display: "flex";
+    align-Items: "center";
+    gap: 12;
+    min-Width: 0;
+}
+
+.icon {
+    width: 22;
+    height: 22;
+    display: "block";
+    filter: "invert(1)";
+    flex: "0 0 auto";
+}
+
+.text {
+    white-space: "nowrap";
+    overflow: "hidden";
+    text-overflow: "ellipsis";
+    margin: 0;
+    font-size: 20;
+    font-weight: 500;
+}
