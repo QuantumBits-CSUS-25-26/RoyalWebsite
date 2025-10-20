@@ -9,7 +9,6 @@ export default function HeroSection() {
             <div className="hero__overlay" aria-hidden="true" />
             <div className="hero__content">
                 <h1 className="hero__title">Royal Auto and Body Repair</h1>
-                {/* <p className="hero__subtitle">Your trusted partner in excellence</p> */}
                 <button className = "HeroBookingButton">Book an Appointment</button>
             </div>
         </section>
