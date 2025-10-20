@@ -11,9 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
   
 
-
-  
-
+import pymysql
+pymysql.install_as_MySQLdb()
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -84,13 +83,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
-        'NAME': 'testdb',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'RoyalWebsite',
         'HOST': '127.0.0.1',
         'PORT': 3306,
         #change user/pass as needed
         'USER': 'root',
-        'PASSWORD': 'Root',
+        'PASSWORD': '',
     }
 }
 
