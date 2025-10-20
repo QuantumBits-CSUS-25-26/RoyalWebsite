@@ -36,6 +36,18 @@
     transform: rotate(360deg);
   }
 }
+.Header {
+  padding: 10px;
+  text-align: center;
+  background: #151F27;
+  color: white;
+  font-size: 40px;
+  width: 100%;
+  background-image: url('/src/TopLeftLogo.png');
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
 
 .Navbar {
   left: 0;
@@ -104,7 +116,7 @@
   margin-bottom: .5rem;
   font-size: 64px;
   padding: .75rem;
-  /* background: rgb(0, 0, 0, 0.6);  */
+  background: rgb(0, 0, 0, 0.3); 
   background-size: inherit ;
 }
 
