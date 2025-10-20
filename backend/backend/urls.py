@@ -3,8 +3,10 @@ from django.urls import path
 from django.http import JsonResponse
 from core import views
 
+
 def home(request):
-    return JsonResponse({"message": "Welcome to the Places API!"})
+
+    return JsonResponse({"message": "Welcome the Places API!"})
 
 urlpatterns = [
     path("admin/", admin.site.urls),
