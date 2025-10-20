@@ -10,28 +10,53 @@ load_dotenv()
 @require_GET
 def place_reviews(request):
     """
-    Fetch Google Maps place reviews using a given place_id.
-    Example request: /api/place_reviews?place_id=YOUR_PLACE_ID
+    Fetch Google Maps place reviews for a business.
+    Example request: /api/place_reviews?name=Royal+Auto+And+Body+Repair
+    or /api/place_reviews?place_id=PLACE_ID
     """
-    place_id = request.GET.get("place_id")
-    if not place_id:
-        return JsonResponse({"error": "place_id parameter is required"}, status=400)
-
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     if not api_key:
         return JsonResponse({"error": "API key not configured"}, status=500)
 
-    url = (
-        "https://maps.googleapis.com/maps/api/place/details/json"
-        f"?place_id={place_id}&fields=name,rating,reviews&key={api_key}"
-    )
+    place_id = request.GET.get("place_id")
+    business_name = request.GET.get("name", "Royal Auto And Body Repair, Sacramento, CA")
+
+    # If place_id is not provided, get it via business name
+    if not place_id:
+        if not business_name:
+            return JsonResponse({"error": "Either place_id or name parameter is required"}, status=400)
+
+        # Find Place API to get place_id
+        find_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+        params = {
+            "input": business_name,
+            "inputtype": "textquery",
+            "fields": "place_id",
+            "key": api_key
+        }
+        try:
+            response = requests.get(find_url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            if not data.get("candidates"):
+                return JsonResponse({"error": "Business not found"}, status=404)
+            place_id = data["candidates"][0]["place_id"]
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({"error": f"Failed to get place_id: {str(e)}"}, status=500)
+
+    # Now get place details and reviews
+    details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+    params = {
+        "place_id": place_id,
+        "fields": "name,rating,reviews",
+        "key": api_key
+    }
 
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(details_url, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
 
-        # Check if the response from Google contains an error
         if data.get("status") != "OK":
             return JsonResponse({"error": data.get("error_message", "Invalid place_id")}, status=400)
 
