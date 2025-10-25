@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css";
-import carImage from "../images/login-car.jpg"; // 👈 نام فایل تصویری‌ات را این‌جا بگذار
-import logo from "../images/HeroImage.jpg"; // 👈 اگر لوگو داری، مسیرش را این‌جا بگذار
+import carImage from "../images/login-car.jpg";
+import logo from "../images/HeroImage.jpg";
 
 function Login() {
     const [email, setEmail] = useState("");
