@@ -133,8 +133,7 @@
     height: 100%;
     object-fit: cover;
     object-position: 0cap;
-    border-bottom-left-radius: 40px;
-    border-top-left-radius: 8px;
+    border-bottom-left-radius: 300px;
     z-index: 200;
 }
 
