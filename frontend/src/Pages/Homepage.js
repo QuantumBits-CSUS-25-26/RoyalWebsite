@@ -4,6 +4,7 @@ import Header from '../Components/Header';
 import AboutServices from '../Components/AboutServices/AboutServices';
 import HeroSection from '../Components/HeroSection';
 import './Homepage.css';
+import Reviews from '../Components/Reviews';
 
 const Homepage = () => {
   return (
@@ -12,6 +13,7 @@ const Homepage = () => {
       <div className="homepage-content">
         <Header />
         <HeroSection />
+        <Reviews />
         <AboutServices />
       </div>
     </div>
