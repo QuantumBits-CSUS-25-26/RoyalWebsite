@@ -1,8 +1,9 @@
 .login-page {
     display: flex;
     height: 100vh;
-    background-color: #f5f6fa;
+    background-color: #ffffff;
     font-family: "Poppins", sans-serif;
+    z-index: 200;
 }
 
 .login-left {
@@ -12,38 +13,53 @@
     justify-content: center;
     align-items: center;
     padding: 0px;
-    background-color: #fff;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+
 }
 
 .login-header {
     text-align: left;
     width: 100%;
-    max-width: 350px;
-    margin-bottom: 40px;
+    height: 100px;
+    max-width: 100%;
+    background-color: #2F6DAA;
+    border-top-left-radius: 80px;
+    border-bottom-left-radius: 80px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin-left: 5px;
+    z-index: 1;
+    margin-bottom: 140px;
 }
 
 .login-logo {
-    width: 120px;
-    margin-bottom: 10px;
+    width: 80px;
 }
 
 .login-header h2 {
-    color: #1e3a8a;
+    color: #ffffff;
     font-weight: 600;
     font-size: 18px;
+    margin-top: 25px;
+    margin-left: 10px;
+
 }
 
 .login-form {
     width: 100%;
     max-width: 350px;
     background-color: transparent;
+    margin-bottom: 350px;
 }
 
 .login-form h3 {
     color: #0094ff;
     font-size: 22px;
     margin-bottom: 20px;
+    text-align: left;
+    font-weight: bold;
 }
 
 .login-form label {
@@ -75,6 +91,11 @@
     display: flex;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.remember-label {
+    margin-left: 10px;
+    font-weight: bold;
 }
 
 .remember input {
@@ -110,9 +131,61 @@
 .login-right img {
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    object-fit: cover;
     object-position: 0cap;
-    border-bottom-left-radius: 500px;
+    border-bottom-left-radius: 40px;
+    border-top-left-radius: 8px;
+    z-index: 200;
+}
+
+.image-container {
+    position: relative;
+    width: 800px;
+    /* Adjust to your image width */
+    height: 600px;
+    /* Adjust to your image height */
+    overflow: hidden;
+    background-color: #1a1a1a;
+    /* Dark background to match garage floor */
+    border-radius: 8px;
+    /* Optional subtle rounding */
+}
+
+.image-container::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    /* Width of the blue border strip */
+    background: linear-gradient(to right, #0056b3 0%, #007bff 100%);
+    /* Blue gradient to mimic the accent */
+    z-index: 1;
+}
+
+.image-container img {
+    position: absolute;
+    right: 0;
+    /* Positions image to the right of the blue strip */
+    top: 0;
+    width: calc(100% - 120px);
+    /* Adjusts image width to fit beside the border */
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+}
+
+/* Optional: Add a subtle bottom shadow or bar for depth */
+.image-container::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 100%);
+    z-index: 3;
 }
 
 /* The switch - the box around the slider */

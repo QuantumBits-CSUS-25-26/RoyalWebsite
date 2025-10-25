@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css";
 import carImage from "../images/login-car.jpg";
-import logo from "../images/HeroImage.jpg";
+import logo from "../images/logo.png";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -46,11 +46,12 @@ function Login() {
                             <input type="checkbox" id="remember" />
                             <span class="slider round"></span>
                         </label>
-                        <label className="ml-5" htmlFor="remember">Remember me</label>
+                        <label className="remember-label" htmlFor="remember">Remember me</label>
                     </div>
                     <button type="submit">SIGN IN</button>
                 </form>
             </div>
+
 
             <div className="login-right">
                 <img src={carImage} alt="Car" />
