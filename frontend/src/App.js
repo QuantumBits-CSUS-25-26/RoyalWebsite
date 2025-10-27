@@ -5,6 +5,7 @@ import CustomerDashboard from './Pages/CustomerDashboard';
 import Appointments from './Pages/Appointments';
 import Services from './Pages/Services';
 import News from './Pages/News';
+import AdminDashboard from './Pages/AdminDashboard';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path='/appointments' element={<Appointments />} />
         <Route path='/services' element={<Services />} />
         <Route path='/news' element={<News />} />
+        <Route path='/admin' element={<AdminDashboard />} />
       </Routes>
     </div>
   );
