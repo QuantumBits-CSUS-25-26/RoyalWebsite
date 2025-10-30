@@ -6,10 +6,12 @@ import appointmentIcon from '../images/appointment_Icon.png';
 import messageIcon from '../images/message_Icon.png';
 import serviceIcon from '../images/services_Icon.png';
 import adminIcon from "../images/sign_in_Icon.png"
+import AdminSideBar from "../Components/AdminSideBar";
 
 export default function AdminDashboard() {
     return (
         <section className="admin-dashboard">
+            <AdminSideBar />
             <div className="admin-dashboard-content"> 
                 <div className="admin-dashboard-header">
                    <span className="admin-dashboard-title">Admin Dashboard </span> 

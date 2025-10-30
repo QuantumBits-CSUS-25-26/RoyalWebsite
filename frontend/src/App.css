@@ -130,6 +130,10 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+.admin-dashboard-content{
+  margin-top: -800px;
+  margin-left: -40px;
+}
 .admin-dashboard-header{
   display: flex;
   flex-direction: row;
@@ -286,4 +290,77 @@
     height: 32px;
     flex: 0 0 32px;
   }
+}
+
+
+/* begin admin side bar */
+.adminNav {
+  margin: 10px;
+  width: 225px;
+  background-color: #2F6DAB;
+  color: white;
+  border-radius: 15px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.adminNav .navButton {
+  background-color: #2F6DAB;
+  color: white;
+  border-color: #2F6DAB;
+  width: 200px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 10px;
+}
+
+.adminNav .nav-link.active .navButton {
+  border: 2px solid white;
+  background-color: #2F6DAB;
+  color: white;
+  box-shadow: none;
+}
+
+.adminApts {
+  margin-top: -800px;
+  margin-left: -40px;
+}
+
+
+.adminCustomers {
+  margin-top: -800px;
+  margin-left: -40px;
+}
+
+
+.adminServices {
+  margin-top: -800px;
+  margin-left: -40px;
+}
+
+.updates {
+  margin-top: -800px;
+  margin-left: -40px;
+}
+
+
+.invoices {
+  margin-top: -800px;
+  margin-left: -40px;
+}
+
+
+.messages {
+  margin-top: -800px;
+  margin-left: -40px;
+}
+
+
+.settings {
+  margin-top: -800px;
+  margin-left: -40px;
 }
