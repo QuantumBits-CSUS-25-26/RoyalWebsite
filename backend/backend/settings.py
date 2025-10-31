@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #new
     'rest_framework',
+    'rest_framework_simplejwt'
     'core',
     'corsheaders',
 ]
@@ -90,6 +91,7 @@ DATABASES = {
         #change user/pass as needed
         'USER': 'root',
         'PASSWORD': '',
+        #'PASSWORD': 'Root',
     }
 }
 
@@ -139,7 +141,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
     ]
+}
+
+#Token Lifetimes
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
