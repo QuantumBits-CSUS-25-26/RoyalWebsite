@@ -18,7 +18,7 @@ import InfoBar from './Components/InfoBar';
 
 function App() {
   return (
-    <InfoBar /> {}
+    <InfoBar /> ,//{}      // originally: '<InfoBar /> {}'  , this thows error when running server, but fix no longer shows infobar 
     <div className="App">
       <Routes>
         <Route path='/login' element={<Login />} />

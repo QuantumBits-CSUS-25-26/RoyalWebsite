@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #new
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
     'core',
     'corsheaders',
 ]
@@ -90,8 +90,8 @@ DATABASES = {
         'PORT': 3306,
         #change user/pass as needed
         'USER': 'root',
-        'PASSWORD': '',
-        #'PASSWORD': 'Root',
+        #'PASSWORD': '',
+        'PASSWORD': 'Root',
     }
 }
 
@@ -140,8 +140,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #new
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
+        'rest_framework.permissions.AllowAny',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 

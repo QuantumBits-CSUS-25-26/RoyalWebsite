@@ -5,5 +5,5 @@ python-dotenv
 requests
 
 # sql api drivers:
-mysqlclient
-#pymysql
+#mysqlclient
+pymysql
