@@ -3,6 +3,9 @@ import requests
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from dotenv import load_dotenv
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializer import CustomTokenObtainPairSerializer
 
 # Load environment variables
 load_dotenv()
@@ -66,3 +69,16 @@ def place_reviews(request):
         return JsonResponse({"error": "Request to Google Maps API timed out"}, status=504)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"error": f"Request failed: {str(e)}"}, status=500)
+    
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        tokens = serializer.validated_data
+
+        response = Response(tokens)
+        return response
