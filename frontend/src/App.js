@@ -14,10 +14,11 @@ import Updates from './Pages/AdminPages/Updates';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
-
+import InfoBar from './Components/InfoBar'; 
 
 function App() {
   return (
+    <InfoBar /> {}
     <div className="App">
       <Routes>
         <Route path='/login' element={<Login />} />
