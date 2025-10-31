@@ -6,10 +6,47 @@ import logo from "../images/logo.png";
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+
+    const validateEmail = (value) => {
+        if (!value) return "Email is required.";
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return "Please enter a valid email address.";
+        return "";
+    };
+
+    const validatePassword = (value) => {
+        if (!value) return "Password is required.";
+        if (value.length < 8) return "Password must be at least 8 characters.";
+        return "";
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("Email:", email, "Password:", password);
+        setError("");
+
+        const emailError = validateEmail(email);
+        const passwordError = validatePassword(password);
+
+        if (emailError || passwordError) {
+            setError(emailError || passwordError);
+            setSubmitting(false);
+            return;
+        }
+        else {
+            setSubmitting(true);
+        }
+
+
+        const payload = {
+            email: email.trim(),
+            password: password,
+        };
+
+        console.log("Prepared payload for API:", payload); 
+
     };
 
     return (
@@ -23,6 +60,8 @@ function Login() {
                 <form className="login-form" onSubmit={handleSubmit}>
                     <h3>Login</h3>
 
+                    {error && <div className="form-error" role="alert">{error}</div>}
+
                     <label>Email</label>
                     <input
                         type="email"
@@ -30,6 +69,7 @@ function Login() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        aria-invalid={!!validateEmail(email)}
                     />
 
                     <label>Password</label>
@@ -39,6 +79,7 @@ function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        aria-invalid={!!validatePassword(password)}
                     />
 
                     <div className="remember">
@@ -48,7 +89,7 @@ function Login() {
                         </label>
                         <label className="remember-label" htmlFor="remember">Remember me</label>
                     </div>
-                    <button type="submit">SIGN IN</button>
+                    <button type="submit" disabled={!submitting}>{submitting ? "Signing in..." : "SIGN IN"}</button>
                 </form>
             </div>
 
