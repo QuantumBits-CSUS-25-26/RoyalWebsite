@@ -22,7 +22,14 @@ function Login() {
         return "";
     };
 
-    const handleSubmit = (e) => {
+    const getCookie = (name) => {
+        const matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Email:", email, "Password:", password);
         setError("");
@@ -46,6 +53,48 @@ function Login() {
         };
 
         console.log("Prepared payload for API:", payload); 
+
+        const endpoint = "/api/login/";
+
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            };
+            const csrftoken = getCookie("csrftoken");
+            if (csrftoken) headers["X-CSRFToken"] = csrftoken;
+
+            const res = await fetch(endpoint, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(payload),
+                credentials: "include", 
+            });
+
+            if (res.ok) {
+                const data = await res.json().catch(() => ({}));
+
+                if (data.token) {
+                    sessionStorage.setItem("authToken", data.token);
+                }
+
+                window.location.href = data.redirect || "/dashboard";
+                return;
+            }
+             if (res.status === 400 || res.status === 401) {
+                const errData = await res.json().catch(() => null);
+                const message = errData?.detail || errData?.error || errData?.message || "Invalid email or password.";
+                setError(message);
+            } else {
+                setError("Server error. Please try again later.");
+            }
+        } catch (err) {
+            console.error("Login request failed:", err);
+            setError("Network error. Please check your connection and try again.");
+        } finally {
+            setSubmitting(false);
+        }
 
     };
 
