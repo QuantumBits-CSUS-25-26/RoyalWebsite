@@ -39,9 +39,9 @@
 .Header {
   padding: 10px;
   text-align: center;
+  text-indent: 40px;
   background: #151F27;
   color: white;
-  font-size: 40px;
   width: 100%;
   background-image: url('/src/TopLeftLogo.png');
   background-position: top left;
@@ -342,4 +342,29 @@
     height: 32px;
     flex: 0 0 32px;
   }
+}
+
+.news .title{
+  color: white;
+  background-color: #2F6DAB;
+  margin-left: max(120px, 10%);
+  margin-top: max(30px, 2%);
+  padding-top: min(40px, 2%);
+  padding-bottom: min(40px, 2%);
+  width: max(200px, 10%);
+  min-height: 50px;
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.news .content{
+  overflow-y: auto;
+  height: 80vh;
+  margin-left: 100px;
 }
