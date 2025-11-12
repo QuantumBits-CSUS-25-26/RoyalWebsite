@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Services.module.css";
-
+import { Link } from "react-router-dom";
 import oilChange from "./asset/services-1.png";
 import brakeRepair from "./asset/services-2.jpeg";
 import suspensionWork from "./asset/services-3.jpeg";
@@ -54,6 +54,7 @@ const ServicesSection = () => {
                         <div className={styles.serviceList}>
                             {services.map((service) => (
                                 <div key={service.id} className={styles.serviceCard}>
+
                                     <img
                                         src={service.img}
                                         alt={service.title}
@@ -61,6 +62,9 @@ const ServicesSection = () => {
                                     />
                                     <h3 className={styles.serviceTitle}>{service.title}</h3>
                                     <p className={styles.serviceDesc}>{service.desc}</p>
+                                    <Link to={`/service/${service.id}`} className={styles.viewMore}>
+                                        View More →
+                                    </Link>
                                 </div>
                             ))}
                         </div>
