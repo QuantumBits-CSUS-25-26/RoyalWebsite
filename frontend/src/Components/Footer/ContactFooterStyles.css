@@ -1,0 +1,74 @@
+
+.box{
+    display: flex;
+    flex-direction: column;
+    width: 100%;            
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 16px 0;
+    background: #2F6DAB;
+    flex-shrink: 0;       
+    gap: 16px;              
+}
+
+.contactUsTitle{
+    font-family: "Poppins", Helvetica, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.textblock{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+}
+
+.text{
+    font-family: "Poppins", Helvetica, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    line-height: normal;
+}
+
+
+.contactFormButton{
+    background-color: #ffffff;
+    color: #2F6DAB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-family: "Poppins", Helvetica, sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 1.4rem;
+    line-height: normal;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 10px 8px 11px;
+}
+
+.icon{
+    width: 24px;
+    height: 24px;
+    display: block;
+    filter: invert(1);
+    flex: 0 0 auto;
+}
