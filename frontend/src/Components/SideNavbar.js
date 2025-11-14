@@ -14,7 +14,7 @@ const SideNavbar = () => {
           <Nav vertical>
             <div class ="btn-group">
               <NavItem>
-                <NavLink className='nav-link' to='/dashboard'>
+                <NavLink className='nav-link' to='/login'>
                   <button>
                     <img src={AccountSvg} alt="AccountImage" style={{ height:30, width:30}}/>
                     Account
