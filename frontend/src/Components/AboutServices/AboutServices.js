@@ -1,8 +1,11 @@
 import React from "react";
 import styles from "./AboutServices.module.css";
 import mechanicImg from "./AboutServicesAssets/stockMechanicImage.jpeg"; 
+import {useUi} from '../ServicePopUp/UiContext';
+import { UiProvider } from '../ServicePopUp/UiContext';
 
 export default function AboutServices() {
+  const {setServiceOpen} = useUi();
   return (
     <section className={styles.aboutServices}>
       <img
@@ -21,10 +24,9 @@ export default function AboutServices() {
           brake repairs, suspension work, and vehicle inspections for Uber and
           Lyft drivers, among other repair and maintenance services.
         </div>
-        <button
-          className={styles.viewServicesButton}
-          aria-label="View all available auto repair services"
-        >
+        <button className={styles.viewServicesButton} 
+          onClick={() => setServiceOpen(true)}
+          aria-label="View all available auto repair services">
           View all services
         </button>
       </div>

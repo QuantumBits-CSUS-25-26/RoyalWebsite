@@ -5,8 +5,11 @@ import ServicesSvg from './NavbarAssets/ServicesButton.svg';
 import NewsSvg from './NavbarAssets/NewsButton.svg';
 import { Navbar, Container, NavItem, Nav } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
+import { useUi } from './ServicePopUp/UiContext';
+import '../App.css';
 
 const SideNavbar = () => {
+  const { setServiceOpen } = useUi();
   return (
     <div className ="Navbar">
       <Navbar>
@@ -14,7 +17,7 @@ const SideNavbar = () => {
           <Nav vertical>
             <div class ="btn-group">
               <NavItem>
-                <NavLink className='nav-link' to='/dashboard'>
+                <NavLink className='nav-link' to='/dashboard' onClick={() => setServiceOpen(false)}>
                   <button>
                     <img src={AccountSvg} alt="AccountImage" style={{ height:30, width:30}}/>
                     Account
@@ -22,7 +25,7 @@ const SideNavbar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className='nav-link' to='/'>
+                <NavLink className='nav-link' to='/' onClick={() => setServiceOpen(false)}>
                   <button>
                     <img src={HomeSvg} alt="HomeImage" style={{ height:30, width:30}}/>
                     Home
@@ -30,7 +33,7 @@ const SideNavbar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className='nav-link' to='/appointments'>
+                <NavLink className='nav-link' to='/appointments' onClick={() => setServiceOpen(false)}>
                   <button>
                     <img src={AppointmentSvg} alt="AppointmentImage" style={{ height:30, width:30}}/>
                     Schedule
@@ -38,15 +41,13 @@ const SideNavbar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className='nav-link' to='/services'>
-                  <button>
-                    <img src={ServicesSvg} alt="ServicesImage" style={{ height:30, width:30}}/>
-                    Services
-                  </button>
-                </NavLink>
+                <button className='service-nav-btn' onClick={() => setServiceOpen(true)}>
+                  <img src={ServicesSvg} alt="ServicesImage" style={{ height:30, width:30}}/>
+                  Services
+                </button>
               </NavItem>
               <NavItem>
-                <NavLink className='nav-link' to='/news'>
+                <NavLink className='nav-link' to='/news' onClick={() => setServiceOpen(false)}>
                   <button>
                     <img src={NewsSvg} alt="NewsImage" style={{ height:30, width:30}}/>
                     News
