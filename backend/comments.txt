@@ -5,6 +5,7 @@ password = Pass
 in top backend folder:
     run the following:
         pip install --upgrade --force-reinstall -r requirements.txt
+            default sql driver 'mysqlclient', if cant build, switch to 'pymysql'
         py manage.py makemigrations
         py manage.py migrate
         and finally, to run locally

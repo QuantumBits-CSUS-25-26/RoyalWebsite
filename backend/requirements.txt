@@ -1,6 +1,9 @@
 Django>=5.0
 djangorestframework
+djangorestframework-simplejwt
 python-dotenv
 requests
-mysqlclient
 
+# sql api drivers:
+#mysqlclient
+pymysql
