@@ -15,6 +15,8 @@ import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
 import CustomerLogin from './Pages/CustomerLogin';
+import ServiceDetail from './Pages/ServiceDetail';
+
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
         <Route path='/dashboard' element={<CustomerDashboard />} />
         <Route path='/appointments' element={<Appointments />} />
         <Route path='/services' element={<Services />} />
+        <Route path="/service/:id" element={<ServiceDetail />} />
         <Route path='/news' element={<News />} />
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/admin/customers' element={<CustomerList />} />
