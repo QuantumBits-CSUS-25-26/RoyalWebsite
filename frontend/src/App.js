@@ -14,12 +14,10 @@ import Updates from './Pages/AdminPages/Updates';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
-import InfoBar from './Components/InfoBar'; 
 import CustomerLogin from './Pages/CustomerLogin';
 
 function App() {
   return (
-    <InfoBar /> ,//{}      // originally: '<InfoBar /> {}'  , this thows error when running server, but fix no longer shows infobar 
     <div className="App">
       <Routes>
         <Route path='/login' element={<CustomerLogin />} />
