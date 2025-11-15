@@ -14,18 +14,20 @@ import Updates from './Pages/AdminPages/Updates';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
-import InfoBar from './Components/InfoBar'; 
+import CustomerLogin from './Pages/CustomerLogin';
+import ServiceDetail from './Pages/ServiceDetail';
+
 
 function App() {
   return (
-    <InfoBar /> ,//{}      // originally: '<InfoBar /> {}'  , this thows error when running server, but fix no longer shows infobar 
     <div className="App">
       <Routes>
-        <Route path='/login' element={<Login />} />
+        <Route path='/login' element={<CustomerLogin />} />
         <Route path='/' element={<Homepage />} />
         <Route path='/dashboard' element={<CustomerDashboard />} />
         <Route path='/appointments' element={<Appointments />} />
         <Route path='/services' element={<Services />} />
+        <Route path="/service/:id" element={<ServiceDetail />} />
         <Route path='/news' element={<News />} />
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/admin/customers' element={<CustomerList />} />
@@ -35,6 +37,7 @@ function App() {
         <Route path='/admin/invoices' element={<Invoices />} />
         <Route path='/admin/messages' element={<Messages />} />
         <Route path='/admin/settings' element={<Settings />} />
+        <Route path='/admin/login' element={<Login />} />
       </Routes>
     </div>
   );
