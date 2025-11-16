@@ -354,6 +354,13 @@
   background-color: #2F6DAB;
   margin-left: max(120px, 10%);
   margin-top: max(30px, 2%);
+}
+
+.news .content{
+  overflow-y: auto;
+  height: 80vh;
+  margin-left: 100px;
+}
 
 /* begin admin side bar */
 .adminNav {
@@ -447,11 +454,7 @@
   font-weight: bold;
 }
 
-.news .content{
-  overflow-y: auto;
-  height: 80vh;
-  margin-left: 100px;
-}
+
 .customerLogin .content {
   height: 10vh;
   margin-left: 100px;
