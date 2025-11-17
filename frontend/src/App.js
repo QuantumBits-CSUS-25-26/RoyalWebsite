@@ -15,33 +15,48 @@ import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
 import CustomerLogin from './Pages/CustomerLogin';
+import {UiProvider} from './Components/ServicePopUp/UiContext';
+import ServiceBar from "./Components/ServicePopUp/ServicesBar";
+import SideNavbar from './Components/SideNavbar';
+import { useLocation } from 'react-router-dom';
+//{}      // originally: '<InfoBar /> {}'  , this throws error when running server, but fix no longer shows infobar
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
 
 
 function App() {
+  const location = useLocation();
+  const showSideNavBar = !location.pathname.startsWith('/admin');
   return (
-    <div className="App">
-      <Routes>
-        <Route path='/login' element={<CustomerLogin />} />
-        <Route path='/' element={<Homepage />} />
-        <Route path='/dashboard' element={<CustomerDashboard />} />
-        <Route path='/account-creation' element={<CustomerCreation />} />
-        <Route path='/appointments' element={<Appointments />} />
-        <Route path='/services' element={<Services />} />
-        <Route path="/service/:id" element={<ServiceDetail />} />
-        <Route path='/news' element={<News />} />
-        <Route path='/admin' element={<AdminDashboard />} />
-        <Route path='/admin/customers' element={<CustomerList />} />
-        <Route path='/admin/appointments' element={<AdminAppointments />} />
-        <Route path='/admin/services' element={<AdminServices />} />
-        <Route path='/admin/updates' element={<Updates />} />
-        <Route path='/admin/invoices' element={<Invoices />} />
-        <Route path='/admin/messages' element={<Messages />} />
-        <Route path='/admin/settings' element={<Settings />} />
-        <Route path='/admin/login' element={<Login />} />
-      </Routes>
-    </div>
+    <>
+      <UiProvider>
+        {showSideNavBar && <SideNavbar />}
+        <ServiceBar />
+        <InfoBar /> 
+        <div className="App">
+          <Routes>
+            <Route path='/login' element={<CustomerLogin />} />
+            <Route path='/' element={<Homepage />} />
+            <Route path='/dashboard' element={<CustomerDashboard />} />
+            <Route path='/account-creation' element={<CustomerCreation />} />
+            <Route path='/appointments' element={<Appointments />} />
+            <Route path='/services' element={<Services />} />
+            <Route path="/service/:id" element={<ServiceDetail />} />
+            <Route path='/news' element={<News />} />
+            <Route path='/admin' element={<AdminDashboard />} />
+            <Route path='/admin/customers' element={<CustomerList />} />
+            <Route path='/admin/appointments' element={<AdminAppointments />} />
+            <Route path='/admin/services' element={<AdminServices />} />
+            <Route path='/admin/updates' element={<Updates />} />
+            <Route path='/admin/invoices' element={<Invoices />} />
+            <Route path='/admin/messages' element={<Messages />} />
+            <Route path='/admin/settings' element={<Settings />} />
+            <Route path='/admin/login' element={<Login />} />
+          </Routes>
+        </div>
+      </UiProvider>
+    </>
+    
   );
 }
 
