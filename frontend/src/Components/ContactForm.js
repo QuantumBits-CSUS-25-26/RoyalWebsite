@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { validateContactForm } from './validateContactForm';
 
-const ContactForm = () => {
+const ContactForm = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     fname: '',
     lname: '',
@@ -11,6 +11,8 @@ const ContactForm = () => {
     responseRequested: false,
     currentCustomer: false
   });
+
+  const [mouseDownTarget, setMouseDownTarget] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -29,6 +31,22 @@ const ContactForm = () => {
       
       alert('Form submitted successfully!');
       
+      
+      if (onClose) {
+        onClose();
+      }
+      
+      
+      setFormData({
+        fname: '',
+        lname: '',
+        phone: '',
+        email: '',
+        message: '',
+        responseRequested: false,
+        currentCustomer: false
+      });
+      
     } else {
       
       const errorMessages = Object.values(validationErrors).join('\n');
@@ -37,11 +55,32 @@ const ContactForm = () => {
     }
   };
 
+  
+  if (!isOpen) return null;
+
+  const handleMouseDown = (e) => {
+    setMouseDownTarget(e.target);
+  };
+
+  // Only close if both mousedown and mouseup happen outside box thing
+  const handleMouseUp = (e) => {
+    if (e.target.className === 'contact-form-overlay' && 
+        mouseDownTarget?.className === 'contact-form-overlay') {
+      onClose();
+    }
+    setMouseDownTarget(null);
+  };
+
   return (
-    <div className="contact_form">
-      <div className="title">
-        Contact Us
-      </div>
+    <div 
+      className="contact-form-overlay" 
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+    >
+      <div className="contact_form">
+        <div className="title">
+          Contact Us
+        </div>
       <form onSubmit={handleSubmit}>
         <div className="content">
           <div className="entries">
@@ -118,6 +157,7 @@ const ContactForm = () => {
         Or call us at <a href="tel:+19255198710">(916) 562-9441</a><br />
         Find us at 2546 Tower Ave, Sacramento, CA 95825 <a href="https://maps.app.goo.gl/nhVarV8tpZaBLSLk8">Open in Maps</a>
       </p>
+      </div>
     </div>
   );
 }
