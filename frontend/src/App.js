@@ -21,6 +21,7 @@ import SideNavbar from './Components/SideNavbar';
 import { useLocation } from 'react-router-dom';
 //{}      // originally: '<InfoBar /> {}'  , this throws error when running server, but fix no longer shows infobar
 import ServiceDetail from './Pages/ServiceDetail';
+import CustomerCreation from './Pages/CustomerCreation';
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
             <Route path='/login' element={<CustomerLogin />} />
             <Route path='/' element={<Homepage />} />
             <Route path='/dashboard' element={<CustomerDashboard />} />
+            <Route path='/account-creation' element={<CustomerCreation />} />
             <Route path='/appointments' element={<Appointments />} />
             <Route path='/services' element={<Services />} />
             <Route path="/service/:id" element={<ServiceDetail />} />
