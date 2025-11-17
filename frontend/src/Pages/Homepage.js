@@ -4,7 +4,7 @@ import AboutServices from '../Components/AboutServices/AboutServices';
 import HeroSection from '../Components/HeroSection';
 import './Homepage.css';
 import Reviews from '../Components/Reviews';
-import ContactFooter from '../Components/Footer/ContactFooterr';
+import ContactFooter from '../Components/Footer/ContactFooter';
 import InfoBar from '../Components/InfoBar';
 
 
