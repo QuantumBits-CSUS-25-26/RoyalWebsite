@@ -19,7 +19,6 @@ import {UiProvider} from './Components/ServicePopUp/UiContext';
 import ServiceBar from "./Components/ServicePopUp/ServicesBar";
 import SideNavbar from './Components/SideNavbar';
 import { useLocation } from 'react-router-dom';
-//{}      // originally: '<InfoBar /> {}'  , this throws error when running server, but fix no longer shows infobar
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
 
@@ -32,7 +31,6 @@ function App() {
       <UiProvider>
         {showSideNavBar && <SideNavbar />}
         <ServiceBar />
-        <InfoBar /> 
         <div className="App">
           <Routes>
             <Route path='/login' element={<CustomerLogin />} />
