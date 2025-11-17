@@ -37,7 +37,7 @@
   }
 }
 .Header {
-  margin-top: 20px;
+  /* margin-top: 20px; */
   padding: 10px;
   text-align: center;
   text-indent: 40px;
@@ -63,6 +63,7 @@
 .Navbar .btn-group {
   position: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .Navbar .btn-group button {
@@ -131,9 +132,10 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+
 .admin-dashboard-content{
   margin-top: -800px;
-  margin-left: -40px;
+  margin-left: 5%;
 }
 
 .contact_form{
@@ -381,6 +383,13 @@
   margin-left: max(120px, 10%);
   margin-top: max(30px, 2%);
 }
+
+.news .content{
+  overflow-y: auto;
+  height: 80vh;
+  margin-left: 100px;
+}
+
 /* begin admin side bar */
 .adminNav {
   margin: 10px;
@@ -411,6 +420,23 @@
   background-color: #2F6DAB;
   color: white;
   box-shadow: none;
+}
+.service-nav-btn{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #2F6DAB;
+  width: 100%;
+  height: 100%;
+  color: white;
+  width: 100%;
+  padding: 5px;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  text-align: center;
+  border: none !important;
 }
 
 .adminApts {
@@ -473,15 +499,56 @@
   font-weight: bold;
 }
 
-.news .content{
-  overflow-y: auto;
-  height: 80vh;
-  margin-left: 100px;
-}
+
 .customerLogin .content {
   height: 10vh;
   margin-left: 100px;
 } 
+.services-drawer{
+  position: fixed;
+  left: 100px;
+  top: 20px;
+  height: 100vh; 
+  width: 250px;
+  background: #ffff;
+  z-index: 10;
+  
+  display: flex;
+  flex-direction: column;
+}
+.services-drawer-header{ 
+  color: #2F6DAB;
+  display: flex; 
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
+}
+.services-list{
+  overflow: auto;
+}
+.services-list li{
+  list-style: none;
+  padding: 5px 15px 5px 0px;
+  display: flex;
+  
+  
+}
+.service-list-buttons{
+  background-color: #2F6DAB;
+  border-radius: 5px;
+  width: 100%;
+  color: white;  
+  padding-right: 10px;
+  
+}
+.services-backdrop{
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  
+}
+
 
 .customerLogin .customerForm {
   background-color: #D9D9D9;
