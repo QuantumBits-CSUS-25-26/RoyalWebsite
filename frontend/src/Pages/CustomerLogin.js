@@ -14,12 +14,62 @@ const CustomerLogin = () => {
 
   const [ email, setEmail ] = useState('');
   const [ password, setPassword] = useState('');
+  const [ emailPlaceHolder, setEmailPlaceholder] = useState("Enter Email Here");
+  const [ passPlaceHolder, setPassPlaceholder] =  useState("Enter Password Here");
+  const [ emailError, setEmailError] = useState(false);
+  const [ passError, setPassError] = useState(false);
+
+  const validateEmail = (value) => {
+     if (!value) {
+      setEmailError(true);
+      return "Email is required.";
+     }
+     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+     if (!emailRegex.test(value)) {
+      setEmailError(true);
+      return "Please enter a valid email address.";
+     }
+     return "";
+  }
+
+  const validatePassword = (value) => {
+      if (!value) {
+        setPassError(true);
+        return "Password is required.";
+      }
+      if (value.length < 8) {
+        setPassError(true);
+        return "Password must be at least 8 characters.";
+      }
+      return "";
+  };
+
+  const handleClickNoAcc = () => {
+    navigate('/account-creation');
+  }
+
+  const handleClickLogin = async (e) => {
+    e.preventDefault();
+
+    const emailErrorMsg = validateEmail(email);
+    const passErrorMsg = validatePassword(password);
+
+    if (emailError){
+      setEmailPlaceholder(emailErrorMsg);
+      setEmail('');
+    }
+    if (passError){
+      setPassPlaceholder(passErrorMsg);
+      setPassword('');
+    }
+    
+  }
+
 
   const navigate = useNavigate();
 
   return (
     <div className="customerLogin">
-      <InfoBar />
       <Header />
       <SideNavbar />
       <div className="content">
@@ -32,7 +82,7 @@ const CustomerLogin = () => {
                 <Input
                   id="email"
                   name="email"
-                  placeholder="Enter Email Here"
+                  placeholder={emailPlaceHolder}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -43,7 +93,7 @@ const CustomerLogin = () => {
                 <Input
                   id="password"
                   name="password"
-                  placeholder="Enter Password Here"
+                  placeholder={passPlaceHolder}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -52,7 +102,7 @@ const CustomerLogin = () => {
               <Button
                 type="submit"
                 className='btn btn-lg my-4 py-4'
-                onClick={() => navigate('/dashboard')}
+                onClick={handleClickLogin}
               >
                   Log In
                 </Button>
@@ -60,7 +110,7 @@ const CustomerLogin = () => {
               <Button
                 type='btn'
                 className='btn btn-lg my-4 py-4'
-                onClick={() => navigate('/')}
+                onClick={handleClickNoAcc}
               >
                 Create New Account
               </Button>

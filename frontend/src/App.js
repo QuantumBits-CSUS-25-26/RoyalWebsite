@@ -16,6 +16,7 @@ import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
 import CustomerLogin from './Pages/CustomerLogin';
 import ServiceDetail from './Pages/ServiceDetail';
+import CustomerCreation from './Pages/CustomerCreation';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path='/login' element={<CustomerLogin />} />
         <Route path='/' element={<Homepage />} />
         <Route path='/dashboard' element={<CustomerDashboard />} />
+        <Route path='/account-creation' element={<CustomerCreation />} />
         <Route path='/appointments' element={<Appointments />} />
         <Route path='/services' element={<Services />} />
         <Route path="/service/:id" element={<ServiceDetail />} />
