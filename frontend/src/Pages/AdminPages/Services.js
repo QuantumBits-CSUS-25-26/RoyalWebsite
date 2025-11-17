@@ -1,5 +1,5 @@
 import AdminSideBar from "../../Components/AdminSideBar";
-const Services = () => {
+const AdminServices = () => {
   return (
     <div>
       <AdminSideBar />
@@ -8,4 +8,4 @@ const Services = () => {
   )
 }
 
-export default Services
+export default AdminServices

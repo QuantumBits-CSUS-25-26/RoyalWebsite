@@ -40,9 +40,9 @@
   margin-top: 20px;
   padding: 10px;
   text-align: center;
+  text-indent: 40px;
   background: #151F27;
   color: white;
-  font-size: 40px;
   width: 100%;
   background-image: url('/src/TopLeftLogo.png');
   background-position: top left;
@@ -351,6 +351,18 @@
   }
 }
 
+.news .title{
+  color: white;
+  background-color: #2F6DAB;
+  margin-left: max(120px, 10%);
+  margin-top: max(30px, 2%);
+}
+
+.news .content{
+  overflow-y: auto;
+  height: 80vh;
+  margin-left: 100px;
+}
 
 /* begin admin side bar */
 .adminNav {
@@ -461,6 +473,7 @@
   font-weight: bold;
 }
 
+
 .customerLogin .content {
   height: 10vh;
   margin-left: 100px;
@@ -510,3 +523,13 @@
   
 }
 
+
+.customerLogin .customerForm {
+  background-color: #D9D9D9;
+  margin-top: 10%;
+}
+
+.customerLogin .btn {
+  width: 40%;
+  background-color: #2F6DAB;
+}

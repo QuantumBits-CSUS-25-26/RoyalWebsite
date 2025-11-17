@@ -14,13 +14,14 @@ import Updates from './Pages/AdminPages/Updates';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
-import InfoBar from './Components/InfoBar'; 
 import CustomerLogin from './Pages/CustomerLogin';
 import {UiProvider} from './Components/ServicePopUp/UiContext';
 import ServiceBar from "./Components/ServicePopUp/ServicesBar";
 import SideNavbar from './Components/SideNavbar';
 import { useLocation } from 'react-router-dom';
 //{}      // originally: '<InfoBar /> {}'  , this throws error when running server, but fix no longer shows infobar
+import ServiceDetail from './Pages/ServiceDetail';
+
 
 function App() {
   const location = useLocation();
@@ -38,6 +39,7 @@ function App() {
             <Route path='/dashboard' element={<CustomerDashboard />} />
             <Route path='/appointments' element={<Appointments />} />
             <Route path='/services' element={<Services />} />
+            <Route path="/service/:id" element={<ServiceDetail />} />
             <Route path='/news' element={<News />} />
             <Route path='/admin' element={<AdminDashboard />} />
             <Route path='/admin/customers' element={<CustomerList />} />
