@@ -41,10 +41,12 @@ const SideNavbar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <button className='service-nav-btn' onClick={() => setServiceOpen(true)}>
-                  <img src={ServicesSvg} alt="ServicesImage" style={{ height:30, width:30}}/>
-                  Services
-                </button>
+                <NavLink className='nav-link' to='/services'>
+                  <button>
+                    <img src={ServicesSvg} alt="ServicesImage" style={{ height:30, width:30}}/>
+                    Services
+                  </button>
+                </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink className='nav-link' to='/news' onClick={() => setServiceOpen(false)}>
