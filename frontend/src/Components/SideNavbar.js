@@ -9,7 +9,9 @@ import { useUi } from './ServicePopUp/UiContext';
 import '../App.css';
 
 const SideNavbar = () => {
-  const { setServiceOpen } = useUi();
+  const { setServiceOpen, openServices } = useUi();
+
+
   return (
     <div className ="Navbar">
       <Navbar>
@@ -40,7 +42,9 @@ const SideNavbar = () => {
                   </button>
                 </NavLink>
               </NavItem>
-              <NavItem>
+              <NavItem
+                onMouseEnter={openServices}
+              >
                 <NavLink className='nav-link' to='/services'>
                   <button>
                     <img src={ServicesSvg} alt="ServicesImage" style={{ height:30, width:30}}/>

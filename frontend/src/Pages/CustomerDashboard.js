@@ -1,8 +1,6 @@
-import SideNavbar from "../Components/SideNavbar";
 const CustomerDashboard = () => {
   return (
     <div>
-      <SideNavbar />
       CustomerDashboard
     </div>
   )

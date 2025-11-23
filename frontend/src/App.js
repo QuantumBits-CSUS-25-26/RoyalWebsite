@@ -21,16 +21,21 @@ import SideNavbar from './Components/SideNavbar';
 import { useLocation } from 'react-router-dom';
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
+import InfoBar from './Components/InfoBar';
+import Header from './Components/Header';
 
 
 function App() {
   const location = useLocation();
-  const showSideNavBar = !location.pathname.startsWith('/admin');
+  const showSideNavBarAndInfo = !location.pathname.startsWith('/admin');
+  const showHeader = !location.pathname.startsWith('/admin') && location.pathname !=='/';
   return (
     <>
       <UiProvider>
-        {showSideNavBar && <SideNavbar />}
-        <ServiceBar />
+        {showSideNavBarAndInfo && <InfoBar />}
+        {showHeader && <Header />}
+        {showSideNavBarAndInfo && <SideNavbar />}
+        {showSideNavBarAndInfo && <ServiceBar />}
         <div className="App">
           <Routes>
             <Route path='/login' element={<CustomerLogin />} />

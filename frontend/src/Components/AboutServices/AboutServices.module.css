@@ -4,7 +4,7 @@
   align-items: flex-start;
   margin: 0;
   padding: 0;
-  background: #fff;
+  background-color: #f8f9fa;
   flex-shrink: 0;       
   gap: 0;               
 }

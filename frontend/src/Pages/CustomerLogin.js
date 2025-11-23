@@ -1,7 +1,3 @@
-import React from 'react';
-import SideNavbar from '../Components/SideNavbar';
-import Header from '../Components/Header';
-import InfoBar from '../Components/InfoBar';
 import './Homepage.css';
 import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
@@ -70,13 +66,11 @@ const CustomerLogin = () => {
 
   return (
     <div className="customerLogin">
-      <Header />
-      <SideNavbar />
       <div className="content">
         <Row className='justify-content-center'>
           <Col md='5' sm='2'>
             <Form className='customerForm fs-3 p-4'>
-              <div className='title my-4'>Account Login</div>
+              <div className=' my-4'>Account Login</div>
               <FormGroup className='mx-5 px-5 my-5 text-start'>
                 <Label for="email">Email</Label>
                 <Input

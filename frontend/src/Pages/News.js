@@ -1,9 +1,7 @@
-import React from 'react';
-import SideNavbar from "../Components/SideNavbar";
-import Header from '../Components/Header';
 import imageHoliday from './PlaceHolderNewsImages/Holiday.jpg';
 import imageLift from './PlaceHolderNewsImages/Lift.jpg';
 import './News.css';
+
 
 const sampleEntries = [
   {
@@ -52,14 +50,13 @@ const NewsItem = ({ entry }) => {
 const News = () => {
   return (
     <div className="news">
-      <Header />
-      <SideNavbar />
-      <div className="title">
-        News / Updates
-      </div>
-      <main className="news-list" aria-live="polite">
-        {sampleEntries.map(entry => <NewsItem key={entry.id} entry={entry} />)}
-      </main>
+        <div className="newsTitle" style={{ color: 'white' }}>
+          News / Updates
+        </div>
+        <main className="news-list" aria-live="polite">
+          {sampleEntries.map(entry => <NewsItem key={entry.id} entry={entry} />)}
+        </main>
+
     </div>
   )
 }

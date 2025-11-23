@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import '../../App.css';
 
 export default function ServicesBars(){
-    const {servicesOpen, setServiceOpen} = useUi();
+    const {servicesOpen, setServiceOpen, openServices, scheduleCloseServices} = useUi();
      const location = useLocation();
 
     useEffect(() => {
@@ -19,10 +19,20 @@ export default function ServicesBars(){
         if(servicesOpen) document.addEventListener('keydown', onKey);
         return() => document.removeEventListener('keydown', onKey);
     }, [servicesOpen, setServiceOpen]);
+
+    useEffect(() => {
+        if (!servicesOpen) return;
+
+        const timeoutId = setTimeout(() => {
+            setServiceOpen(false);
+        }, 2000);
+        return () => clearTimeout(timeoutId);
+    }, [servicesOpen, setServiceOpen])
+
     if (!servicesOpen) return null;
     return(
         <>
-            <aside className="services-drawer" role="dialog" aria-modal="true">
+            <aside className="services-drawer" role="dialog" aria-modal="true" onMouseEnter={openServices} onMouseLeave={scheduleCloseServices}>
                 <header className="services-drawer-header">
                     <h2>Services</h2>
                     <button onClick={() => setServiceOpen(false)}>✕</button>

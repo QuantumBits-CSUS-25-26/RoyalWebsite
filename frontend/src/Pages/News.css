@@ -4,6 +4,8 @@
   --muted: #f3f6fb;
   --card-bg: #ffffff;
   --radius: 10px;
+  background-color: #f8f9fa;
+
 }
 
 .news-list{
@@ -85,10 +87,3 @@
   }
 }
 
-.news > .title{
-  margin-left: max(120px, 10%);
-  margin-top: max(30px, 2%);
-  color: var(--dark);
-  font-weight: 600;
-  font-size: 20px;
-}

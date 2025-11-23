@@ -1,7 +1,8 @@
 .homepage {
   min-height: 100vh;
-  background: #fff;
+  background-color: #f8f9fa;
   color: #111;
+  margin-left: 100px;
 }
 
 .homepage-content {
