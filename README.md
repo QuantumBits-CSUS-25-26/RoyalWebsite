@@ -91,6 +91,18 @@ RoyalWebsite/
 └── README.md               # Project documentation
 ```
 
+
+## Images & Media
+Some screenshots to showcase the visual theme of the project.
+
+<img src="frontend/src/images/sshotHomepage.jpg" width="200" /> <img src="frontend/src/images/sshotAdminDash.jpg" width="200" />
+
+<img src="frontend/src/images/sshotHomepage2.jpg" width="200" /> <img src="frontend/src/images/sshotCustomerLogin.jpg" width="200" />
+
+The ERD for our project's handling of database entities.
+
+<img src="frontend/src/images/royalWebsiteERD.jpg" width="300" />
+
 ## Roadmap (Based on JIRA)
 
 | Sprint | Major Stories | Estimated Completion |
