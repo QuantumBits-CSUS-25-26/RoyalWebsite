@@ -91,7 +91,6 @@ RoyalWebsite/
 └── README.md               # Project documentation
 ```
 
-
 ## Images & Media
 Some screenshots to showcase the visual theme of the project.
 
