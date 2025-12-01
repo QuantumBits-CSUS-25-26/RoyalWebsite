@@ -67,6 +67,49 @@ The system uses React on the frontend and Django with a MySQL database on the ba
 **e. Customer messages**
 - View and send messages
 
+## Tech Stack
+
+The Royal Auto & Body Repair website is built using a modern full-stack architecture designed for maintainability, performance, and scalability.
+
+### Frontend
+
+**React 18**  
+- Component-based UI for both customer and admin portals  
+- Reusable layouts for services, vehicles, appointments, and dashboards  
+
+**Bootstrap 5**  
+- Ensures responsive and consistent styling across devices  
+
+**React Router**  
+- Provides smooth navigation between pages  
+
+**Create React App (CRA)**  
+- Handles bundling, compilation, hot reload, and the development server  
+- Organized folder structure for scalable growth  
+
+### Backend
+
+**Django Framework**  
+- REST-style endpoints powering all core features (authentication, profiles, vehicles, services, appointments, messages)  
+- Built-in security features such as CSRF protection and input validation  
+
+**Django Models + Views**  
+- Clean separation between business logic and data representation  
+
+### Database
+
+**MySQL**  
+- Relational database used for all persistent data  
+- Matches the ERD for customers, vehicles, services, appointments, and messages  
+
+### APIs / External Services
+
+**Google Reviews API (Free Tier)**  
+- Displays real customer reviews directly on the homepage  
+
+**Bootstrap CDN**  
+- Provides fast-loading UI components  
+
 ## Project Structure
 
 ```
