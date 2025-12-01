@@ -9,6 +9,24 @@ On the customer side, the site allows people to browse services, create an accou
 
 The system uses React on the frontend and Django with a MySQL database on the backend, with reusable UI components and divided client/admin portals to keep everything organized and easy to maintain. Overall, this project modernizes how Royal Auto & Body Repair interacts with its customers and helps streamline the day-to-day operations inside the shop.
 
+
+## Images & Media
+### Some screenshots to showcase the visual theme for the project.
+
+<img src="frontend/src/images/sshotHomepage.jpg" width="200" />
+
+<img src="frontend/src/images/sshotHomepage2.jpg" width="200" />
+
+<img src="frontend/src/images/sshotAdminDash.jpg" width="200" />
+
+<img src="frontend/src/images/sshotCustomerLogin.jpg" width="200" />
+
+### The ERD for our project's handling of database entities.
+
+<img src="frontend/src/images/royalWebsiteERD.jpg" width="300" />
+
+
+
 ## Roadmap (Based on JIRA)
 | Sprint | Major Stories | Estimated Completion |
 |--------|----------------|-----------------------|
