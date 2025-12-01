@@ -3,6 +3,7 @@
 <img src="frontend/src/images/logo.png" width="200" />
 
 ## Synopsis
+
 The Royal Auto & Body Repair Website is a full-stack web application built to bring the shop’s services and operations online. Right now, the business has no website at all, so our goal is to create a modern, easy-to-use platform that improves both the customer experience and the workflow for the shop’s staff.
 
 On the customer side, the site allows people to browse services, create an account, manage their vehicles, and schedule appointments directly online. For staff, the admin dashboard provides secure tools to view and update customer profiles, track upcoming appointments, manage service descriptions, post shop updates, and handle customer messages, all in one place.
@@ -66,8 +67,32 @@ The system uses React on the frontend and Django with a MySQL database on the ba
 **e. Customer messages**
 - View and send messages
 
+## Project Structure
+
+```
+RoyalWebsite/
+├── backend/
+│   ├── backend/            # Django project configuration (settings, urls, wsgi, asgi)
+│   ├── core/               # Main Django app (views, models, admin, etc.)
+│   ├── manage.py           # Django management script
+│   └── requirements.txt    # Python dependencies for backend
+│
+├── frontend/
+│   ├── public/             # Base HTML template and static assets
+│   └── src/
+│       ├── Components/     # Reusable React components
+│       ├── Pages/          # Top-level React pages (routing targets)
+│       ├── images/         # Frontend images (logos, graphics)
+│       ├── App.js          # Main React component
+│       ├── App.css         # Global styles
+│       ├── index.js        # React entry point
+│       └── index.css       # Base CSS styling
+│
+└── README.md               # Project documentation
+```
 
 ## Roadmap (Based on JIRA)
+
 | Sprint | Major Stories | Estimated Completion |
 |--------|----------------|-----------------------|
 | Sprint 5 | Customer account creation | 02/07/26 |
@@ -83,6 +108,7 @@ The system uses React on the frontend and Django with a MySQL database on the ba
 ## Deployment
 
 ## Team Members
+
  MadelynAnne Kirkman\
  Najaf Ali Mohammady\
  Erik Contreras\
@@ -93,6 +119,7 @@ The system uses React on the frontend and Django with a MySQL database on the ba
  David Meltonyan
 
  ## License
+
  This project is proprietary, and the property of Royal Auto and Body Repair.
  The dev team maintains nominal ownership of the project until end of development.
  The CSUS Computer Science Department reserves the right to use the documentation and product as examples of student work.
