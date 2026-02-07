@@ -23,6 +23,7 @@ import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
 // import InfoBar from './Components/InfoBar';
 import Header from './Components/Header';
+import CustomerUpdate from './Pages/CustomerUpdate';
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
             <Route path='/' element={<Homepage />} />
             <Route path='/dashboard' element={<CustomerDashboard />} />
             <Route path='/account-creation' element={<CustomerCreation />} />
+            <Route path='/account-update' element={<CustomerUpdate />} />
             <Route path='/appointments' element={<Appointments />} />
             <Route path='/services' element={<Services />} />
             <Route path="/service/:id" element={<ServiceDetail />} />
