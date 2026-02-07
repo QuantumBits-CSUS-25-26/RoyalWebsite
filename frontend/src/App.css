@@ -591,13 +591,26 @@
 }
 
 /* begin customer update */
-.customerUpdate .content {
+.customerUpdate .title {
   height: 10vh;
   margin-left: 100px;
 } 
-
 .customerUpdate .updateForm {
   background-color: #D9D9D9;
-  margin-top: 10%;
+  margin-top: 0%;
 }
-
+.customerUpdate .container {
+  display: flex;
+}
+.customerUpdate .contentRight {
+  height: 20vh;
+  width: 100vh;
+}
+.customerUpdate .contentLeft {
+  height: 20vh;
+  width: 100vh;
+}
+.customerUpdate .btn {
+  width: 40%;
+  background-color: #2F6DAB;
+}
