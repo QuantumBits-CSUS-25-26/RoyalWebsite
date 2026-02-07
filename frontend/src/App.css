@@ -120,8 +120,11 @@
   transition: background-color 0.3s ease;
 }
 
-
-
+@media (min-width: 600px) and (max-width: 1024px) {
+  .HeroBookingButton {
+      font-size: 30px;
+  }
+}
 /* begin contact form */
 .contact_form{
   background: #fff;
