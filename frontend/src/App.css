@@ -593,6 +593,15 @@
   margin-top: 10%;
 }
 
+.customerDashboard button{
+  background-color: #2F6DAB;
+  color: white;
+  border-width: 0px;
+  border-radius: 5px;
+  padding: 1.5%;
+  cursor: pointer;
+}
+
 /* begin customer update */
 .customerUpdate .title {
   height: 10vh;
