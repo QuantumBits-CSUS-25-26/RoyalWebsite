@@ -17,11 +17,11 @@ import Settings from './Pages/AdminPages/Settings';
 import CustomerLogin from './Pages/CustomerLogin';
 import {UiProvider} from './Components/ServicePopUp/UiContext';
 import ServiceBar from "./Components/ServicePopUp/ServicesBar";
-// import SideNavbar from './Components/SideNavbar';
+import SideNavbar from './Components/SideNavbar';
 import { useLocation } from 'react-router-dom';
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
-// import InfoBar from './Components/InfoBar';
+import InfoBar from './Components/InfoBar';
 import Header from './Components/Header';
 import CustomerUpdate from './Pages/CustomerUpdate';
 
@@ -33,9 +33,9 @@ function App() {
   return (
     <>
       <UiProvider>
-        {/* {showSideNavBarAndInfo && <InfoBar />} */}
+        {showSideNavBarAndInfo && <InfoBar />}
         {showHeader && <Header />}
-        {/* {showSideNavBarAndInfo && <SideNavbar />} */}
+        {showSideNavBarAndInfo && <SideNavbar />}
         {showSideNavBarAndInfo && <ServiceBar />}
         <div className="App">
           <Routes>
