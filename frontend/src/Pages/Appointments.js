@@ -1,7 +1,10 @@
+import React from 'react'
+import AppStepOne from './AppointmentComponents/AppStepOne'
+
 const Appointments = () => {
   return (
     <div>
-      Appointments
+      <AppStepOne />
     </div>
   )
 }
