@@ -10,11 +10,23 @@ const CustomerDashboard = () => {
   
   return (
     <div className="customerDashboard">
+      <div className="hero-overlay" aria-hidden="true" />
       <div className="content">
         <Row className='justify-content-center'>
           <Col md='10' sm='2'>
             <Form className='updateForm fs-3 p-4'>
-              <div className=' my-4'>Account Info</div>
+              <Button
+                type='button'
+                className='btn btn-lg py-4'
+              >
+                Account Info
+              </Button>
+              <Button
+                type='button'
+                className='btn btn-lg py-4'
+              >
+                Book an Appointment
+              </Button>
             </Form>
           </Col>
         </Row>
