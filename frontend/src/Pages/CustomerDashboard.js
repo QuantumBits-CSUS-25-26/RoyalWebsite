@@ -176,7 +176,7 @@ const CustomerDashboard = () => {
                       Book an Appointment
                     </Button>
                   </Row>
-                  <Row>
+                  <Row className="mb-4">
                     {!showAppointments && (
                       <Button
                         className="appSummBtn btn-lg py-4"
@@ -197,6 +197,11 @@ const CustomerDashboard = () => {
                         />
                       </div>
                     )}
+                  </Row>
+                  <Row className="mb-4">
+                    <Button type="button" className="btn btn-lg py-4">
+                      New Vehicle
+                    </Button>
                   </Row>
                 </Col>
               </Row>
