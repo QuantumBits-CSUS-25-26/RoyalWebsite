@@ -10,7 +10,7 @@ const AppStepOne = () => {
 
     return (
         <div className="app-step-one">
-            <h1>Step 1. Vehicle Information</h1>
+            <h1>Vehicle Information</h1>
 
             <div className="vehicle-card">
                 <div className="vehicle-form">
