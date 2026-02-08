@@ -585,16 +585,14 @@
 /* begin customer dashboard */
 .customerDashboard {
   min-height: 100vh;
+  height: auto;
   background-image: url('./images/HeroImage.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
-  color: #fff;
+  background-size: 100% auto;  
+  background-repeat: repeat-y;  
+  background-position: top center;
 }
 
 .customerDashboard .content {
-  height: 10vh;
   margin-left: 100px;
   position: relative;
   z-index: 2;
@@ -603,27 +601,110 @@
 .customerDashboard .updateForm {
   --dashboard-btn-height: 72px;
   background-color: rgba(217, 217, 217, 0.8);
-  margin-top: 10%;
+  margin-top: 5%;
+  margin-bottom: 5%;
   border-radius: 16px;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: calc(var(--dashboard-btn-height) / 2);
 }
 
+.customerDashboard .info{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #2f6dab66;
+  width: 80%;
+  color: black;
+  border-radius: 16px;
+  align-items: center;
+  font-size: x-large;
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.customerDashboard .info .info-text{
+  padding: 1.5%;
+  font-size: large;
+  color: black;
+  background-color: #ffffff66;
+  border-radius: 8px;
+  padding: 2% 4%;
+  box-shadow:
+    0 12px 30px #00000033,
+    0 4px 12px #00000026;
+}
+
+.customerDashboard .apptsPlateLabel{
+  font-weight: bold;
+}
+
+.customerDashboard .apptText {
+  font-size: medium;
+  color: black;
+  display: inline-flex;
+  white-space: nowrap;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  padding-top: 12px; 
+  margin-top: 12px;
+}
+
+.customerDashboard .plateText {
+  font-size: medium;
+  color: black;
+  display: block;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  padding-top: 12px;   
+  margin-top: 12px;
+}
+
+.customerDashboard .vehiclesCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.customerDashboard .vehiclesCol > * {
+  width: 100%;
+  display: block;
+}
+
+.customerDashboard .vehiclesRow {
+  --bs-gutter-x: 0;      
+  justify-content: space-between;
+  width: 100%;
+}
+
+.customerDashboard .vehiclesRow > [class*="col"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.customerDashboard .buttonsCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: -5%;
+}
+
 .customerDashboard .btn {
-  width: 70%;
-  max-width: 420px;
-  min-height: var(--dashboard-btn-height);
+  width: 60%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   background-color: #2F6DAB;
+  color:white;
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .customerDashboard button{
   background-color: #2F6DAB;
   color: white;
   border-width: 0px;
-  border-radius: 5px;
+  border-radius: 16px;
   padding: 1.5%;
+  width: 60%;
   cursor: pointer;
 }
 
@@ -662,12 +743,13 @@
 .appointment-page{
   align-items: center;
   padding-bottom:1%;
-  /* justify-content: center; */
 }
 .appSummBtn{
-  margin: 3%;
   color:white;
   background-color: #2f6dab;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 .appointment-page-overlay{
   margin: 3% 0 3% 0;
@@ -696,6 +778,7 @@
 .appointments-table tbody td {
   padding: 10px;
   border-bottom: 1px solid #eaeaea;
+  font-size: medium;
 }
 .appointments-table tbody tr:last-child td {
   border-bottom: none;
