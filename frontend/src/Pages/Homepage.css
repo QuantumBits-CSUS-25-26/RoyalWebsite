@@ -14,3 +14,9 @@
   box-sizing: border-box;
   overflow: hidden;
 }
+
+@media screen and (max-width: 1024px) {
+  .homepage {
+    margin-left: 0px;
+  }
+}

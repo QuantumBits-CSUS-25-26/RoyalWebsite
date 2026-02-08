@@ -37,6 +37,14 @@
     padding: 0;
 }
 
+@media (max-width: 1024px) {
+    .textblock{
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        }
+}
+
 .text{
     font-family: "Poppins", Helvetica, sans-serif;
     font-size: 1.2rem;
@@ -45,6 +53,37 @@
     margin-right: 50px;
     text-align: center;
     line-height: normal;
+}
+
+.phone{
+    margin-left: 50px;
+}
+
+.mobileBreakpoint{
+    display: none;
+}
+
+.pipe{
+    display: inline;
+}
+
+@media (max-width: 767px) {
+    .phone{
+        margin-left: 0px;
+        }
+    .text{
+        margin-right: 0px;
+        }
+    .pipe{
+        display: none;
+    }
+    .mobileBreakpoint{
+        display: block;
+    }
+    .mobileSpacing{
+        display: block;
+        margin-top:10px;
+    }
 }
 
 
@@ -72,4 +111,16 @@
     height: 24px;
     color: white;
     margin-right: 10px;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .footer{
+        width: 75%;
+        align-self: stretch;
+    }
+    .textblock { align-items: center; }
+    .text { 
+        text-align: center; 
+        margin: 0;
+    }
 }

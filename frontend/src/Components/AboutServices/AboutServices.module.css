@@ -22,6 +22,17 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 1024px) {
+  .aboutServices {
+    flex-direction: column-reverse;
+  }
+  .image {
+    width: 100%;
+    height: auto;
+    min-height: none;
+  }
+}
+
 .rightSide {
   flex: 1;
   display: flex;
@@ -67,12 +78,14 @@
 
 .description {
   font-family: "Poppins", Helvetica, sans-serif;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
   color: #151f27;
   text-align: center;
   max-width: 1000px;
-  margin: 80px;   
+  margin: clamp(40px, 5vw, 80px);   
 }
+
+
 
 .viewServicesButton {
   background-color: #2f6dab;

@@ -26,8 +26,8 @@ const ContactFooter = () => {
     <div className="footer mx-auto">
       <footer className='box' role="contentinfo" aria-label="Contact us footer">
         <h3 className='contactUsTitle'>Contact Us</h3>
-        <div>
-          <span className='text' style={{marginLeft: '50px'}}>
+        <div className='textblock'>
+          <span className='text phone'>
             <img src={PhoneSVG} className='icon' alt="" aria-hidden="true" />
             (916) 562-9441
           </span>
@@ -37,7 +37,10 @@ const ContactFooter = () => {
           </span>
           <span className='text'>
             <FontAwesomeIcon icon={faClock} className="icon" />
-            Monday - Friday: 8AM - 5PM | Saturday: 9AM - 4PM
+            Monday - Friday: 8AM - 5PM
+            <span className="pipe"> | </span>
+            <br className="mobileBreakpoint" />
+            <span className="mobileSpacing">Saturday: 9AM - 4PM</span>
           </span>
         </div>
         <button
