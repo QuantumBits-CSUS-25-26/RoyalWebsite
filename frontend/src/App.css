@@ -885,6 +885,7 @@
 /* =========================
    MOBILE RESPONSIVE FIXES
    ========================= */
+
 @media (max-width: 768px) {
 
   /* General reset */
@@ -986,6 +987,7 @@
 
   table {
     min-width: 600px;
+    
   }
 
 }
