@@ -881,3 +881,111 @@
     color: #374151;
   }
 }
+
+/* =========================
+   MOBILE RESPONSIVE FIXES
+   ========================= */
+@media (max-width: 768px) {
+
+  /* General reset */
+  body, html {
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .Header {
+    text-indent: 0;
+    background-position: center;
+    text-align: center;
+  }
+
+  /* SIDE NAVBAR */
+  .Navbar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .Navbar .btn-group {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .Navbar .btn-group button {
+    margin-left: 0;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* REMOVE LEFT OFFSETS */
+  .news,
+  .news .content,
+  .customerDashboard .content,
+  .customerLogin .content,
+  .customer-creation .content {
+    margin-left: 0;
+  }
+
+  /* HERO */
+  .hero {
+    height: auto;
+    padding: 3rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  /* CONTACT FORM */
+  .contact_form {
+    width: 90%;
+    min-width: unset;
+    min-height: unset;
+    height: auto;
+  }
+
+  /* ADMIN DASHBOARD */
+  .admin-dashboard-content,
+  .adminServices,
+  .adminCustomers,
+  .adminApts,
+  .updates,
+  .messages,
+  .settings,
+  .invoices {
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  .admin-totals {
+    flex-direction: column;
+    margin-left: 0;
+  }
+
+  .admin-content {
+    margin-left: 0;
+  }
+
+  /* CUSTOMER DASHBOARD */
+  .customerDashboard .info {
+    width: 95%;
+    font-size: medium;
+  }
+
+  .customerDashboard .btn {
+    width: 90%;
+  }
+
+  /* TABLES */
+  .table-wrapper,
+  .rc-customer-table {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+}
