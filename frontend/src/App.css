@@ -732,6 +732,84 @@
   width: 40%;
   background-color: #2F6DAB;
 }
+
+.contact-info-header{
+  display: flex;
+  justify-content: center;
+}
+.step-4-title{
+  color: white;
+  background-color:#2F6DAB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1vh;
+  padding: 0;
+}
+.contact-info{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.5vw
+}
+.contact-info .contact-info-content{
+  /* display:flex;
+  flex-direction: column; */
+  align-items: center;
+  width: 75%;
+  margin-top: 3vh;
+  background-color: #D9D9D9;
+  padding-bottom: 3vh;
+  padding-left: 2vh;
+  padding-right: 2vh;
+}
+.contact-info .contact-info-content .form{
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: auto auto;
+  padding-bottom: 2vh;
+  gap: 3%;
+}
+.contact-info .contact-info-content .form .entries{
+  text-align: left;
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-top: 3vh;
+}
+.contact-info-input{
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  line-height:inherit;
+
+}
+.notif-check-boxes{
+  margin-top: 3vh;
+  font-size: 1.5vw;
+  padding-right: 3%;
+}
+.notif-header{
+  font-size: 3vh;
+}
+.notif-check-boxes label{
+  margin-left: 3vh;
+}
+.form .entries{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  
+}
+.contact-info-sbmt-btn{
+  margin-top: auto;
+  align-self: flex-end;
+  color: white;
+  background-color: #2F6DAB;
+  padding: 1vh;
+}
+.notif-check-boxes input[type="checkbox"]{
+  transform: scale(1.4);
+  margin-right: 1vh;
 .table-wrapper {
   margin: 2% 4% 1% 4%;
   max-height: 50%;
