@@ -1,5 +1,9 @@
 import React, {useState} from 'react';
 import ContactInfoS4 from "../Components/ContactInfoS4";
+import React from 'react'
+import AppStepOne from './AppointmentComponents/AppStepOne'
+import AppStepThree from './AppointmentComponents/AppStepThree'
+
 const Appointments = () => {
   const [contactInfo, setContactInfo] = useState({
     fname:'',
@@ -25,12 +29,14 @@ const Appointments = () => {
   return (
     <div>
       Appointments
+      <AppStepOne />
+      <AppStepThree />
       <ContactInfoS4 
-        contactInfo={contactInfo}
-        onFieldChange={handleFieldChange}
-        onNotifChange={handleNotifChange}
-        onSubmit={handleSubmit}
-        />
+          contactInfo={contactInfo}
+          onFieldChange={handleFieldChange}
+          onNotifChange={handleNotifChange}
+          onSubmit={handleSubmit}
+          />
     </div>
   )
 }

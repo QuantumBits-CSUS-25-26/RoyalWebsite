@@ -1,0 +1,52 @@
+
+.app-step-one {
+	display: flex;
+	flex-direction: column;
+	align-items: center; 
+}
+
+.app-step-one h1 {
+	text-align: center;
+}
+
+.vehicle-form {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 12px 24px;
+ 	max-width: 960px; 
+ 	margin: 20px auto; 
+}
+
+.vehicle-card {
+ 	background: #2F6DAB;
+ 	padding: 28px 28px; 
+ 	border-radius: 14px; 
+ 	box-shadow: 0 8px 24px rgba(16,24,40,0.06);
+ 	border: 1px solid rgba(16,24,40,0.04);
+ 	width: 100%;
+ 	max-width: 1000px; 
+ 	box-sizing: border-box;
+}
+
+.vehicle-form label {
+	display: flex;
+	flex-direction: column;
+	font-size: 24px;
+	color: #ffffff;
+}
+
+.vehicle-form input {
+ 	margin-top: 6px;
+ 	padding: 14px 16px; 
+ 	border: 1px solid #ccc;
+ 	border-radius: 8px;
+ 	font-size: 16px; 
+ 	min-height: 52px; 
+ 	width: 100%; 
+}
+
+@media (max-width: 600px) {
+	.vehicle-form {
+		grid-template-columns: 1fr;
+	}
+}
