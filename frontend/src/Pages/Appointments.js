@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import ContactInfoS4 from "../Components/ContactInfoS4";
-import React from 'react'
 import AppStepOne from './AppointmentComponents/AppStepOne'
 import AppStepThree from './AppointmentComponents/AppStepThree'
 

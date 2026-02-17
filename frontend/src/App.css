@@ -807,187 +807,200 @@
   background-color: #2F6DAB;
   padding: 1vh;
 }
-.notif-check-boxes input[type="checkbox"]{
+.notif-check-boxes input[type="checkbox"] {
   transform: scale(1.4);
   margin-right: 1vh;
-.table-wrapper {
-  margin: 2% 4% 1% 4%;
-  max-height: 50%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 8px;
-  background: #fff;
-}
-.appointment-page{
-  align-items: center;
-  padding-bottom:1%;
-}
-.appSummBtn{
-  color:white;
-  background-color: #2f6dab;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-.appointment-page-overlay{
-  margin: 3% 0 3% 0;
-  inset: 0;
-  background: #2f6dab;
-  border-radius: 1rem;
-}
-.AppSummTtl{
-  color: white;
-}
-.appointments-table {
-  width: 100%;
-  border-collapse: collapse;
-}
 
-.appointments-table thead th {
-  position: sticky;
-  top: 0;
-  background: #f9fafb;
-  z-index: 2;
-  padding: 12px 10px;
-  border-bottom: 2px solid #e6e6e6;
-  text-align: center;
-}
+  .table-wrapper {
+    margin: 2% 4% 1% 4%;
+    max-height: 50%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    background: #fff;
+  }
 
-.appointments-table tbody td {
-  padding: 10px;
-  border-bottom: 1px solid #eaeaea;
-  font-size: medium;
-}
-.appointments-table tbody tr:last-child td {
-  border-bottom: none;
-}
+  .appointment-page {
+    align-items: center;
+    padding-bottom: 1%;
+  }
 
-/* responsive: stack cells on very small screens (optional) */
-@media (max-width: 520px) {
-  .appointments-table thead { display: none; }
-  .appointments-table, .appointments-table tbody, .appointments-table tr, .appointments-table td {
+  .appSummBtn {
+    color: white;
+    background-color: #2f6dab;
     display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .appointment-page-overlay {
+    margin: 3% 0 3% 0;
+    inset: 0;
+    background: #2f6dab;
+    border-radius: 1rem;
+  }
+
+  .AppSummTtl {
+    color: white;
+  }
+
+  .appointments-table {
     width: 100%;
-  }
-  .appointments-table td {
-    box-sizing: border-box;
-    padding: 8px 12px;
-  }
-  .appointments-table td::before {
-    content: attr(data-label);
-    display: block;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: #374151;
-  }
-}
-
-/* =========================
-   MOBILE RESPONSIVE FIXES
-   ========================= */
-
-@media (max-width: 768px) {
-
-  /* General reset */
-  body, html {
-    overflow-x: hidden;
+    border-collapse: collapse;
   }
 
-  /* HEADER */
-  .Header {
-    text-indent: 0;
-    background-position: center;
+  .appointments-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f9fafb;
+    z-index: 2;
+    padding: 12px 10px;
+    border-bottom: 2px solid #e6e6e6;
     text-align: center;
   }
 
-  /* SIDE NAVBAR */
-  .Navbar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    display: flex;
-    justify-content: center;
-  }
-
-  .Navbar .btn-group {
-    flex-direction: row;
-    width: 100%;
-  }
-
-  .Navbar .btn-group button {
-    margin-left: 0;
-    font-size: 14px;
+  .appointments-table tbody td {
     padding: 10px;
-  }
-
-  /* REMOVE LEFT OFFSETS */
-  .news,
-  .news .content,
-  .customerDashboard .content,
-  .customerLogin .content,
-  .customer-creation .content {
-    margin-left: 0;
-  }
-
-  /* HERO */
-  .hero {
-    height: auto;
-    padding: 3rem 1rem;
-  }
-
-  .hero-title {
-    font-size: 32px;
-  }
-
-  /* CONTACT FORM */
-  .contact_form {
-    width: 90%;
-    min-width: unset;
-    min-height: unset;
-    height: auto;
-  }
-
-  /* ADMIN DASHBOARD */
-  .admin-dashboard-content,
-  .adminServices,
-  .adminCustomers,
-  .adminApts,
-  .updates,
-  .messages,
-  .settings,
-  .invoices {
-    margin-top: 0;
-    margin-left: 0;
-  }
-
-  .admin-totals {
-    flex-direction: column;
-    margin-left: 0;
-  }
-
-  .admin-content {
-    margin-left: 0;
-  }
-
-  /* CUSTOMER DASHBOARD */
-  .customerDashboard .info {
-    width: 95%;
+    border-bottom: 1px solid #eaeaea;
     font-size: medium;
   }
 
-  .customerDashboard .btn {
-    width: 90%;
+  .appointments-table tbody tr:last-child td {
+    border-bottom: none;
   }
 
-  /* TABLES */
-  .table-wrapper,
-  .rc-customer-table {
-    overflow-x: auto;
+  /* responsive: stack cells on very small screens (optional) */
+  @media (max-width: 520px) {
+    .appointments-table thead {
+      display: none;
+    }
+
+    .appointments-table, .appointments-table tbody, .appointments-table tr, .appointments-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .appointments-table td {
+      box-sizing: border-box;
+      padding: 8px 12px;
+    }
+
+    .appointments-table td::before {
+      content: attr(data-label);
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #374151;
+    }
   }
 
-  table {
-    min-width: 600px;
-    
-  }
+  /* =========================
+     MOBILE RESPONSIVE FIXES
+     ========================= */
 
+  @media (max-width: 768px) {
+
+    /* General reset */
+    body, html {
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    .Header {
+      text-indent: 0;
+      background-position: center;
+      text-align: center;
+    }
+
+    /* SIDE NAVBAR */
+    .Navbar {
+      position: relative;
+      width: 100%;
+      height: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .Navbar .btn-group {
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .Navbar .btn-group button {
+      margin-left: 0;
+      font-size: 14px;
+      padding: 10px;
+    }
+
+    /* REMOVE LEFT OFFSETS */
+    .news,
+    .news .content,
+    .customerDashboard .content,
+    .customerLogin .content,
+    .customer-creation .content {
+      margin-left: 0;
+    }
+
+    /* HERO */
+    .hero {
+      height: auto;
+      padding: 3rem 1rem;
+    }
+
+    .hero-title {
+      font-size: 32px;
+    }
+
+    /* CONTACT FORM */
+    .contact_form {
+      width: 90%;
+      min-width: unset;
+      min-height: unset;
+      height: auto;
+    }
+
+    /* ADMIN DASHBOARD */
+    .admin-dashboard-content,
+    .adminServices,
+    .adminCustomers,
+    .adminApts,
+    .updates,
+    .messages,
+    .settings,
+    .invoices {
+      margin-top: 0;
+      margin-left: 0;
+    }
+
+    .admin-totals {
+      flex-direction: column;
+      margin-left: 0;
+    }
+
+    .admin-content {
+      margin-left: 0;
+    }
+
+    /* CUSTOMER DASHBOARD */
+    .customerDashboard .info {
+      width: 95%;
+      font-size: medium;
+    }
+
+    .customerDashboard .btn {
+      width: 90%;
+    }
+
+    /* TABLES */
+    .table-wrapper,
+    .rc-customer-table {
+      overflow-x: auto;
+    }
+
+    table {
+      min-width: 600px;
+
+    }
+
+  }
 }
