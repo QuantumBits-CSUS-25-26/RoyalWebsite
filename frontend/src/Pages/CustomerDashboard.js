@@ -82,6 +82,19 @@ const CustomerDashboard = () => {
       paymentStatus: "Paid",
     },
   ];
+  const serviceHistory = [
+    {
+      service: "Brake Inspection",
+      date: "17/2/2026",
+      cost: "$20",
+    },
+    {
+      service: "Oil Change",
+      date: "17/2/2026",
+      cost: "$17",
+    },
+  ];
+
 
   const navigate = useNavigate();
   const handleClickUpdateInfo = () => {
@@ -164,6 +177,65 @@ const CustomerDashboard = () => {
                       </div>
                     </FormGroup>
                   </div>
+                  <div className="info text-start px-5 py-4 mb-5">
+                    <FormGroup>
+                      <Label>Service History:</Label>
+
+                      <div className="info-text">
+                        <Row className="vehiclesRow">
+                          {/* Service Column */}
+                          <Col md="3" sm="6" className="vehiclesCol">
+                            <div className="apptsPlateLabel">Service</div>
+                            {serviceHistory.map((item, index) => (
+                                <div className="plateText" key={`service-${index}`}>
+                                  {item.service}
+                                </div>
+                            ))}
+                          </Col>
+
+                          {/* Date Column */}
+                          <Col md="3" sm="6" className="vehiclesCol">
+                            <div className="apptsPlateLabel">Date</div>
+                            {serviceHistory.map((item, index) => (
+                                <div className="plateText" key={`date-${index}`}>
+                                  {item.date}
+                                </div>
+                            ))}
+                          </Col>
+
+                          {/* Cost Column */}
+                          <Col md="3" sm="6" className="vehiclesCol">
+                            <div className="apptsPlateLabel">Cost</div>
+                            {serviceHistory.map((item, index) => (
+                                <div className="plateText" key={`cost-${index}`}>
+                                  {item.cost}
+                                </div>
+                            ))}
+                          </Col>
+                        </Row>
+                      </div>
+
+                      {/* Pagination */}
+                      <div className="info-text mt-2">
+                        <Row className="vehiclesRow">
+                          <div className="pagination">
+                            <button>&laquo;</button>
+                            {[1, 2, 3, 4].map((page) => (
+                                <button
+                                    key={page}
+                                    className={page === 2 ? "active" : ""}
+                                >
+                                  {page}
+                                </button>
+                            ))}
+                            <button>&raquo;</button>
+                          </div>
+                        </Row>
+                      </div>
+                    </FormGroup>
+                  </div>
+
+
                 </Col>
                 <Col md="6" sm="12" className="buttonsCol">
                   <Row className="mb-4">
