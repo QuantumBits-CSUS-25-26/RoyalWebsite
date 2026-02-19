@@ -2,7 +2,7 @@ import { Navbar, Container, NavItem, Nav, NavbarBrand, Button } from 'reactstrap
 import { NavLink } from 'react-router-dom';
 import Logo from '../images/logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGaugeSimpleHigh, faUsers, faScrewdriverWrench, faBullhorn, faFileInvoiceDollar, faEnvelope, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faGaugeSimpleHigh, faUsers, faScrewdriverWrench, faFileInvoiceDollar, faEnvelope, faUsersGear } from '@fortawesome/free-solid-svg-icons';
 import { faCalendarCheck } from '@fortawesome/free-regular-svg-icons';
 
 const AdminSideBar = () => {
@@ -42,13 +42,6 @@ const AdminSideBar = () => {
                             </Button>
                         </NavLink>
                     </NavItem>
-                    <NavItem>
-                        <NavLink className='nav-link' to='/admin/updates'>
-                            <Button type='btn' className='navButton'>
-                                 <FontAwesomeIcon icon={faBullhorn} /> Updates
-                            </Button>
-                        </NavLink>
-                    </NavItem>
                          <NavItem>
                     <NavLink className='nav-link' to='/admin/invoices'>
                             <Button type='btn' className='navButton'>
@@ -64,9 +57,9 @@ const AdminSideBar = () => {
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink className='nav-link' to='/admin/settings'>
+                        <NavLink className='nav-link' to='/admin/management'>
                             <Button type='btn' className='navButton' >
-                                <FontAwesomeIcon icon={faGear}/> Settings
+                                <FontAwesomeIcon icon={faUsersGear}/>Employee Management
                             </Button>
                         </NavLink>
                     </NavItem>

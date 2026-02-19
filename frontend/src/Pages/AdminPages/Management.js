@@ -1,12 +1,12 @@
 import AdminSideBar from "../../Components/AdminSideBar";
 
-const Settings = () => {
+const Management = () => {
   return (
     <div>
       <AdminSideBar />
-      <div className='settings'>Settings</div>
+      <div className='management'>Management</div>
     </div>
   )
 }
 
-export default Settings
+export default Management
