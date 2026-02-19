@@ -1,9 +1,11 @@
-Django>=5.0
+Django>=5.0,<6.0
 djangorestframework
 djangorestframework-simplejwt
 python-dotenv
 requests
+django-cors-headers
 
 # sql api drivers:
 #mysqlclient
 pymysql
+cryptography
