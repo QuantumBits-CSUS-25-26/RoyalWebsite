@@ -1,11 +1,13 @@
 import React from "react";
 import styles from "./AboutServices.module.css";
-import mechanicImg from "./AboutServicesAssets/stockMechanicImage.jpeg"; 
-import {useUi} from '../ServicePopUp/UiContext';
-import { UiProvider } from '../ServicePopUp/UiContext';
+import mechanicImg from "./AboutServicesAssets/stockMechanicImage.jpeg";
+import { useNavigate } from "react-router-dom";
+import { useMobileNav } from "../MobileNavContext";
 
 export default function AboutServices() {
-  const {setServiceOpen} = useUi();
+  const navigate = useNavigate();
+  const { openMobileNav } = useMobileNav();
+
   return (
     <section className={styles.aboutServices}>
       <img
@@ -17,6 +19,7 @@ export default function AboutServices() {
         <div className={styles.grayBar}>
           <div className={styles.title}>Services</div>
         </div>
+
         <div className={styles.description}>
           Royal Auto and Body Repair is a Sacramento-based auto repair shop
           located at 2546 Tower Ave, Sacramento, CA 95825. The business
@@ -24,9 +27,16 @@ export default function AboutServices() {
           brake repairs, suspension work, and vehicle inspections for Uber and
           Lyft drivers, among other repair and maintenance services.
         </div>
-        <button className={styles.viewServicesButton} 
-          onClick={() => setServiceOpen(true)}
-          aria-label="View all available auto repair services">
+
+        <button
+          className={styles.viewServicesButton}
+          onClick={() => {
+            const isMobile = window.matchMedia("(max-width: 767px)").matches;
+            if (isMobile) openMobileNav();
+            else navigate("/services");
+          }}
+          aria-label="View all available auto repair services"
+        >
           View all services
         </button>
       </div>

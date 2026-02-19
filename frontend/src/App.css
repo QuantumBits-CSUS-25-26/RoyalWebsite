@@ -1022,3 +1022,268 @@
   /* Add a grey background color on mouse-over */
   .pagination a:hover:not(.active) {background-color: #ddd;}
 }
+
+/* Hide side navbar on mobile */
+@media (max-width: 767px) {
+  .Navbar {
+    display: none;
+  }
+}
+
+/* Header layout */
+.Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.Header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hide hamburger on desktop */
+.Header-hamburger {
+  display: none;
+}
+
+/* Mobile drawer styles */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.mobile-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  border: none;
+}
+
+.mobile-menu-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 280px;
+  background: white;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-services-toggle {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0;
+}
+
+.mobile-services-list {
+  margin-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Show hamburger on small screens */
+@media (max-width: 767px) {
+  .Header-hamburger {
+    display: inline-flex;
+    font-size: 22px;
+    background: none;
+    border: none;
+  }
+}
+ /* hide the desktop side navbar on small screens */
+@media (max-width: 767px) {
+  .Navbar {
+    display: none;
+  }
+}
+
+/* top header (always visible) */
+.topHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.topHeader-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topHeader-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.topHeader-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* hamburger hidden on desktop */
+.topHeader-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+}
+
+/* show hamburger only on small screens */
+@media (max-width: 767px) {
+  .topHeader-hamburger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* full-screen overlay nav */
+.mobileNavOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.mobileNavBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  border: none;
+}
+
+.mobileNavPanel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileNavHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.mobileNavBrand {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.mobileNavClose {
+  background: none;
+  border: none;
+  font-size: 18px;
+}
+
+.mobileNavLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobileNavLink {
+  padding: 12px 12px;
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 600;
+}
+
+.mobileSection {
+  margin-top: 6px;
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mobileSectionHeader {
+  width: 100%;
+  background: #fff;
+  border: none;
+  padding: 12px 12px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobileSectionBody {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 12px;
+  gap: 10px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.mobileSubLink {
+  text-decoration: none;
+  color: inherit;
+  padding: 10px 10px;
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 10px;
+  font-weight: 600;
+}
+ 
+/* mobile fixed-top offcanvas navbar height spacing */
+.mobileOffcanvasNav {
+  min-height: 56px; /* standard bootstrap navbar height */
+}
+
+/* push page content down on mobile so fixed-top doesn't cover it */
+@media (max-width: 767px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.mobileOffcanvasNav {
+  min-height: 56px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.brandButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+/* InfoBar is fixed at top and is 20px tall.
+   push the mobile fixed header below it */
+@media (max-width: 767px) {
+  .mobileOffcanvasNav {
+    top: 20px !important;
+  }
+
+  /* total fixed height = 20px infobar + 56px header */
+  body {
+    padding-top: 76px;
+  }
+}
