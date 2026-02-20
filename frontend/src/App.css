@@ -524,6 +524,95 @@
   border: black 1px solid;
 }
 
+/* begin begin admin customer list - new customer pop-up */
+.customer-list-button {
+  width: 20%;
+  padding: 10px;
+  margin-top: 8px;
+  background-color: #2F6DAB;
+}
+
+.customer-list-popup{
+  background: #fff;
+  color: #111;
+  position: fixed;
+  height: 25%;
+  width: 75%;
+  max-width: 625px;
+  min-height: 415px;
+  min-width: 415px; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: solid black 1px;
+  z-index: 1001;
+  animation: fadeIn 0.08s ease-in;
+}
+
+.customer-list-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.08s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.customer-list-popup .title{
+  background-color: #2F6DAB;
+  box-shadow: 0px -3px 6px 2px rgba(0, 0, 0, 0.15) inset;
+  color: white;
+  font-size: 40px;
+  text-align: center;
+  display: block;
+}
+
+.customer-list-popup .content{
+  column-gap: 5%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+
+.customer-list-popup .content .entries{
+  grid-template-columns: 1fr 1fr;
+  text-align: left;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.customer-list-popup .content .entries input[type="text"]{
+  width: 100%;
+}
+
+.customer-list-popup .content .entries textarea{
+  width: 100%;
+  resize: none;
+}
+
+.customer-list-popup button{
+  background-color: #2F6DAB;
+  color: white;
+  border-width: 0px;
+  border-radius: 5px;
+  padding: 1.5%;
+}
+
+
+
 /* begin customer login */
 
 .customerLogin .content {
@@ -1076,3 +1165,4 @@
   /* Add a grey background color on mouse-over */
   .pagination a:hover:not(.active) {background-color: #ddd;}
 }
+
