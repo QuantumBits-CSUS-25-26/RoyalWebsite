@@ -762,6 +762,29 @@
   cursor: pointer;
 }
 
+/* begin admin services management */
+.service-management {
+  display: flex;
+  flex-direction: column;
+  margin-left: max(10%, 200px);
+  margin-right: 5%;
+  gap: 8px;
+}
+.service-management-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  color: #6b7280;
+}
+.service-management-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border: black 1px solid;
+}
+
 /* begin customer update */
 .customerUpdate .title {
   height: 10vh;

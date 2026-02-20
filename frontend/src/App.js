@@ -24,6 +24,7 @@ import CustomerCreation from './Pages/CustomerCreation';
 import InfoBar from './Components/InfoBar';
 import Header from './Components/Header';
 import CustomerUpdate from './Pages/CustomerUpdate';
+import ServicesManagement from './Pages/AdminPages/ServicesManagement';
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
             <Route path='/news' element={<News />} />
             <Route path='/admin' element={<AdminDashboard />} />
             <Route path='/admin/customers' element={<CustomerList />} />
+            <Route path='/admin/services' element={<ServicesManagement />} />
             <Route path='/admin/appointments' element={<AdminAppointments />} />
             <Route path='/admin/services' element={<AdminServices />} />
             <Route path='/admin/updates' element={<Updates />} />
