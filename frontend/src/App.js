@@ -53,7 +53,7 @@ function App() {
             <Route path='/admin/customers' element={<CustomerList />} />
             <Route path='/admin/appointments' element={<AdminAppointments />} />
             <Route path='/admin/services' element={<AdminServices />} />
-            <Route path='/admin/employees-test' element={<EmployeeManagementTest />} />
+            <Route path='/admin/employees-test' element={<EmployeeManagementTest />} /> {/* Temporary route for testing employee management popups */}
             <Route path='/admin/updates' element={<Updates />} />
             <Route path='/admin/invoices' element={<Invoices />} />
             <Route path='/admin/messages' element={<Messages />} />

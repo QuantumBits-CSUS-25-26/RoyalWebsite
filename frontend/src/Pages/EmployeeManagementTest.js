@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './EmployeeManagementPopup.css';
 import AddEmployeeForm from './EmployeeManagmentPopups/AddEmployee';
+import RemoveEmployeeForm from './EmployeeManagmentPopups/RemoveEmployee';
 
 const EmployeeManagementTest = () => {
   const [employees, setEmployees] = useState([
@@ -8,7 +9,8 @@ const EmployeeManagementTest = () => {
     { id: 2, name: 'Bob Newby', phone: '(999)555-5678', email: 'bob@example.com' },
     { id: 3, name: 'Charlie Brown', phone: '(999)555-9012', email: 'charlie@example.com' }
   ]);
-  const [showForm, setShowForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showRemoveForm, setShowRemoveForm] = useState(false);
 
   const handleAdd = (data) => {
     const nextId = employees.length ? Math.max(...employees.map(e => e.id)) + 1 : 1;
@@ -22,7 +24,9 @@ const EmployeeManagementTest = () => {
     };
     setEmployees(prev => [...prev, newEmployee]);
   };
-
+  const handleRemove = (employeeId) => {
+    setEmployees(prev => prev.filter(e => e.id !== employeeId));
+  }
   const formatPhone = (phone) => {
     if (!phone) return '';
     const digits = phone.toString().replace(/\D/g, '');
@@ -33,7 +37,8 @@ const EmployeeManagementTest = () => {
   return (
     <div>
       <h1>Employee Management</h1>
-      <button onClick={() => setShowForm(true)} className="buttonPrimary">Add Employee</button>
+      <button onClick={() => setShowAddForm(true)} className="buttonPrimary">Add Employee</button>
+      <button onClick={() => setShowRemoveForm(true)} className="buttonRed">Remove Employee</button>
       <ul>
         {employees.map(employee => (
           <li key={employee.id} className="listItem">
@@ -43,7 +48,8 @@ const EmployeeManagementTest = () => {
           </li>
         ))}
       </ul>
-      <AddEmployeeForm visible={showForm} onClose={() => setShowForm(false)} onAdd={handleAdd} />
+      <AddEmployeeForm visible={showAddForm} onClose={() => setShowAddForm(false)} onAdd={handleAdd} />
+      <RemoveEmployeeForm visible={showRemoveForm} onClose={() => setShowRemoveForm(false)} onRemove={handleRemove} employees={employees} />
     </div>
   );
 };
