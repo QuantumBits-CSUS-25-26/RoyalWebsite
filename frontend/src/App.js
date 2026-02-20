@@ -14,6 +14,7 @@ import Updates from './Pages/AdminPages/Updates';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
+import Management from './Pages/AdminPages/Management';
 import CustomerLogin from './Pages/CustomerLogin';
 import {UiProvider} from './Components/ServicePopUp/UiContext';
 import ServiceBar from "./Components/ServicePopUp/ServicesBar";
@@ -57,6 +58,7 @@ function App() {
             <Route path='/admin/messages' element={<Messages />} />
             <Route path='/admin/settings' element={<Settings />} />
             <Route path='/admin/login' element={<Login />} />
+            <Route path='/admin/management' element={<Management />} />
           </Routes>
         </div>
       </UiProvider>
