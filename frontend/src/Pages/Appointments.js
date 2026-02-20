@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import ContactInfoS4 from "../Components/ContactInfoS4";
 import AppStepOne from './AppointmentComponents/AppStepOne'
 import AppStepThree from './AppointmentComponents/AppStepThree'
-
+import '../App.css';
 const Appointments = () => {
   const [contactInfo, setContactInfo] = useState({
     fname:'',

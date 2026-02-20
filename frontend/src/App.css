@@ -1021,4 +1021,36 @@
 
   /* Add a grey background color on mouse-over */
   .pagination a:hover:not(.active) {background-color: #ddd;}
+
+
+  .adminLayout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .adminApts {
+    flex: 1;
+    padding: 20px;
+    background: #f9fafb;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .modal {
+    background: #111827;
+    padding: 20px;
+    border-radius: 10px;
+    width: 320px;
+    color: white;
+  }
+
+
 }
