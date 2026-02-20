@@ -21,7 +21,7 @@ export function UiProvider ({children}) {
         closeTimerRef.current = setTimeout(() => {
             setServiceOpen(false);
             closeTimerRef.current = null;
-        }, 180);
+        }, 500);
     };
 
     return(

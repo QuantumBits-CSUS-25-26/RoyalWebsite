@@ -539,15 +539,36 @@
 /* begin service pop up bar */
 .services-drawer{
   position: fixed;
+  padding: 1rem;
   left: 100px;
-  top: 20px;
-  height: 100vh; 
-  width: 250px;
-  background: #ffff;
+  top: 10rem;
+  width: 15rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  margin: auto; 
+  max-width: 90%; 
   z-index: 10;
   
   display: flex;
   flex-direction: column;
+}
+.services-drawer h2{
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2F6DAB;
+  transition: color 0.2s;
+}
+
+.services-drawer .service-popup-close-btn{
+  cursor: pointer;
+  background-color: #2F6DAB; 
+  color: #ffffff; 
+}
+
+.services-drawer .service-popup-close-btn:hover{
+  color: #111827;
 }
 .services-drawer-header{ 
   color: #2F6DAB;
@@ -564,16 +585,25 @@
   list-style: none;
   padding: 5px 15px 5px 0px;
   display: flex;
-  
-  
 }
+
 .service-list-buttons{
+  display: block;
   background-color: #2f6dab;
   border-radius: 5px;
   width: 100%;
   color: white;  
   padding-right: 10px;
+  cursor: pointer; 
+  transition: color 0.2s, transform 0.2s;
   
+}
+.service-list-buttons:hover{
+  background: #3b7fc7;
+  transform: translateY(-2px); 
+}
+.service-list-buttons:active{
+  transform: translateY(0);
 }
 .services-backdrop{
   position: fixed;
@@ -810,8 +840,9 @@
 .notif-check-boxes input[type="checkbox"] {
   transform: scale(1.4);
   margin-right: 1vh;
+}
 
-  .table-wrapper {
+ .table-wrapper {
     margin: 2% 4% 1% 4%;
     max-height: 50%;
     overflow: auto;
@@ -1021,4 +1052,3 @@
 
   /* Add a grey background color on mouse-over */
   .pagination a:hover:not(.active) {background-color: #ddd;}
-}

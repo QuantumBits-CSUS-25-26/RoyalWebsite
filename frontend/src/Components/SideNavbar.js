@@ -45,7 +45,7 @@ const SideNavbar = () => {
               <NavItem
                 onMouseEnter={openServices}
               >
-                <NavLink className='nav-link' to='/services'>
+                <NavLink className='nav-link' to='/services' onClick={() => setServiceOpen(true)}>
                   <button>
                     <img src={ServicesSvg} alt="ServicesImage" style={{ height:30, width:30}}/>
                     Services
