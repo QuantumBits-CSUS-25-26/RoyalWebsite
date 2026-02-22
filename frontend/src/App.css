@@ -19,10 +19,11 @@
   background-size: contain;
   position: sticky;
   top: 20px;
+  z-index: 100;
 }
 
 .Header .Header-logo-button {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 120px;                  
@@ -471,9 +472,10 @@
 }
 
 /* begin customer login */
-
+.customerLogin{
+  min-height: 100vh;
+}
 .customerLogin .content {
-  height: 10vh;
   margin-left: 100px;
 } 
 
@@ -710,7 +712,6 @@
 
 /* begin customer update */
 .customerUpdate .title {
-  height: 10vh;
   margin-left: 100px;
 } 
 .customerUpdate .updateForm {
@@ -810,215 +811,214 @@
 .notif-check-boxes input[type="checkbox"] {
   transform: scale(1.4);
   margin-right: 1vh;
+}
+.table-wrapper {
+  margin: 2% 4% 1% 4%;
+  max-height: 50%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  background: #fff;
+}
 
-  .table-wrapper {
-    margin: 2% 4% 1% 4%;
-    max-height: 50%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 8px;
-    background: #fff;
-  }
+.appointment-page {
+  align-items: center;
+  padding-bottom: 1%;
+}
 
-  .appointment-page {
-    align-items: center;
-    padding-bottom: 1%;
-  }
+.appSummBtn {
+  color: white;
+  background-color: #2f6dab;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .appSummBtn {
-    color: white;
-    background-color: #2f6dab;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
+.appointment-page-overlay {
+  margin: 3% 0 3% 0;
+  inset: 0;
+  background: #2f6dab;
+  border-radius: 1rem;
+}
 
-  .appointment-page-overlay {
-    margin: 3% 0 3% 0;
-    inset: 0;
-    background: #2f6dab;
-    border-radius: 1rem;
-  }
+.AppSummTtl {
+  color: white;
+}
 
-  .AppSummTtl {
-    color: white;
-  }
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  .appointments-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.appointments-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  z-index: 2;
+  padding: 12px 10px;
+  border-bottom: 2px solid #e6e6e6;
+  text-align: center;
+}
 
-  .appointments-table thead th {
-    position: sticky;
-    top: 0;
-    background: #f9fafb;
-    z-index: 2;
-    padding: 12px 10px;
-    border-bottom: 2px solid #e6e6e6;
-    text-align: center;
-  }
+.appointments-table tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #eaeaea;
+  font-size: medium;
+}
 
-  .appointments-table tbody td {
-    padding: 10px;
-    border-bottom: 1px solid #eaeaea;
-    font-size: medium;
-  }
-
-  .appointments-table tbody tr:last-child td {
-    border-bottom: none;
-  }
+.appointments-table tbody tr:last-child td {
+  border-bottom: none;
+}
 
   /* responsive: stack cells on very small screens (optional) */
-  @media (max-width: 520px) {
-    .appointments-table thead {
-      display: none;
-    }
-
-    .appointments-table, .appointments-table tbody, .appointments-table tr, .appointments-table td {
-      display: block;
-      width: 100%;
-    }
-
-    .appointments-table td {
-      box-sizing: border-box;
-      padding: 8px 12px;
-    }
-
-    .appointments-table td::before {
-      content: attr(data-label);
-      display: block;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #374151;
-    }
+@media (max-width: 520px) {
+  .appointments-table thead {
+    display: none;
   }
+
+  .appointments-table, .appointments-table tbody, .appointments-table tr, .appointments-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .appointments-table td {
+    box-sizing: border-box;
+    padding: 8px 12px;
+  }
+
+  .appointments-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+}
 
   /* =========================
      MOBILE RESPONSIVE FIXES
      ========================= */
 
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
 
-    /* General reset */
-    body, html {
-      overflow-x: hidden;
-    }
+  /* General reset */
+  body, html {
+    overflow-x: hidden;
+  }
 
-    /* HEADER */
-    .Header {
-      text-indent: 0;
-      background-position: center;
-      text-align: center;
-    }
+  /* HEADER */
+  .Header {
+    text-indent: 0;
+    background-position: center;
+    text-align: center;
+  }
 
-    /* SIDE NAVBAR */
-    .Navbar {
-      position: relative;
-      width: 100%;
-      height: auto;
-      display: flex;
-      justify-content: center;
-    }
+  /* SIDE NAVBAR */
+  .Navbar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+  }
 
-    .Navbar .btn-group {
-      flex-direction: row;
-      width: 100%;
-    }
+  .Navbar .btn-group {
+    flex-direction: row;
+    width: 100%;
+  }
 
-    .Navbar .btn-group button {
-      margin-left: 0;
-      font-size: 14px;
-      padding: 10px;
-    }
+  .Navbar .btn-group button {
+    margin-left: 0;
+    font-size: 14px;
+    padding: 10px;
+  }
 
-    /* REMOVE LEFT OFFSETS */
-    .news,
-    .news .content,
-    .customerDashboard .content,
-    .customerLogin .content,
-    .customer-creation .content {
-      margin-left: 0;
-    }
+  /* REMOVE LEFT OFFSETS */
+  .news,
+  .news .content,
+  .customerDashboard .content,
+  .customerLogin .content,
+  .customer-creation .content {
+    margin-left: 0;
+  }
 
-    /* HERO */
-    .hero {
-      height: auto;
-      padding: 3rem 1rem;
-    }
+  /* HERO */
+  .hero {
+    height: auto;
+    padding: 3rem 1rem;
+  }
 
-    .hero-title {
-      font-size: 32px;
-    }
+  .hero-title {
+    font-size: 32px;
+  }
 
-    /* CONTACT FORM */
-    .contact_form {
-      width: 90%;
-      min-width: unset;
-      min-height: unset;
-      height: auto;
-    }
+  /* CONTACT FORM */
+  .contact_form {
+    width: 90%;
+    min-width: unset;
+    min-height: unset;
+    height: auto;
+  }
 
-    /* ADMIN DASHBOARD */
-    .admin-dashboard-content,
-    .adminServices,
-    .adminCustomers,
-    .adminApts,
-    .updates,
-    .messages,
-    .settings,
-    .invoices {
-      margin-top: 0;
-      margin-left: 0;
-    }
+  /* ADMIN DASHBOARD */
+  .admin-dashboard-content,
+  .adminServices,
+  .adminCustomers,
+  .adminApts,
+  .updates,
+  .messages,
+  .settings,
+  .invoices {
+    margin-top: 0;
+    margin-left: 0;
+  }
 
-    .admin-totals {
-      flex-direction: column;
-      margin-left: 0;
-    }
+  .admin-totals {
+    flex-direction: column;
+    margin-left: 0;
+  }
 
-    .admin-content {
-      margin-left: 0;
-    }
+  .admin-content {
+    margin-left: 0;
+  }
 
-    /* CUSTOMER DASHBOARD */
-    .customerDashboard .info {
-      width: 95%;
-      font-size: medium;
-    }
+  /* CUSTOMER DASHBOARD */
+  .customerDashboard .info {
+    width: 95%;
+    font-size: medium;
+  }
 
-    .customerDashboard .btn {
-      width: 90%;
-    }
+  .customerDashboard .btn {
+    width: 90%;
+  }
 
-    /* TABLES */
-    .table-wrapper,
-    .rc-customer-table {
-      overflow-x: auto;
-    }
+  /* TABLES */
+  .table-wrapper,
+  .rc-customer-table {
+    overflow-x: auto;
+  }
 
-    table {
-      min-width: 600px;
-
-    }
+  table {
+    min-width: 600px;
 
   }
+
+}
 
   /* Pagination links */
-  .pagination a {
-    color: black;
-    float: left;
-    padding: 8px 16px;
-    text-decoration: none;
-    transition: background-color .3s;
-  }
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color .3s;
+}
 
-  /* Style the active/current link */
-  .pagination a.active {
-    background-color: dodgerblue;
-    color: white;
-  }
+/* Style the active/current link */
+.pagination a.active {
+  background-color: dodgerblue;
+  color: white;
+ }
 
   /* Add a grey background color on mouse-over */
-  .pagination a:hover:not(.active) {background-color: #ddd;}
-}
+.pagination a:hover:not(.active) {background-color: #ddd;}
