@@ -470,6 +470,31 @@
   margin-left: -40px;
 }
 
+.management {
+  margin-top: -800px;
+  margin-left: 5%;
+}
+
+/* begin employee management */
+.employee-list{
+  display: flex;
+  flex-direction: column;
+  margin-left: max(10%, 200px);
+  margin-right: 5%;
+  gap: 8px;
+}
+
+.employee-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  color: #6b7280;
+}
+
 /* begin customer login */
 
 .customerLogin .content {
