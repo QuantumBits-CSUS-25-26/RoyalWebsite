@@ -1,4 +1,7 @@
 import AdminSideBar from "../../Components/AdminSideBar"
+import {useState} from 'react';
+import AddEmployeeForm from "../EmployeeManagmentPopups/AddEmployee";
+import '../EmployeeManagementPopup.css';
 
 const DisplayEmployee = ({ employee }) => {
     const { name, email, phone} = employee;
@@ -11,13 +14,27 @@ const DisplayEmployee = ({ employee }) => {
     )
 }
 
-const sampleEmployees = [
-    { name: "John Doe", email: "john@example.com", phone: "123-456-7890" },
-    { name: "Jane Smith", email: "jane@example.com", phone: "987-654-3210" },
-    { name: "Bob Johnson", email: "bob@example.com", phone: "555-123-4567" }
-];
-
 const Management = () => {
+    const[employees, setEmployees] = useState([
+    { id: 1, name: "John Doe", email: "john@example.com", phone: "123-456-7890" },
+    { id: 2, name: "Jane Smith", email: "jane@example.com", phone: "987-654-3210" },
+    { id: 3, name: "Bob Johnson", email: "bob@example.com", phone: "555-123-4567" }
+]);
+    const [showForm, setShowForm] = useState(false);
+
+    const handleAdd = (data) => {
+    const nextId = employees.length ? Math.max(...employees.map(e => e.id)) + 1 : 1;
+    const newEmployee = {
+      id: nextId,
+      name: `${data.firstName} ${data.lastName}`,
+      phone: data.phone,
+      email: data.email,
+      // Temporary password storage - be sure in real application to handle securely
+      password: data.password,
+    };
+    setEmployees(prev => [...prev, newEmployee]);
+  };
+
   return (
     <div>
         <AdminSideBar />
@@ -26,10 +43,12 @@ const Management = () => {
                 <span className="admin-dashboard-title">Management</span>
             </div>
             <div className="employee-list">
-                {sampleEmployees.map((employee, index) => (
+                {employees.map((employee, index) => (
                     <DisplayEmployee key={index} employee={employee} />
                 ))}
             </div>
+            <button onClick={() => setShowForm(true)} className="buttonPrimary">Add Employee</button>
+                  <AddEmployeeForm visible={showForm} onClose={() => setShowForm(false)} onAdd={handleAdd} />
         </div>
     </div>
   )
