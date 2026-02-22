@@ -1,7 +1,7 @@
 import React, { useState} from 'react';
 import '../EmployeeManagementPopup.css';
 
-export default function RemoveEmployeeForm({ visible, onClose, onRemove, employees = [] }) {
+export default function RemoveEmployeeForm({ visible, onClose, onRemove, employee = [] }) {
   const [selectedId, setSelectedId] = useState('');
   const [error, setError] = useState('');
   const [confirming, setConfirming] = useState(false);
@@ -44,7 +44,7 @@ export default function RemoveEmployeeForm({ visible, onClose, onRemove, employe
             <div className="row">
               <select className="input" value={selectedId} onChange={e => setSelectedId(e.target.value)}>
                 <option value="">-- Select employee --</option>
-                {employees.map(emp => (
+                {employee.map(emp => (
                   <option key={emp.id} value={emp.id}>{`${emp.id} - ${emp.name}`}</option>
                 ))}
               </select>
@@ -56,7 +56,7 @@ export default function RemoveEmployeeForm({ visible, onClose, onRemove, employe
           </form>
         ) : (
           <div>
-            <p>Are you sure you want to remove <strong>{employees.find(e => String(e.id) === String(selectedId))?.name || ''}</strong> (ID: {selectedId})?</p>
+            <p>Are you sure you want to remove <strong>{employee.find(e => String(e.id) === String(selectedId))?.name || ''}</strong> (ID: {selectedId})?</p>
             <div className="actions">
               <button type="button" className="buttonGray" onClick={handleCancelConfirm}>Cancel</button>
               <button type="button" className="buttonRed" onClick={handleConfirm}>Confirm Remove</button>

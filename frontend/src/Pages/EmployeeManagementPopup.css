@@ -75,6 +75,10 @@
   margin-bottom: 16px;
 }
 
+.management .buttonPrimary {
+  margin-right: 12px;
+}
+
 @media (max-width:480px) {
   .employee-form { width: 92%; padding: 14px; }
   .row { flex-direction: column; }
