@@ -90,3 +90,19 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f'{self.service_type} – {self.vehicle} @ {self.scheduled_at}'
+
+class SiteService(models.Model):
+    service_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, default='')
+    cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    image = models.CharField(max_length=500, blank=True, default='')
+    display_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'site_service'
+        ordering = ['display_order', 'name']
+
+    def __str__(self):
+        return self.name

@@ -22,7 +22,9 @@ urlpatterns = [
     # ── Contact form ───────────────────────────────────────────
     path('contact/', views.ContactMessageView.as_view(), name='contact_message'),
 
-    # ── Admin / employee list views ────────────────────────────
+    path('services/', views.SiteServiceListCreateView.as_view(), name='site_service_list_create'),
+    path('services/<int:service_id>/', views.SiteServiceDetailView.as_view(), name='site_service_detail'),
+
     path('admin/customers/', views.AdminCustomerListView.as_view(), name='admin_customer_list'),
     path('admin/appointments/', views.AdminAppointmentListView.as_view(), name='admin_appointment_list'),
     path('admin/vehicles/', views.AdminVehicleListView.as_view(), name='admin_vehicle_list'),

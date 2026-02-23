@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Customer, Vehicle, Employee, Appointment
+from .models import Customer, Vehicle, Employee, Appointment, SiteService
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -129,3 +129,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'email': self.user.email,
         }
         return data
+
+
+class SiteServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteService
+        fields = [
+            'service_id', 'name', 'description',
+            'cost', 'image', 'display_order', 'is_active',
+        ]

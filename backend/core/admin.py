@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, Vehicle, Employee, Appointment
+from .models import Customer, Vehicle, Employee, Appointment, SiteService
 
 
 @admin.register(Customer)
@@ -28,3 +28,11 @@ class AppointmentAdmin(admin.ModelAdmin):
     search_fields = ('service_type',)
     list_filter = ('service_type', 'scheduled_at')
     raw_id_fields = ('vehicle', 'employee')
+
+
+@admin.register(SiteService)
+class SiteServiceAdmin(admin.ModelAdmin):
+    list_display = ('service_id', 'name', 'cost', 'display_order', 'is_active')
+    search_fields = ('name',)
+    list_filter = ('is_active',)
+    list_editable = ('display_order', 'is_active')

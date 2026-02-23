@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import Customer, Vehicle, Employee, Appointment
+from .models import Customer, Vehicle, Employee, Appointment, SiteService
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -20,6 +20,7 @@ from .serializer import (
     AppointmentSerializer,
     AppointmentReadSerializer,
     CustomTokenObtainPairSerializer,
+    SiteServiceSerializer,
 )
 from .authentication import (
     CustomJWTAuthentication,
@@ -366,9 +367,63 @@ class AdminVehicleListView(APIView):
         return Response(serializer.data)
 
 
-# ══════════════════════════════════════════════════════════════════
-#  Contact form (no model — just validates and logs for now)
-# ══════════════════════════════════════════════════════════════════
+class SiteServiceListCreateView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [IsAdmin()]
+
+    def get(self, request):
+        qs = SiteService.objects.filter(is_active=True)
+        serializer = SiteServiceSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = SiteServiceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class SiteServiceDetailView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [IsAdmin()]
+
+    def get_object(self, service_id):
+        try:
+            return SiteService.objects.get(service_id=service_id)
+        except SiteService.DoesNotExist:
+            return None
+
+    def get(self, request, service_id):
+        service = self.get_object(service_id)
+        if not service:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = SiteServiceSerializer(service)
+        return Response(serializer.data)
+
+    def put(self, request, service_id):
+        service = self.get_object(service_id)
+        if not service:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = SiteServiceSerializer(service, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, service_id):
+        service = self.get_object(service_id)
+        if not service:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        service.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ContactMessageView(APIView):
     """POST /api/contact/"""
@@ -386,9 +441,6 @@ class ContactMessageView(APIView):
         return Response({'detail': 'Message received.'}, status=status.HTTP_201_CREATED)
 
 
-# ══════════════════════════════════════════════════════════════════
-#  Existing endpoints (kept as-is)
-# ══════════════════════════════════════════════════════════════════
 
 @require_GET
 def place_reviews(request):
