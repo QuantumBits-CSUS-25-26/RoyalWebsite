@@ -787,7 +787,15 @@
   width: 20%;
   padding: 10px;
   margin-top: 8px;
-  background-color: #2f6dab;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.service-management-delete-button:hover {
+  background-color: #c82333;
 }
 .services-management-delete{
   background: #fff;
@@ -846,6 +854,106 @@
   border: #dbdbdb 1px solid;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* begin admin add service popup */
+.service-management-add-button {
+  width: 20%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-right: 8px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.service-management-add-button:hover {
+  background-color: #218838;
+}
+.services-management-add {
+  background: #fff;
+  color: #111;
+  position: fixed;
+  width: 75%;
+  max-width: 625px;
+  min-width: 415px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: solid black 1px;
+  z-index: 1001;
+  animation: fadeIn 0.08s ease-in;
+}
+.services-management-add-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.08s ease-in;
+}
+.services-management-add .title {
+  background-color: #2F6DAB;
+  box-shadow: 0px -3px 6px 2px rgba(0, 0, 0, 0.15) inset;
+  color: white;
+  font-size: 40px;
+  text-align: center;
+  display: block;
+}
+.add-service-content {
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.add-service-field {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.add-service-field label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+}
+.add-service-field input,
+.add-service-field textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.add-service-field textarea {
+  resize: vertical;
+}
+.add-service-content button {
+  background-color: #2F6DAB;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.add-service-content button:hover {
+  background-color: #245a8d;
+}
+.add-service-content button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.add-service-error {
+  color: #dc3545;
+  font-size: 14px;
 }
 
 

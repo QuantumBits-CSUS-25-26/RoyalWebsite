@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './CustomerReviews.css';
+import { API_BASE_URL } from '../config';
 
 const CustomerReviews = () => {
     const [reviews, setReviews] = useState([]);
@@ -9,7 +10,7 @@ const CustomerReviews = () => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/places/reviews');
+                const response = await fetch(`${API_BASE_URL}/api/places/reviews`);
                 const data = await response.json();
 
                 if (data.status === 'OK') {

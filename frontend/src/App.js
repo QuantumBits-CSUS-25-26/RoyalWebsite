@@ -53,7 +53,6 @@ function App() {
             <Route path='/admin/customers' element={<CustomerList />} />
             <Route path='/admin/services' element={<ServicesManagement />} />
             <Route path='/admin/appointments' element={<AdminAppointments />} />
-            <Route path='/admin/services' element={<AdminServices />} />
             <Route path='/admin/updates' element={<Updates />} />
             <Route path='/admin/invoices' element={<Invoices />} />
             <Route path='/admin/messages' element={<Messages />} />
