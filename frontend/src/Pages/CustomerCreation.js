@@ -1,6 +1,7 @@
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[0-9\s-.()]{7,15}$/;
@@ -91,79 +92,125 @@ const CustomerCreation = () => {
   return (
     <div className="customer-creation">
       <div className="content">
-        Account Creation
-        <form className="form" onSubmit={handleSubmit} noValidate>
-          <div className="entries">
-            First Name <br/>
-              <input 
-                type="text" 
-                name="fname"
-                placeholder="First Name"
-                 maxLength={24}
-                value={values.fname}
-                onChange={handleChange}
-              />
-              <br/>
-              {errors.fname && <div className="error">{errors.fname}</div>}
-           Email <br/>
-              <input
-                type="text"
-                name="email"
-                placeholder="Email"
-                value={values.email}
-                onChange={handleChange}
-              />
-              <br/>
-              {errors.email && <div className="error">{errors.email}</div>}
-              Password <br/>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={values.password}
-                onChange={handleChange}
-              />
-                <br/>
-              {errors.password && <div className="error">{errors.password}</div>}
+        <Row className="justify-content-center">
+          <Col md="8" sm="12">
+            <Form className="customerForm fs-3 p-4" onSubmit={handleSubmit} noValidate>
+              <div className="my-4"><strong>Sign Up</strong></div>
+              <Row>
+                <Col md="6">
+                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                    <Label for="fname">First Name</Label>
+                    <Input
+                      id="fname"
+                      name="fname"
+                      placeholder="First Name"
+                      type="text"
+                      maxLength={24}
+                      value={values.fname}
+                      onChange={handleChange}
+                      invalid={!!errors.fname}
+                    />
+                    {errors.fname && <div className="text-danger small">{errors.fname}</div>}
+                  </FormGroup>
+                </Col>
+                <Col md="6">
+                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                    <Label for="lname">Last Name</Label>
+                    <Input
+                      id="lname"
+                      name="lname"
+                      placeholder="Last Name"
+                      type="text"
+                      maxLength={24}
+                      value={values.lname}
+                      onChange={handleChange}
+                      invalid={!!errors.lname}
+                    />
+                    {errors.lname && <div className="text-danger small">{errors.lname}</div>}
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col md="6">
+                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                    <Label for="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      placeholder="Email"
+                      type="email"
+                      value={values.email}
+                      onChange={handleChange}
+                      invalid={!!errors.email}
+                    />
+                    {errors.email && <div className="text-danger small">{errors.email}</div>}
+                  </FormGroup>
+                </Col>
+                <Col md="6">
+                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                    <Label for="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      placeholder="Phone Number"
+                      type="text"
+                      value={values.phone}
+                      onChange={handleChange}
+                      invalid={!!errors.phone}
+                    />
+                    {errors.phone && <div className="text-danger small">{errors.phone}</div>}
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col md="6">
+                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                    <Label for="password">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      placeholder="Password"
+                      type="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      invalid={!!errors.password}
+                    />
+                    {errors.password && <div className="text-danger small">{errors.password}</div>}
+                  </FormGroup>
+                </Col>
+                <Col md="6">
+                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                    <Label for="confirmPassword">Confirm Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Confirm Password"
+                      type="password"
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      invalid={!!errors.confirmPassword}
+                    />
+                    {errors.confirmPassword && <div className="text-danger small">{errors.confirmPassword}</div>}
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Button type="submit" className="btn btn-lg my-4 py-4">
+                Sign Up
+              </Button>
+              <div className="mt-3 mb-4" style={{ fontSize: '1rem' }}>
+                <span style={{ color: '#6c757d' }}>Already have an account? </span>
+                <span
+                  style={{ color: '#2F6DAB', cursor: 'pointer', fontWeight: 500 }}
+                  onClick={() => navigate('/login')}
+                >
+                  Log In
+                </span>
               </div>
-            <div className="entries">
-              Last Name <br/>
-              <input
-                type="text"
-                name="lname"
-                placeholder="Last Name"
-                value={values.lname}
-                onChange={handleChange}
-              />
-                <br/>
-              {errors.lname && <div className="error">{errors.lname}</div>}
-              Phone Number <br/>
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone Number"
-                value={values.phone}
-                onChange={handleChange}
-              />
-                <br/>
-              {errors.phone && <div className="error">{errors.phone}</div>}
-              Confirm Password <br/>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={values.confirmPassword}
-                onChange={handleChange}
-              />
-                  <br/>
-              {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
-            </div>
-            <div style={{ clear: 'both' }} />
-            <br/>
-            <button type="submit"> Create Account </button>
-          </form>
-        </div>
+            </Form>
+          </Col>
+        </Row>
       </div>
+    </div>
   )
 }
 
