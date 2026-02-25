@@ -1,75 +1,61 @@
-import React, { useState } from 'react';
-import { Button, Input } from 'reactstrap';
+import React, { useRef } from 'react';
+import { Button } from 'reactstrap';
+import { API_BASE_URL } from '../config';
 
-const ServicesManagementDelete = ({ isOpen, onClose }) => {
+const ServicesManagementDelete = ({ isOpen, onClose, services = [], onServiceDeleted }) => {
 
-    //temp values for display and testing
-    const sampleServices = {
-        1: {
-            title: "Oil Changes",
-            cost: "$29.99",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-        },
-        2: {
-            title: "Brake Repairs",
-            cost: "$29.99",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-        },
-        3: {
-            title: "Suspension Work",
-            cost: "$49.99",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-        },
-        4: {
-            title: "Vehicle Inspections",
-            cost: "$79.99",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-        },
-    }
-    const [selectedService, setSelectedService] = useState(null);
-
-    const [mouseDownTarget, setMouseDownTarget] = useState(null);
+    const mouseDownTarget = useRef(null);
     
     const DisplayService = ({ service }) => {
-        const { title } = service;
         return (
             <div className="content">
                 <Button
-                type="submit"
+                type="button"
                 className='btn'
-                onClick={() => handleSubmit(service)}
+                onClick={() => handleDelete(service)}
                 >
-                  {title}
+                  {service.name}
                 </Button>
             </div>
         )
     }
 
 
-    const handleSubmit = (service) => {
-        setSelectedService(service);
-
-        //make api call to delete service in database
-        //service to delete is selectedService
-
-        //close form
-
+    const handleDelete = async (service) => {
+        try {
+            const token = sessionStorage.getItem('authToken');
+            const res = await fetch(`${API_BASE_URL}/api/services/${service.service_id}/`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (res.ok || res.status === 204) {
+                if (onServiceDeleted) onServiceDeleted();
+                onClose();
+            } else {
+                const data = await res.json();
+                alert(data.detail || 'Failed to delete service.');
+            }
+        } catch (err) {
+            alert('Error deleting service: ' + err.message);
+        }
     }
 
     if (!isOpen) return null;
 
    
     const handleMouseDown = (e) => {
-        setMouseDownTarget(e.target);
+        mouseDownTarget.current = e.target;
     }
 
     //Only close if both mousedown and mouseup happen outside box thing
     const handleMouseUp = (e) => {
         if (e.target.className === 'services-management-delete-overlay' && 
-            mouseDownTarget?.className === 'services-management-delete-overlay') {
+            mouseDownTarget.current?.className === 'services-management-delete-overlay') {
             onClose();
         }
-        setMouseDownTarget(null);
+        mouseDownTarget.current = null;
     };
 
     return (
@@ -85,8 +71,8 @@ const ServicesManagementDelete = ({ isOpen, onClose }) => {
                 <form>
                     <div className="content">
                         Select a service to delete
-                        {Object.values(sampleServices).map((service, index) => (
-                            <DisplayService key={index} service={service} />
+                        {services.map((service) => (
+                            <DisplayService key={service.service_id} service={service} />
                         ))}
                     </div>
                 </form>            

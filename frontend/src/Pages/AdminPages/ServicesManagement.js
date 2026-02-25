@@ -1,49 +1,44 @@
 import AdminSideBar from "../../Components/AdminSideBar"
 import ServicesManagementDelete from "../../Components/ServicesManagementDelete"
-import { useState } from "react";
+import ServicesManagementAdd from "../../Components/ServicesManagementAdd"
+import { useState, useEffect } from "react";
+import { API_BASE_URL } from '../../config';
 
 
 
 const DisplayService = ({ service }) => {
-  const { title, cost, description } = service;
   return (
     <div className="service-management-card">
-      <h5 style={{ color: '#2F6DAB' }}>{title}</h5>
-      <p>Cost: {cost}</p>
-      <p>Description: {description}</p>
+      <h5 style={{ color: '#2F6DAB' }}>{service.name}</h5>
+      <p>Cost: {service.cost ? `$${service.cost}` : 'N/A'}</p>
+      <p>Description: {service.description}</p>
     </div>
   )
 }
 
 
-const sampleServices = {
-  1: {
-      title: "Oil Changes",
-      cost: "$29.99",
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  2: {
-      title: "Brake Repairs",
-      cost: "$29.99",
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  3: {
-      title: "Suspension Work",
-      cost: "$49.99",
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  4: {
-      title: "Vehicle Inspections",
-      cost: "$79.99",
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-}
-
-
-
 const ServicesManagement = () => {
 
+  const [services, setServices] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+
+  const fetchServices = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/services/`);
+      if (res.ok) {
+        const data = await res.json();
+        setServices(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch services:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
   const handleOpenForm = () => {
     setIsFormOpen(true);
   }
@@ -59,17 +54,33 @@ const ServicesManagement = () => {
           <span className="admin-dashboard-title">Services Management</span>
         </div>
         <div className="service-management">
-          {Object.values(sampleServices).map((service, index) => (
-            <DisplayService key={index} service={service} />
+          {services.map((service) => (
+            <DisplayService key={service.service_id} service={service} />
           ))}
         </div>
+        <button
+          className="service-management-add-button"
+          onClick={() => setIsAddFormOpen(true)}
+          >
+            Add Service
+          </button>
         <button
           className="service-management-delete-button"
           onClick={handleOpenForm}
           >
             Delete Service
           </button>
-        <ServicesManagementDelete isOpen={isFormOpen} onClose={handleCloseForm} />
+        <ServicesManagementAdd
+          isOpen={isAddFormOpen}
+          onClose={() => setIsAddFormOpen(false)}
+          onServiceAdded={() => fetchServices()}
+        />
+        <ServicesManagementDelete
+          isOpen={isFormOpen}
+          onClose={handleCloseForm}
+          services={services}
+          onServiceDeleted={() => fetchServices()}
+        />
       </div>
     </div>
   )
