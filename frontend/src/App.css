@@ -952,7 +952,7 @@
   color: black;
   border-radius: 16px;
   align-items: center;
-  font-size: x-large;
+  font-size: clamp(14px, 2.5vw, x-large);
   box-shadow:
     0 20px 45px rgba(0, 0, 0, 0.35),
     0 6px 16px rgba(0, 0, 0, 0.25);
@@ -974,23 +974,29 @@
   font-weight: bold;
 }
 
-.customerDashboard .apptText {
-  font-size: medium;
-  color: black;
-  display: inline-flex;
-  white-space: nowrap;
-  border-top: 1px solid rgba(0, 0, 0, 0.15);
-  padding-top: 12px;
-  margin-top: 12px;
+.customerDashboard .dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.customerDashboard .plateText {
+.customerDashboard .dash-table th {
+  font-weight: bold;
+  font-size: medium;
+  text-align: center;
+  padding: 4px 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.customerDashboard .dash-table td {
   font-size: medium;
   color: black;
-  display: block;
+  text-align: center;
+  padding: 12px 0 0;
   border-top: 1px solid rgba(0, 0, 0, 0.15);
-  padding-top: 12px;
-  margin-top: 12px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .customerDashboard .vehiclesCol {
