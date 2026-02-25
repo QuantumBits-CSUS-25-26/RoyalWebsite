@@ -82,7 +82,7 @@ const CustomerLogin = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </FormGroup>
-              <FormGroup className='mx-5 px-5 my-4 text-start'>
+              <FormGroup className='mx-3vh px-5 my-4vh w-150 text-start'>
                 <Label for="password">Password</Label>
                 <Input
                   id="password"
@@ -95,7 +95,7 @@ const CustomerLogin = () => {
               </FormGroup>
               <Button
                 type="submit"
-                className='btn btn-lg my-4 py-4'
+                className='btn btn-lg my-4 py-4 w-50'
                 onClick={handleClickLogin}
               >
                   Log In

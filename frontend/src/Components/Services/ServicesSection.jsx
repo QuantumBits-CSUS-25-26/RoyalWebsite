@@ -12,8 +12,6 @@ const ServicesSection = () => {
             id: 1,
             img: oilChange,
             title: "Oil Changes",
-            cost: "20$",
-            date: "2026/02/25",
             desc: "Quick and reliable oil changes to keep your engine healthy.",
         },
         {
@@ -21,16 +19,12 @@ const ServicesSection = () => {
             img: brakeRepair,
             title: "Brake Repairs",
             desc: "Professional brake inspection and replacement for safe driving.",
-            cost: "10$",
-            date: "2026/02/25",
         },
         {
             id: 3,
             img: suspensionWork,
             title: "Suspension Work",
             desc: "Smooth out your ride with full suspension diagnostics and repair.",
-            cost: "50$",
-            date: "2026/02/25",
         },
         {
 
@@ -38,8 +32,6 @@ const ServicesSection = () => {
             id: 4,
             img: vehicleInspection,
             title: "Vehicle Inspections",
-            cost: "70$",
-            date: "2026/02/25",
             desc: "Certified inspections for Uber and Lyft drivers.",
         },
     ];
@@ -71,8 +63,6 @@ const ServicesSection = () => {
                                         className={styles.serviceImage}
                                     />
                                     <h3 className={styles.serviceTitle}>{service.title}</h3>
-                                     <h3 className={styles.serviceTitle}>{service.date}</h3>
-                                      <h3 className={styles.serviceTitle}>{service.cost}</h3>
                                     <p className={styles.serviceDesc}>{service.desc}</p>
                                     <Link to={`/service/${service.id}`} className={styles.viewMore}>
                                         View More →

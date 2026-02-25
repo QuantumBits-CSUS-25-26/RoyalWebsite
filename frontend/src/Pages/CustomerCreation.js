@@ -1,3 +1,4 @@
+import './Homepage.css';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
