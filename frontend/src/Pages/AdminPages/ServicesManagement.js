@@ -1,9 +1,11 @@
 import AdminSideBar from "../../Components/AdminSideBar"
+import ServicesManagementDelete from "../../Components/ServicesManagementDelete"
+import { useState } from "react";
 
 
 
 const DisplayService = ({ service }) => {
-  const { title, img, cost, description } = service;
+  const { title, cost, description } = service;
   return (
     <div className="service-management-card">
       <h5 style={{ color: '#2F6DAB' }}>{title}</h5>
@@ -38,7 +40,17 @@ const sampleServices = {
 }
 
 
+
 const ServicesManagement = () => {
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const handleOpenForm = () => {
+    setIsFormOpen(true);
+  }
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+  }
+
   return (
     <div>
       <AdminSideBar />
@@ -48,10 +60,16 @@ const ServicesManagement = () => {
         </div>
         <div className="service-management">
           {Object.values(sampleServices).map((service, index) => (
-            //DisplayService
             <DisplayService key={index} service={service} />
           ))}
         </div>
+        <button
+          className="service-management-delete-button"
+          onClick={handleOpenForm}
+          >
+            Delete Service
+          </button>
+        <ServicesManagementDelete isOpen={isFormOpen} onClose={handleCloseForm} />
       </div>
     </div>
   )
