@@ -59,6 +59,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     text-align: center;
+    max-width: 400px;
 }
 
 .serviceCard:hover {
@@ -100,4 +101,13 @@
 
 .bookButton:hover {
     background-color: #1d4ed8;
+}
+
+:global(.carousel-control-prev-icon),
+:global(.carousel-control-next-icon) {
+    background-size: 100% 100%;
+    width: 24px;
+    height: 24px;
+    opacity: 1;
+    filter: invert(1);
 }

@@ -4,6 +4,7 @@ import HeroSection from '../Components/HeroSection';
 import './Homepage.css';
 import Reviews from '../Components/Reviews';
 import ContactFooter from '../Components/Footer/ContactFooter';
+import ServicesCarousel from '../Components/ServicesCarousel';
 
 
 const Homepage = () => {
@@ -11,7 +12,8 @@ const Homepage = () => {
     <div className="homepage">
       <div className="homepage-content">
         <HeroSection />
-        <AboutServices />        
+        <AboutServices />   
+        <ServicesCarousel />     
         <Reviews />
         <ContactFooter />
       </div>
