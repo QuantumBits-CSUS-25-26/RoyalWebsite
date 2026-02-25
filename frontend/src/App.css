@@ -438,7 +438,7 @@
 
 .adminCustomers {
   margin-top: -800px;
-  margin-left: -40px;
+  margin-left: 5%;
 }
 
 
@@ -468,6 +468,60 @@
 .settings {
   margin-top: -800px;
   margin-left: -40px;
+}
+
+/* begin admin customer list */
+
+.customer-list{
+  display: flex;
+  flex-direction: column;
+  margin-left: max(10%, 200px);
+  margin-right: 5%;
+  gap: 8px;
+}
+
+.customer-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  color: #6b7280;
+}
+
+.customer-card .dropdown {
+  position: relative;
+}
+.customer-card .dropdown .dropbtn {
+  margin-left: auto;
+  color: white;
+  background-color: #2F6DAB;
+  border: #dbdbdb 1px solid;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.customer-card .dropdown .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  border: #dbdbdb 1px solid;
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 1;
+  width: 150px;
+}
+
+.customer-card .dropdown:hover .dropdown-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-card:hover{
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border: black 1px solid;
 }
 
 /* begin customer login */
