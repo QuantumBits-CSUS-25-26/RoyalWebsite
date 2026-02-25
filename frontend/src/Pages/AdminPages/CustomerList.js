@@ -1,4 +1,6 @@
 import AdminSideBar from "../../Components/AdminSideBar"
+import AdminNewCustomer from "../../Components/AdminNewCustomer";
+import React, { useState } from 'react';
 
 
 const DisplayCustomer = ({ customer }) => {
@@ -63,6 +65,15 @@ const sampleCustomers = [
 ];
 
 const CustomerList = () => {
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+const handleOpenForm = () => {
+  setIsFormOpen(true);
+};
+const handleCloseForm = () => {
+  setIsFormOpen(false);
+};
+
   return (
     <div>
       <AdminSideBar />
@@ -76,6 +87,13 @@ const CustomerList = () => {
           ))}
         </div>
       </div>
+      <button
+          className='customer-list-button'
+          onClick={handleOpenForm}
+        >
+          Add New Customer
+        </button>
+      <AdminNewCustomer isOpen={isFormOpen} onClose={handleCloseForm} />
     </div>
   )
 }
