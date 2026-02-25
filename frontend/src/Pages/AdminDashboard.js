@@ -7,17 +7,18 @@ import messageIcon from '../images/message_Icon.png';
 import serviceIcon from '../images/services_Icon.png';
 import adminIcon from "../images/sign_in_Icon.png"
 import AdminSideBar from "../Components/AdminSideBar";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function AdminDashboard() {
     return (
         <section className="admin-dashboard">
             <AdminSideBar />
-            <div className="admin-dashboard-content"> 
+            <div className="admin-dashboard-content ms-md-5"> 
                 <div className="admin-dashboard-header">
                    <span className="admin-dashboard-title">Admin Dashboard </span> 
                    <div className="admin-sign-out">
-                        <img src={adminIcon} alt="Admin Avatar" className="admin-icon" aria-hidden="true"/>
-                        <btn className="admin-signIn-btn">Sign-Out</btn>
+                        <button className="admin-signIn-btn"><FontAwesomeIcon icon={faUser} /> Sign-Out</button>
                    </div>
                 </div>
                 <div className="admin-totals">
@@ -70,7 +71,8 @@ export default function AdminDashboard() {
                                             <span className="rc-name">Ali Mohammady</span>
                                         </td>
                                         <td className="rc-joined">
-                                            <span>02-10-2023 10:00 AM</span>
+                                            <span className="break-word">02-10-2023 </span> 
+                                            <span>10:00 AM</span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -79,7 +81,7 @@ export default function AdminDashboard() {
                                             <span className="rc-name">Suhali</span>
                                         </td>
                                         <td className="rc-joined">
-                                            <span>02-10-2023 10:00 AM</span>
+                                            <span><span className="break-word">02-10-2023 </span><span>10:00 AM</span></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -88,7 +90,7 @@ export default function AdminDashboard() {
                                             <span className="rc-name">Sanal</span>
                                         </td>
                                         <td className="rc-joined">
-                                            <span>02-10-2023 10:00 AM</span>
+                                            <span><span className="break-word">02-10-2023 </span><span>10:00 AM</span></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -97,7 +99,7 @@ export default function AdminDashboard() {
                                             <span className="rc-name">James</span>
                                         </td>
                                         <td className="rc-joined">
-                                             <span>02-10-2023 10:00 AM</span>
+                                             <span><span className="break-word">02-10-2023 </span><span>10:00 AM</span></span>
                                         </td>
                                     </tr>
                                 </tbody>

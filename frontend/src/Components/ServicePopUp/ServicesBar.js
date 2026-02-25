@@ -20,22 +20,13 @@ export default function ServicesBars(){
         return() => document.removeEventListener('keydown', onKey);
     }, [servicesOpen, setServiceOpen]);
 
-    useEffect(() => {
-        if (!servicesOpen) return;
-
-        const timeoutId = setTimeout(() => {
-            setServiceOpen(false);
-        }, 2000);
-        return () => clearTimeout(timeoutId);
-    }, [servicesOpen, setServiceOpen])
-
     if (!servicesOpen) return null;
     return(
         <>
             <aside className="services-drawer" role="dialog" aria-modal="true" onMouseEnter={openServices} onMouseLeave={scheduleCloseServices}>
                 <header className="services-drawer-header">
                     <h2>Services</h2>
-                    <button onClick={() => setServiceOpen(false)}>✕</button>
+                    <button className="service-popup-close-btn" onClick={() => setServiceOpen(false)}>✕</button>
                 </header>
                 <div className="services-list">
                     <ul>
@@ -67,7 +58,7 @@ export default function ServicesBars(){
                     </ul>
                 </div>
             </aside>
-            <div className="services-backdrop" onClick={() => setServiceOpen(false)}/>
+            <div onClick={() => setServiceOpen(false)}/>
         </>
     );
 
