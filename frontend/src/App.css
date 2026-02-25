@@ -470,6 +470,17 @@
   margin-left: -40px;
 }
 
+.management {
+  margin-top: -800px;
+  margin-left: 5%;
+}
+
+/* begin employee management */
+.employee-list{
+  /* not sure what is needed, closed to stop errors
+  open bracket was cut off by merge */
+}
+
 /* begin admin customer list */
 
 .customer-list{
