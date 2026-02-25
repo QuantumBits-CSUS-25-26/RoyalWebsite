@@ -70,8 +70,8 @@ const CustomerLogin = () => {
         <Row className='justify-content-center'>
           <Col md='5' sm='2'>
             <Form className='customerForm fs-3 p-4'>
-              <div className=' my-4'>Account Login</div>
-              <FormGroup className='mx-3vh px-5 my-5vh w-150 text-start'>
+              <div className=' my-4'><strong>Log In</strong></div>
+              <FormGroup className='mx-5 px-5 my-5 text-start'>
                 <Label for="email">Email</Label>
                 <Input
                   id="email"
@@ -100,14 +100,15 @@ const CustomerLogin = () => {
               >
                   Log In
                 </Button>
-              <div className='border-top border-black border-2 border-opacity-50 w-75 mx-auto my-2'></div>
-              <Button
-                type='btn'
-                className='btn btn-lg my-4 py-4 w-50'
-                onClick={handleClickNoAcc}
-              >
-                Create New Account
-              </Button>
+              <div className="mt-3 mb-4" style={{ fontSize: '1rem' }}>
+                <span style={{ color: '#6c757d' }}>Don't have an account? </span>
+                <span
+                  style={{ color: '#2F6DAB', cursor: 'pointer', fontWeight: 500 }}
+                  onClick={handleClickNoAcc}
+                >
+                  Sign Up
+                </span>
+              </div>
             </Form>
           </Col>
         </Row>

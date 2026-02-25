@@ -793,72 +793,26 @@
 }
 
 /* begin customer account creation */
-.customer-creation {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 30px;
-  font-size: 1.5vw;
+.customer-creation{
+  min-height: 100vh;
+  background-image: url('./images/HeroImage.jpg');
+  background-size: 100% auto;
+  background-repeat: repeat-y;
+  background-position: top center;
 }
 
-.customer-creation .content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.customer-creation .content{
+  margin-left: 100px;
+}
+
+.customer-creation .customerForm {
   background-color: #D9D9D9;
-  height: 80vh;
-  width: 60vw;
-  margin-top: 5vh;
-  padding-top: 2vh;
-  padding-bottom: 3vh;
-}
-.customer-creation .content .form{
-  display: flex;
-  flex-direction: column;
-  column-gap: 5%;
-  padding-top: 3vh;
-  padding-bottom: 2vh;
-}
-.customer-creation .content .form .entries{
-  display: flex;
-  flex-direction: row;
-  text-align: center;
-  padding-left: 5%;
-  padding-right: 5%;
-}
-.customer-creation .content .form .entries .input{
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  padding: 2vh;
-}
-@media (max-width: 400px) {
-  .customer-creation {
-    font-size: 5vw;
-  }
-  .customer-creation .content {
-  height: auto;
-  width: 100%;
-  }
-  .customer-creation .content .form{
-    align-items: center;
-  }
-  .customer-creation .content .form .entries{
-    flex-direction: column;
-    column-gap: 0px;
-  }
-}
-.customer-creation button{
-  background-color: #2F6DAB;
-  color: white;
-  border-width: 0px;
-  border-radius: 5px;
-  padding: 1.5%;
-  cursor: pointer;
+  margin-top: 10%;
 }
 
-.customer-creation button:hover {
-  background-color: #151F27;
+.customer-creation .btn {
+  width: 40%;
+  background-color: #2F6DAB;
 }
 
 /* begin service pop up bar */
