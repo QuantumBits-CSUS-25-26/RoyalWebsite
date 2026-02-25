@@ -12,11 +12,11 @@ import AdminDashboard from './Pages/AdminDashboard';
 import CustomerList from './Pages/AdminPages/CustomerList';
 import AdminAppointments from './Pages/AdminPages/Appointments';
 import AdminServices from './Pages/AdminPages/Services';
-import Updates from './Pages/AdminPages/Updates';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
 import Settings from './Pages/AdminPages/Settings';
 
+import Management from './Pages/AdminPages/Management';
 import CustomerLogin from './Pages/CustomerLogin';
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
