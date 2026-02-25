@@ -14,11 +14,14 @@ import AdminAppointments from './Pages/AdminPages/Appointments';
 import AdminServices from './Pages/AdminPages/Services';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
+import Settings from './Pages/AdminPages/Settings';
+
 import Management from './Pages/AdminPages/Management';
 import CustomerLogin from './Pages/CustomerLogin';
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
 import CustomerUpdate from './Pages/CustomerUpdate';
+import ServicesManagement from './Pages/AdminPages/ServicesManagement';
 
 import { UiProvider } from './Components/ServicePopUp/UiContext';
 import ServiceBar from "./Components/ServicePopUp/ServicesBar";
