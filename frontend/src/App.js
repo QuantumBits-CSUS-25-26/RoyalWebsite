@@ -21,6 +21,7 @@ import CustomerLogin from './Pages/CustomerLogin';
 import ServiceDetail from './Pages/ServiceDetail';
 import CustomerCreation from './Pages/CustomerCreation';
 import CustomerUpdate from './Pages/CustomerUpdate';
+import ServicesManagement from './Pages/AdminPages/ServicesManagement';
 
 import { UiProvider } from './Components/ServicePopUp/UiContext';
 import ServiceBar from "./Components/ServicePopUp/ServicesBar";
