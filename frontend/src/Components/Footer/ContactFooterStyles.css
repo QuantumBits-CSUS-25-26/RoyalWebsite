@@ -1,0 +1,126 @@
+
+
+.box{
+    display: flex;
+    flex-direction: column;
+    width: 100%;            
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 16px 0;
+    background: #2F6DAB;
+    flex-shrink: 0;       
+    gap: 16px;
+    border-top-left-radius: 15px;   
+    border-top-right-radius: 15px;                    
+}
+
+.contactUsTitle{
+    font-family: "Poppins", Helvetica, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.textblock{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 1024px) {
+    .textblock{
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        }
+}
+
+.text{
+    font-family: "Poppins", Helvetica, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin-right: 50px;
+    text-align: center;
+    line-height: normal;
+}
+
+.phone{
+    margin-left: 50px;
+}
+
+.mobileBreakpoint{
+    display: none;
+}
+
+.pipe{
+    display: inline;
+}
+
+@media (max-width: 767px) {
+    .phone{
+        margin-left: 0px;
+        }
+    .text{
+        margin-right: 0px;
+        }
+    .pipe{
+        display: none;
+    }
+    .mobileBreakpoint{
+        display: block;
+    }
+    .mobileSpacing{
+        display: block;
+        margin-top:10px;
+    }
+}
+
+
+.contactFormButton{
+    background-color: #ffffff;
+    color: #2F6DAB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-family: "Poppins", Helvetica, sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 1.4rem;
+    line-height: normal;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 10px 8px 11px;
+}
+
+.icon{
+    width: 24px;
+    height: 24px;
+    color: white;
+    margin-right: 10px;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .footer{
+        width: 75%;
+        align-self: stretch;
+    }
+    .textblock { align-items: center; }
+    .text { 
+        text-align: center; 
+        margin: 0;
+    }
+}

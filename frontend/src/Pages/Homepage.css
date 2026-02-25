@@ -1,0 +1,22 @@
+.homepage {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  color: #111;
+  margin-left: 100px;
+}
+
+.homepage-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 1024px) {
+  .homepage {
+    margin-left: 0px;
+  }
+}

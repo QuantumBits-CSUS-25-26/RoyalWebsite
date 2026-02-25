@@ -1,0 +1,76 @@
+/* Outer bar */
+.info-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: #2f6dab;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: "Noto Serif", serif;
+}
+
+/* Inner container matches Figma auto layout (row with gaps) */
+.info-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 57px;
+  gap: 57px; /* matches Figma gap */
+  height: 20px;
+}
+
+/* Each item (phone / address / hours) */
+.info-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; /* icon-text spacing */
+  height: 20px;
+}
+
+/* Icons */
+.info-icon {
+  font-size: 18px; /* visually balanced with 20px text */
+  line-height: 1;
+}
+
+/* Text */
+.info-text {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 27px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+/* Optional: shrink layout gracefully on smaller screens */
+@media (max-width: 1024px) {
+  .info-section {
+    gap: 30px;
+    padding: 0 20px;
+  }
+  .info-text {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-section {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 4px 10px;
+    height: auto;
+  }
+  .info-item {
+    height: auto;
+  }
+  .info-text {
+    font-size: 14px;
+  }
+}

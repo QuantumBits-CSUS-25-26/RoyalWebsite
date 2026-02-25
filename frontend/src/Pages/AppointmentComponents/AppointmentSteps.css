@@ -1,0 +1,70 @@
+.appStep {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.appStepTitle {
+  margin: 0 0 6px 0;
+}
+
+.appStepSubtitle {
+  margin: 0 0 16px 0;
+  opacity: 0.85;
+}
+
+.serviceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.serviceCard {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.18);
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: left;
+}
+
+.serviceCard.selected {
+  border-color: rgba(47,109,171,1);
+  box-shadow: 0 0 0 2px rgba(47,109,171,0.25);
+}
+
+.stepActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stepBtn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.stepBtn.primary {
+  background: rgba(47,109,171,1);
+  color: white;
+}
+
+.stepBtn.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stepBtn.secondary {
+  background: rgba(0,0,0,0.08);
+}
+
+@media (max-width: 768px) {
+  .serviceGrid {
+    grid-template-columns: 1fr;
+  }
+}
