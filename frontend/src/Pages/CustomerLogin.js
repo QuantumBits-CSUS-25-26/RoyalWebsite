@@ -70,7 +70,7 @@ const CustomerLogin = () => {
         <Row className='justify-content-center'>
           <Col md='5' sm='2'>
             <Form className='customerForm fs-3 p-4'>
-              <div className=' my-4'>Account Login</div>
+              <div className=' my-4'><strong>Log In</strong></div>
               <FormGroup className='mx-5 px-5 my-5 text-start'>
                 <Label for="email">Email</Label>
                 <Input
@@ -82,7 +82,7 @@ const CustomerLogin = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </FormGroup>
-              <FormGroup className='mx-5 px-5 my-4 text-start'>
+              <FormGroup className='mx-3vh px-5 my-4vh w-150 text-start'>
                 <Label for="password">Password</Label>
                 <Input
                   id="password"
@@ -95,19 +95,20 @@ const CustomerLogin = () => {
               </FormGroup>
               <Button
                 type="submit"
-                className='btn btn-lg my-4 py-4'
+                className='btn btn-lg my-4 py-4 w-50'
                 onClick={handleClickLogin}
               >
                   Log In
                 </Button>
-              <div className='border-top border-black border-2 border-opacity-50 w-75 mx-auto my-2'></div>
-              <Button
-                type='btn'
-                className='btn btn-lg my-4 py-4'
-                onClick={handleClickNoAcc}
-              >
-                Create New Account
-              </Button>
+              <div className="mt-3 mb-4" style={{ fontSize: '1rem' }}>
+                <span style={{ color: '#6c757d' }}>Don't have an account? </span>
+                <span
+                  style={{ color: '#2F6DAB', cursor: 'pointer', fontWeight: 500 }}
+                  onClick={handleClickNoAcc}
+                >
+                  Sign Up
+                </span>
+              </div>
             </Form>
           </Col>
         </Row>

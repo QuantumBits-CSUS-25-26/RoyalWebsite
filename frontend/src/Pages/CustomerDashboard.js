@@ -128,23 +128,27 @@ const CustomerDashboard = () => {
                     <FormGroup>
                       <Label for="appts">Appointments:</Label>
                       <div className="info-text">
-                        <Row>
-                          <Col md="4" sm="6">
-                            <div className="apptsPlateLabel">Date</div>
-                            <div className="apptText">10/15/2025</div>
-                            <div className="apptText">09/12/2025</div>
-                          </Col>
-                          <Col md="4" sm="6">
-                            <div className="apptsPlateLabel">Time</div>
-                            <div className="apptText">10:00 AM</div>
-                            <div className="apptText">11:00 AM</div>
-                          </Col>
-                          <Col md="4" sm="12">
-                            <div className="apptsPlateLabel">Service</div>
-                            <div className="apptText">Brake Inspection</div>
-                            <div className="apptText">Oil Change</div>
-                          </Col>
-                        </Row>
+                        <table className="dash-table">
+                          <thead>
+                            <tr>
+                              <th>Date</th>
+                              <th>Time</th>
+                              <th>Service</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>10/15/2025</td>
+                              <td>10:00 AM</td>
+                              <td>Brake Inspection</td>
+                            </tr>
+                            <tr>
+                              <td>09/12/2025</td>
+                              <td>11:00 AM</td>
+                              <td>Oil Change</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </FormGroup>
                   </div>
@@ -152,28 +156,30 @@ const CustomerDashboard = () => {
                     <FormGroup>
                       <Label for="vehicles">Vehicles:</Label>
                       <div className="info-text">
-                        <Row className="vehiclesRow">
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Make</div>
-                            <div className="plateText">Toyota</div>
-                            <div className="plateText">Honda</div>
-                          </Col>
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Model</div>
-                            <div className="plateText">Camry</div>
-                            <div className="plateText">Civic</div>
-                          </Col>
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Year</div>
-                            <div className="plateText">2020</div>
-                            <div className="plateText">2018</div>
-                          </Col>
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Plate</div>
-                            <div className="plateText">ABC123</div>
-                            <div className="plateText">XYZ789</div>
-                          </Col>
-                        </Row>
+                        <table className="dash-table">
+                          <thead>
+                            <tr>
+                              <th>Make</th>
+                              <th>Model</th>
+                              <th>Year</th>
+                              <th>Plate</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Toyota</td>
+                              <td>Camry</td>
+                              <td>2020</td>
+                              <td>ABC123</td>
+                            </tr>
+                            <tr>
+                              <td>Honda</td>
+                              <td>Civic</td>
+                              <td>2018</td>
+                              <td>XYZ789</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </FormGroup>
                   </div>
@@ -182,37 +188,24 @@ const CustomerDashboard = () => {
                       <Label>Service History:</Label>
 
                       <div className="info-text">
-                        <Row className="vehiclesRow">
-                          {/* Service Column */}
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Service</div>
+                        <table className="dash-table">
+                          <thead>
+                            <tr>
+                              <th>Service</th>
+                              <th>Date</th>
+                              <th>Cost</th>
+                            </tr>
+                          </thead>
+                          <tbody>
                             {serviceHistory.map((item, index) => (
-                                <div className="plateText" key={`service-${index}`}>
-                                  {item.service}
-                                </div>
+                              <tr key={`sh-${index}`}>
+                                <td>{item.service}</td>
+                                <td>{item.date}</td>
+                                <td>{item.cost}</td>
+                              </tr>
                             ))}
-                          </Col>
-
-                          {/* Date Column */}
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Date</div>
-                            {serviceHistory.map((item, index) => (
-                                <div className="plateText" key={`date-${index}`}>
-                                  {item.date}
-                                </div>
-                            ))}
-                          </Col>
-
-                          {/* Cost Column */}
-                          <Col md="3" sm="6" className="vehiclesCol">
-                            <div className="apptsPlateLabel">Cost</div>
-                            {serviceHistory.map((item, index) => (
-                                <div className="plateText" key={`cost-${index}`}>
-                                  {item.cost}
-                                </div>
-                            ))}
-                          </Col>
-                        </Row>
+                          </tbody>
+                        </table>
                       </div>
 
                       {/* Pagination */}
