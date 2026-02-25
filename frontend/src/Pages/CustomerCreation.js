@@ -1,3 +1,4 @@
+import './Homepage.css';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -93,19 +94,37 @@ const CustomerCreation = () => {
       <div className="content">
         Account Creation
         <form className="form" onSubmit={handleSubmit} noValidate>
+
           <div className="entries">
-            First Name <br/>
-              <input 
-                type="text" 
-                name="fname"
-                placeholder="First Name"
-                 maxLength={24}
-                value={values.fname}
+            <div className="input">
+              First Name <br/>
+                <input 
+                  type="text" 
+                  name="fname"
+                  placeholder="First Name"
+                  maxLength={24}
+                  value={values.fname}
+                  onChange={handleChange}
+                />
+                <br/>
+                {errors.fname && <div className="error">{errors.fname}</div>}
+            </div>
+            <div className="input">
+              Last Name <br/>
+                <input
+                  type="text"
+                  name="lname"
+                  placeholder="Last Name"
+                value={values.lname}
                 onChange={handleChange}
               />
               <br/>
-              {errors.fname && <div className="error">{errors.fname}</div>}
-           Email <br/>
+              {errors.lname && <div className="error">{errors.lname}</div>}
+            </div>
+          </div>
+          <div className="entries"> 
+            <div className="input">
+            Email <br/>
               <input
                 type="text"
                 name="email"
@@ -115,53 +134,51 @@ const CustomerCreation = () => {
               />
               <br/>
               {errors.email && <div className="error">{errors.email}</div>}
-              Password <br/>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={values.password}
-                onChange={handleChange}
-              />
-                <br/>
-              {errors.password && <div className="error">{errors.password}</div>}
               </div>
-            <div className="entries">
-              Last Name <br/>
-              <input
-                type="text"
-                name="lname"
-                placeholder="Last Name"
-                value={values.lname}
-                onChange={handleChange}
-              />
-                <br/>
-              {errors.lname && <div className="error">{errors.lname}</div>}
+              <div className="input">
               Phone Number <br/>
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone Number"
-                value={values.phone}
-                onChange={handleChange}
-              />
-                <br/>
-              {errors.phone && <div className="error">{errors.phone}</div>}
-              Confirm Password <br/>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={values.confirmPassword}
-                onChange={handleChange}
-              />
-                  <br/>
-              {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone Number"
+              value={values.phone}
+              onChange={handleChange}
+            />
+            <br/>
+            {errors.phone && <div className="error">{errors.phone}</div>}
             </div>
+          </div>
+          <div className="entries">
+            <div className="input">
+            Password <br/>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={values.password}
+              onChange={handleChange}
+            />
+            <br/>
+            {errors.password && <div className="error">{errors.password}</div>}
+            </div>
+            <div className="input">
+            Confirm Password <br/>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={values.confirmPassword}
+              onChange={handleChange}
+            />
+            <br/>
+            {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
+            </div>
+          </div>
+
             <div style={{ clear: 'both' }} />
             <br/>
-            <button type="submit"> Create Account </button>
           </form>
+          <button type="submit"> Create Account </button>
         </div>
       </div>
   )
