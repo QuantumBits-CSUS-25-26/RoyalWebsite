@@ -14,7 +14,6 @@ import AdminAppointments from './Pages/AdminPages/Appointments';
 import AdminServices from './Pages/AdminPages/Services';
 import Invoices from './Pages/AdminPages/Invoices';
 import Messages from './Pages/AdminPages/Messages';
-import Settings from './Pages/AdminPages/Settings';
 
 import Management from './Pages/AdminPages/Management';
 import CustomerLogin from './Pages/CustomerLogin';
@@ -61,11 +60,9 @@ function App() {
               <Route path='/admin/customers' element={<CustomerList />} />
               <Route path='/admin/appointments' element={<AdminAppointments />} />
               <Route path='/admin/services' element={<AdminServices />} />
-              <Route path='/admin/updates' element={<Updates />} />
               <Route path='/admin/invoices' element={<Invoices />} />
               <Route path='/admin/messages' element={<Messages />} />
               <Route path='/admin/management' element={<Management />} />
-              <Route path='/admin/settings' element={<Settings />} />
               <Route path='/admin/login' element={<Login />} />
             </Routes>
           </div>
