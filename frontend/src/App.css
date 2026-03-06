@@ -622,17 +622,32 @@
 }
 
 .management {
-  margin-top: -800px;
+  margin-top: -1000px;
   margin-left: 5%;
 }
 
 /* begin employee management */
 .employee-list{
-  /* not sure what is needed, closed to stop errors
-  open bracket was cut off by merge */
+  display: flex;
+  flex-direction: column;
+  margin-left: max(10%, 200px);
+  margin-right: 5%;
+  gap: 8px;
+}
+
+.employee-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  color: #6b7280;
 }
 
 /* begin admin customer list */
+
 .customer-list{
   display: flex;
   flex-direction: column;
@@ -771,8 +786,6 @@
   border-radius: 5px;
   padding: 1.5%;
 }
-
-
 
 /* begin customer login */
 .customerLogin{

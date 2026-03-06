@@ -15,6 +15,7 @@ from .models import Customer, Vehicle, Employee, Appointment, SiteService
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
+    EmployeeRegistrationSerializer,
     VehicleSerializer,
     EmployeeProfileSerializer,
     AppointmentSerializer,
@@ -172,7 +173,46 @@ class EmployeeLoginView(APIView):
             **tokens,
         })
 
+class AdminEmployeeCreateView(APIView):
+    """POST /api/admin/employees/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdmin]
 
+    def post(self, request):
+        serializer = EmployeeRegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        employee = serializer.save()
+        return Response(EmployeeRegistrationSerializer(employee).data, status=status.HTTP_201_CREATED)
+
+class AdminEmployeeDeleteView(APIView):
+    """DELETE /api/admin/employees/<employee_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdmin]
+
+    def delete(self, request, employee_id):
+        try:
+            employee = Employee.objects.get(employee_id=employee_id)
+        except Employee.DoesNotExist:
+            return Response({'detail': 'Employee not found.'}, status=status.HTTP_404_NOT_FOUND)
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class AdminEmployeeEditView(APIView):
+    """PUT /api/admin/employees/<employee_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdmin]
+
+    def put(self, request, employee_id):
+        try:
+            employee = Employee.objects.get(employee_id=employee_id)
+        except Employee.DoesNotExist:
+            return Response({'detail': 'Employee not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = EmployeeRegistrationSerializer(employee, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(EmployeeRegistrationSerializer(employee).data)
+    
 # ══════════════════════════════════════════════════════════════════
 #  Vehicles (customer‑scoped)
 # ══════════════════════════════════════════════════════════════════
@@ -344,6 +384,17 @@ class AdminCustomerListView(APIView):
         serializer = CustomerProfileSerializer(qs, many=True)
         return Response(serializer.data)
 
+
+class AdminEmployeeListView(APIView):
+    """GET /api/admin/employees/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    def get(self, request):
+        qs = Employee.objects.all().order_by('last_name', 'first_name')
+        serializer = EmployeeProfileSerializer(qs, many=True)
+        return Response(serializer.data)
+    
 
 class AdminAppointmentListView(APIView):
     """GET /api/admin/appointments/"""
