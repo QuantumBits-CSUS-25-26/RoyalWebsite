@@ -1,7 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { validateContactForm } from './validateContactForm';
+import { API_BASE_URL } from '../config';
+
 
 const ContactForm = ({ isOpen, onClose }) => {
+
+  const [businessInfo, setBusinessInfo] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/business-info/`)
+      .then(res => res.json())
+      .then(data => setBusinessInfo(data[0]));
+  }, []);
+
   const [formData, setFormData] = useState({
     fname: '',
     lname: '',
@@ -154,8 +165,8 @@ const ContactForm = ({ isOpen, onClose }) => {
       </form>
       
       <p>
-        Or call us at <a href="tel:+19255198710">(916) 562-9441</a><br />
-        Find us at 2546 Tower Ave, Sacramento, CA 95825 <a href="https://maps.app.goo.gl/nhVarV8tpZaBLSLk8">Open in Maps</a>
+        Or call us at <a href="tel:+19255198710">{businessInfo?.phone}</a><br />
+        Find us at {businessInfo?.address} <a href="https://maps.app.goo.gl/nhVarV8tpZaBLSLk8">Open in Maps</a>
       </p>
       </div>
     </div>

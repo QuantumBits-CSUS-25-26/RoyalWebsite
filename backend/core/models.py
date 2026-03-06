@@ -106,3 +106,17 @@ class SiteService(models.Model):
 
     def __str__(self):
         return self.name
+
+class BusinessInformation(models.Model):
+    info_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True)
+    address = models.CharField(max_length=255, blank=True, default='')
+    phone = models.CharField(max_length=20, blank=True, default='')
+    email = models.EmailField(null=True, blank=True)
+    hours = models.CharField(max_length=255, blank=True, default='')
+    
+    class Meta:
+        db_table = 'business_information'
+
+    def __str__(self):
+        return self.name

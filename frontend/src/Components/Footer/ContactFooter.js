@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CalenderSVG from './ContactFooterAssets/Calender.svg';
 import CompassSVG from './ContactFooterAssets/Compass.svg';
 import PhoneSVG from './ContactFooterAssets/Phone.svg';
@@ -7,11 +7,21 @@ import './ContactFooterStyles.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
+import { API_BASE_URL } from '../../config';
 
 
 
 
 const ContactFooter = () => {
+
+  const [businessInfo, setBusinessInfo] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/business-info/`)
+      .then(res => res.json())
+      .then(data => setBusinessInfo(data[0]));
+  }, []);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const handleOpenForm = () => {
@@ -29,18 +39,15 @@ const ContactFooter = () => {
         <div className='textblock'>
           <span className='text phone'>
             <img src={PhoneSVG} className='icon' alt="" aria-hidden="true" />
-            (916) 562-9441
+            {businessInfo?.phone}
           </span>
           <span className='text'>
             <FontAwesomeIcon icon={faMapLocationDot} className="icon" />
-            2546 Tower Ave, Sacramento, CA 95825
+            {businessInfo?.address}
           </span>
           <span className='text'>
             <FontAwesomeIcon icon={faClock} className="icon" />
-            Monday - Friday: 8AM - 5PM
-            <span className="pipe"> | </span>
-            <br className="mobileBreakpoint" />
-            <span className="mobileSpacing">Saturday: 9AM - 4PM</span>
+            {businessInfo?.hours}
           </span>
         </div>
         <button

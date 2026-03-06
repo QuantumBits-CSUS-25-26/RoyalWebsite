@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Customer, Vehicle, Employee, Appointment, SiteService
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -138,3 +138,15 @@ class SiteServiceSerializer(serializers.ModelSerializer):
             'service_id', 'name', 'description',
             'cost', 'image', 'display_order', 'is_active',
         ]
+
+# ══════════════════════════════════════════════════════════════════
+#  Business Information serializers
+# ══════════════════════════════════════════════════════════════════
+
+class BusinessInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessInformation
+        fields = [
+            'info_id', 'name', 'address', 'phone', 'email', 'hours'
+        ]
+        read_only_fields = ['info_id']

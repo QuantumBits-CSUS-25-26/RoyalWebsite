@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -21,6 +21,7 @@ from .serializer import (
     AppointmentReadSerializer,
     CustomTokenObtainPairSerializer,
     SiteServiceSerializer,
+    BusinessInformationSerializer,
 )
 from .authentication import (
     CustomJWTAuthentication,
@@ -328,6 +329,29 @@ class AppointmentDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         appt.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+# ══════════════════════════════════════════════════════════════════
+#  Business Information
+# ══════════════════════════════════════════════════════════════════
+
+class BusinessInformationView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [IsAdmin()]
+
+    def get(self, request):
+        qs = BusinessInformation.objects.all()
+        serializer = BusinessInformationSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BusinessInformationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 # ══════════════════════════════════════════════════════════════════
