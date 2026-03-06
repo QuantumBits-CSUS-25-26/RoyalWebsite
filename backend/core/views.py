@@ -353,6 +353,48 @@ class BusinessInformationView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class BusinessInformationDetailView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        # return [IsAdmin()]
+        return [permissions.AllowAny()] #temporarily allow anyone to edit business info for dev/testing; change to IsAdmin in production
+
+
+    def get_object(self, info_id):
+        try:
+            return BusinessInformation.objects.get(info_id=info_id)
+        except BusinessInformation.DoesNotExist:
+            return None
+
+    def get(self, request, info_id):
+        info = self.get_object(info_id)
+        if not info:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = BusinessInformationSerializer(info)
+        return Response(serializer.data)
+
+    def put(self, request, info_id):
+        info = self.get_object(info_id)
+        if not info:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = BusinessInformationSerializer(info, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, info_id):
+        info = self.get_object(info_id)
+        if not info:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        info.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # ══════════════════════════════════════════════════════════════════
 #  Admin-only list views
@@ -361,7 +403,7 @@ class BusinessInformationView(APIView):
 class AdminCustomerListView(APIView):
     """GET /api/admin/customers/"""
     authentication_classes = [CustomJWTAuthentication]
-    permission_classes = [IsEmployee]
+    # permission_classes = [IsEmployee]
 
     def get(self, request):
         qs = Customer.objects.all().order_by('-created_at')

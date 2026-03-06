@@ -218,6 +218,7 @@
   align-items: flex-start;
   gap: 16px;
   width: 100%;
+  padding: 20px;
 }
 
 .admin-dashboard-content {
@@ -424,6 +425,39 @@
   border-bottom: 1px solid #f3f4f6;
   font-size: 14px;
   color: #111827;
+}
+
+.rc-table .business-headers {
+  font-size: 16px;
+  color: #6b7280;
+  padding-left: 20px;
+  font-weight: 700;
+}
+
+.rc-table .business-info {
+  text-align: left;
+  padding-left: 20%
+}
+
+.admin-dashboard .business-table {
+  margin-top: 35px;
+}
+
+.business-table .edit-business-btn {
+  background-color: #2F6DAB;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  width: 100px;
+}
+
+.business-table .business-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 1rem;
 }
 
 .rc-customer {
