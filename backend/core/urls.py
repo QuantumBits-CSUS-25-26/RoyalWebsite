@@ -32,4 +32,9 @@ urlpatterns = [
     path('admin/appointments/', views.AdminAppointmentListView.as_view(), name='admin_appointment_list'),
     path('admin/vehicles/', views.AdminVehicleListView.as_view(), name='admin_vehicle_list'),
     path('admin/employees/', views.AdminEmployeeListView.as_view(), name='admin_employee_list'),
+
+    # ── Business Information ───────────────────────────────────
+    path('business-info/', views.BusinessInformationView.as_view(), name='business_info'),
+    path('business-info/<int:info_id>/', views.BusinessInformationDetailView.as_view(), name='business_info_detail'),
+
 ]

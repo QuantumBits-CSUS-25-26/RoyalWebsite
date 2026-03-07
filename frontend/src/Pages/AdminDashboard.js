@@ -9,17 +9,34 @@ import adminIcon from "../images/sign_in_Icon.png"
 import AdminSideBar from "../Components/AdminSideBar";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from 'react';
+import { API_BASE_URL } from "../config";
+import { Button } from "reactstrap";
+import AdminUpdateBusiness from "../Components/AdminUpdateBusiness";
+
 
 export default function AdminDashboard() {
+
+    const [businessInfo, setBusinessInfo] = useState(null);
+
+    const [showEditBusiness, setShowEditBusiness] = useState(false);
+
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/api/business-info/`)
+            .then(res => res.json())
+            .then(data => setBusinessInfo(data[0]));
+    }, []);
+
+
     return (
         <section className="admin-dashboard">
             <AdminSideBar />
-            <div className="admin-dashboard-content ms-md-5"> 
+            <div className="admin-dashboard-content ms-md-5">
                 <div className="admin-dashboard-header">
-                   <span className="admin-dashboard-title">Admin Dashboard </span> 
-                   <div className="admin-sign-out">
+                    <span className="admin-dashboard-title">Admin Dashboard </span>
+                    <div className="admin-sign-out">
                         <button className="admin-signIn-btn"><FontAwesomeIcon icon={faUser} /> Sign-Out</button>
-                   </div>
+                    </div>
                 </div>
                 <div className="admin-totals">
                     <div className="total-customers">
@@ -27,34 +44,34 @@ export default function AdminDashboard() {
                             <p>Total Customers</p>
                             <p>150</p>
                         </div>
-                        <img src={customerIcon} alt="Customer Icon" className="customer-icon" /> 
+                        <img src={customerIcon} alt="Customer Icon" className="customer-icon" />
                     </div>
                     <div className="total-appointments">
                         <div className="inner-total-appointments">
                             <p >Total Appointments</p>
                             <p >3</p>
                         </div>
-                        <img src={appointmentIcon} alt="Appointment Icon" className="appointment-icon" /> 
+                        <img src={appointmentIcon} alt="Appointment Icon" className="appointment-icon" />
                     </div>
                     <div className="total-messages">
                         <div className="inner-total-messages">
                             <p >Total Messages</p>
                             <p >12</p>
                         </div>
-                        <img src={messageIcon} alt="Message Icon" className="message-icon" /> 
+                        <img src={messageIcon} alt="Message Icon" className="message-icon" />
                     </div>
                     <div className="total-services">
                         <div className="inner-total-services">
                             <p >Total Services</p>
                             <p >8</p>
                         </div>
-                        <img src={serviceIcon} alt="Service Icon" className="service-icon" /> 
+                        <img src={serviceIcon} alt="Service Icon" className="service-icon" />
                     </div>
                 </div>
                 <div className="admin-content" >
                     <section className="admin-recent-customers">
                         <div className="rc-header">
-                            <h2 id="rc-title">Recent Customers</h2>  
+                            <h2 id="rc-title">Recent Customers</h2>
                         </div>
                         <div className="rc-customer-table">
                             <table className="rc-table">
@@ -67,17 +84,17 @@ export default function AdminDashboard() {
                                 <tbody>
                                     <tr>
                                         <td className="rc-customer">
-                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true"/>
+                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true" />
                                             <span className="rc-name">Ali Mohammady</span>
                                         </td>
                                         <td className="rc-joined">
-                                            <span className="break-word">02-10-2023 </span> 
+                                            <span className="break-word">02-10-2023 </span>
                                             <span>10:00 AM</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td className="rc-customer">
-                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true"/>
+                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true" />
                                             <span className="rc-name">Suhali</span>
                                         </td>
                                         <td className="rc-joined">
@@ -86,7 +103,7 @@ export default function AdminDashboard() {
                                     </tr>
                                     <tr>
                                         <td className="rc-customer">
-                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true"/>
+                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true" />
                                             <span className="rc-name">Sanal</span>
                                         </td>
                                         <td className="rc-joined">
@@ -95,11 +112,71 @@ export default function AdminDashboard() {
                                     </tr>
                                     <tr>
                                         <td className="rc-customer">
-                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true"/>
+                                            <img src={customerIcon} alt="Customer Icon" className="rc-avatar" aria-hidden="true" />
                                             <span className="rc-name">James</span>
                                         </td>
                                         <td className="rc-joined">
-                                             <span><span className="break-word">02-10-2023 </span><span>10:00 AM</span></span>
+                                            <span><span className="break-word">02-10-2023 </span><span>10:00 AM</span></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section className="admin-recent-customers business-table">
+                        <div className="rc-header business-header">
+                            <h2 id="rc-title">Business Information</h2>
+                           <Button className="edit-business-btn btn btn-lg" onClick={() => setShowEditBusiness(true)}>
+                                Edit
+                            </Button>
+                            <AdminUpdateBusiness
+                                visible={showEditBusiness} 
+                                onClose={() => setShowEditBusiness(false)} 
+                                businessInfo={businessInfo}
+                                setBusinessInfo={setBusinessInfo}
+                            />
+                        </div>
+                        <div className="rc-customer-table">
+                            <table className="rc-table">
+                                <tbody>
+                                    <tr>
+                                        <td className="rc-customer">
+                                            <span className="business-headers">Name: </span>
+                                        </td>
+                                        <td className="business-info">
+                                            <span>{businessInfo?.name || "No Name Found"}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="rc-customer">
+                                            <span className="business-headers">Phone: </span>
+                                        </td>
+                                        <td className="business-info">
+                                            <span>{businessInfo?.phone || "No Phone Found"}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="rc-customer">
+                                            <span className="business-headers">Address: </span>
+                                        </td>
+                                        <td className="business-info">
+                                            <span>{businessInfo?.address || "No Address Found"}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="rc-customer">
+                                            <span className="business-headers">Hours: </span>
+                                        </td>
+                                        <td className="business-info">
+                                            <span>{businessInfo?.hours || "No Hours Found"}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="rc-customer">
+                                            <span className="business-headers">Email: </span>
+                                        </td>
+                                        <td className="business-info">
+                                            <span>{businessInfo?.email || "No Email Found"}</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -107,7 +184,7 @@ export default function AdminDashboard() {
                         </div>
                     </section>
                 </div>
-                
+
             </div>
         </section>
     );
