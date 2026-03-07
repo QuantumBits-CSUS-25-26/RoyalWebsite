@@ -1,9 +1,5 @@
 import styles from "./Services/Services.module.css";
 import { Link } from "react-router-dom";
-import oilChange from "./Services/asset/services-1.png";
-import brakeRepair from "./Services/asset/services-2.jpeg";
-import suspensionWork from "./Services/asset/services-3.jpeg";
-import vehicleInspection from "./Services/asset/services-4.jpeg";
 import {
     Carousel,
     CarouselItem,
@@ -11,47 +7,19 @@ import {
     CarouselIndicators,
 } from "reactstrap";
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from '../config';
 
 
 const ServicesCarousel = () => {
-    const services = [
-        {
-            id: 1,
-            img: oilChange,
-            title: "Oil Changes",
-            cost: "20$",
-            date: "2026/02/25",
-            desc: "Quick and reliable oil changes to keep your engine healthy.",
-        },
-        {
-            id: 2,
-            img: brakeRepair,
-            title: "Brake Repairs",
-            desc: "Professional brake inspection and replacement for safe driving.",
-            cost: "10$",
-            date: "2026/02/25",
-        },
-        {
-            id: 3,
-            img: suspensionWork,
-            title: "Suspension Work",
-            desc: "Smooth out your ride with full suspension diagnostics and repair.",
-            cost: "50$",
-            date: "2026/02/25",
-        },
-        {
-
-
-            id: 4,
-            img: vehicleInspection,
-            title: "Vehicle Inspections",
-            cost: "70$",
-            date: "2026/02/25",
-            desc: "Certified inspections for Uber and Lyft drivers.",
-        },
-    ];
-
+    const [services, setServices] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/api/services/`)
+            .then(res => res.json())
+            .then(data => setServices(data))
+            .catch(err => console.error('Failed to fetch services:', err));
+    }, []);
 
     useEffect(() => {
         const handleResize = () => {
@@ -95,17 +63,18 @@ const ServicesCarousel = () => {
         >
             <div className={`${styles.serviceList} mx-auto`}>
                 {group.map((service) => (
-                    <div key={service.id} className={`${styles.serviceCard} mx-auto`}>
-                        <img
-                            src={service.img}
-                            alt={service.title}
-                            className={styles.serviceImage}
-                        />
-                        <h3 className={styles.serviceTitle}>{service.title}</h3>
-                        <h3 className={styles.serviceTitle}>{service.date}</h3>
-                        <h3 className={styles.serviceTitle}>{service.cost}</h3>
-                        <p className={styles.serviceDesc}>{service.desc}</p>
-                        <Link to={`/service/${service.id}`} className={styles.viewMore}>
+                    <div key={service.service_id} className={`${styles.serviceCard} mx-auto`}>
+                        {service.image && (
+                            <img
+                                src={service.image}
+                                alt={service.name}
+                                className={styles.serviceImage}
+                            />
+                        )}
+                        <h3 className={styles.serviceTitle}>{service.name}</h3>
+                        <h3 className={styles.serviceTitle}>{service.cost ? `$${service.cost}` : ''}</h3>
+                        <p className={styles.serviceDesc}>{service.description}</p>
+                        <Link to={`/service/${service.service_id}`} className={styles.viewMore}>
                             View More →
                         </Link>
                     </div>
