@@ -438,7 +438,10 @@ class SiteServiceListCreateView(APIView):
     permission_classes = [permissions.AllowAny]  # TODO: restrict to IsAdmin for writes in production
 
     def get(self, request):
-        qs = SiteService.objects.filter(is_active=True)
+        if request.query_params.get('all') == 'true':
+            qs = SiteService.objects.all()
+        else:
+            qs = SiteService.objects.filter(is_active=True)
         serializer = SiteServiceSerializer(qs, many=True)
         return Response(serializer.data)
 
