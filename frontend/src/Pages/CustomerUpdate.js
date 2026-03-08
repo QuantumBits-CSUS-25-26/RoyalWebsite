@@ -1,7 +1,6 @@
 import './Homepage.css';
 import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 const currentEntries = [
@@ -146,109 +145,110 @@ const CustomerUpdate = () => {
 
   return (
     <div className="customerUpdate">
-      <div className="title">
-        <Row className='justify-content-center'>
-          <Col md='10' sm='2'>
-            <Form className='updateForm fs-3 p-4'>
-              <div className=' my-4'>Update Account Information</div>
-              <div className="container" > 
-                <div className="contentLeft">
-                <FormGroup className='mx-5 px-5 my-5 text-start'>
-                  <Label for="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    placeholder={firstNamePlaceHolder}
-                    type="text"
-                    value={newFirstName}
-                    onChange={(e) => setNewFirstName(e.target.value)}
-                  />
-                </FormGroup>
+      <div className="customerUpdate-inner">
+        <div className="title">
+          <Row className='justify-content-center'>
+            <Col xs='12' md='10' sm='12'>
+              <Form className='updateForm fs-3 p-4'>
+                <div className=' my-4'>Update Account Information</div>
+                <div className="container updateForm-grid">
+                  <div className="contentLeft">
+                    <FormGroup className='form-group-update my-4 text-start'>
+                      <Label for="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        placeholder={firstNamePlaceHolder}
+                        type="text"
+                        value={newFirstName}
+                        onChange={(e) => setNewFirstName(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
+                  <div className="contentRight">
+                    <FormGroup className='form-group-update my-4 text-start'>
+                      <Label for="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        placeholder={lastNamePlaceHolder}
+                        type="text"
+                        value={newLastName}
+                        onChange={(e) => setNewLastName(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
                 </div>
-                <div className="contentRight">
-                  <FormGroup className='mx-5 px-5 my-5 text-start'>
-                    <Label for="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      placeholder={lastNamePlaceHolder}
-                      type="text"
-                      value={newLastName}
-                      onChange={(e) => setNewLastName(e.target.value)}
-                    />
-                  </FormGroup>
+                <div className="container updateForm-grid">
+                  <div className="contentLeft">
+                    <FormGroup className='form-group-update my-4 text-start'>
+                      <Label for="email">Email</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        placeholder={emailPlaceHolder}
+                        type="email"
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
+                  <div className="contentRight">
+                    <FormGroup className='form-group-update my-4 text-start'>
+                      <Label for="phoneNumber">Phone Number</Label>
+                      <Input
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        placeholder={phoneNumberPlaceHolder}
+                        type="tel"
+                        value={newPhoneNumber}
+                        onChange={(e) => setNewPhoneNumber(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
                 </div>
-              </div>
-              <div className="container" >
-                <div className="contentLeft">
-                  <FormGroup className='mx-5 px-5 my-4 text-start'>
-                    <Label for="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      placeholder={emailPlaceHolder}
-                      type="email"
-                      value={newEmail}
-                      onChange={(e) => setNewEmail(e.target.value)}
-                    />
-                  </FormGroup>
+                <div className="container updateForm-grid">
+                  <div className="contentLeft">
+                    <FormGroup className='form-group-update my-4 text-start'>
+                      <Label for="newPassword">New Password</Label>
+                      <Input
+                        id="newPassword"
+                        name="newPassword"
+                        placeholder={passPlaceHolder}
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
+                  <div className="contentRight">
+                    <FormGroup className='form-group-update my-4 text-start'>
+                      <Label for="confirmNewPassword">Confirm New Password</Label>
+                      <Input
+                        id="confirmNewPassword"
+                        name="confirmNewPassword"
+                        placeholder={passPlaceHolderConfirm}
+                        type="password"
+                        value={newPasswordConfirm}
+                        onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
                 </div>
-                <div className="contentRight">
-                  <FormGroup className='mx-5 px-5 my-4 text-start'>
-                    <Label for="phoneNumber">Phone Number</Label>
-                    <Input
-                      id="phoneNumber"
-                      name="phoneNumber"
-                      placeholder={phoneNumberPlaceHolder}
-                      type="tel"
-                      value={newPhoneNumber}
-                      onChange={(e) => setNewPhoneNumber(e.target.value)}
-                    />
-                  </FormGroup>
-                </div>
-              </div>  
-              <div className="container" >
-                <div className="contentLeft">
-                  <FormGroup className='mx-5 px-5 my-4 text-start'>
-                    <Label for="newPassword">New Password</Label>
-                    <Input
-                      id="newPassword"
-                      name="newPassword"
-                      placeholder={passPlaceHolder}
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                  </FormGroup>
-                </div>
-                <div className="contentRight">
-                  <FormGroup className='mx-5 px-5 my-4 text-start'>
-                    <Label for="confirmNewPassword">Confirm New Password</Label>
-                    <Input
-                      id="confirmNewPassword"
-                      name="confirmNewPassword"
-                      placeholder={passPlaceHolderConfirm}
-                      type="password"
-                      value={newPasswordConfirm}
-                      onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                    />
-                  </FormGroup>
-                </div>
-              </div> 
-              <Button
-                type='btn'
-                className='btn btn-lg my-4 py-4'
-                onClick={handleClickUpdate}
-              >
-                Update
-              </Button> 
-            </Form>
-          </Col>
-        </Row>
+                <Button
+                  type='button'
+                  className='btn btn-lg my-4 py-3 update-submit-btn'
+                  onClick={handleClickUpdate}
+                >
+                  Update
+                </Button>
+              </Form>
+            </Col>
+          </Row>
+        </div>
       </div>
     </div>
   );
-  
 }
 
 export default CustomerUpdate;
