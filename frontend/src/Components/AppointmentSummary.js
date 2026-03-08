@@ -20,9 +20,9 @@ const AppSumm = ({ appointments = [], onClose }) => (
       <tbody>
         {appointments.map(a => (
           <tr key={a.id}>
-            <td>{a.name}</td>
-            <td>{a.description}</td>
-            <td>{a.paymentStatus}</td>
+            <td data-label="Service">{a.name}</td>
+            <td data-label="Description">{a.description}</td>
+            <td data-label="Payment Status">{a.paymentStatus}</td>
           </tr>
         ))}
       </tbody>
