@@ -1,8 +1,9 @@
 import '../App.css';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
-const ContactInfoS4 = () => {
+const ContactInfoS4 = ({ contactInfo = {}, onFieldChange = () => {}, onNotifChange = () => {}, onSubmit = () => {} }) => {
+
+  const notif = contactInfo.notifPref || { email: false, text: false };
 
   return (
     <div className="contact-info-s4">
@@ -10,13 +11,15 @@ const ContactInfoS4 = () => {
             <h1>Contact Information</h1>
         </div>
         
-        <div className="contact-info-form">
+        <form className="contact-info-form" onSubmit={onSubmit}>
             <div className="contact-name-info">
                 <div className="contact-info-fName">
                     First Name<br/>
                     <input className="contact-info-input"
                         type="text" 
                         name="fname"
+                        value={contactInfo.fname || ''}
+                        onChange={onFieldChange}
                         placeholder="e.g. John"
                     />
                 </div>
@@ -24,7 +27,9 @@ const ContactInfoS4 = () => {
                     Last Name<br/>
                     <input className="contact-info-input"
                         type="text" 
-                        name="lName"
+                        name="lname"
+                        value={contactInfo.lname || ''}
+                        onChange={onFieldChange}
                         placeholder="e.g. Doe"
                     />
                 </div>
@@ -35,6 +40,8 @@ const ContactInfoS4 = () => {
                         <input className="contact-info-input"
                             type="email"
                             name="email"
+                            value={contactInfo.email || ''}
+                            onChange={onFieldChange}
                             placeholder="e.g. john.doe@example.com"
                         />
                     </div>
@@ -43,6 +50,8 @@ const ContactInfoS4 = () => {
                         <input className="contact-info-input"
                             type="tel"
                             name="phone"
+                            value={contactInfo.phone || ''}
+                            onChange={onFieldChange}
                             placeholder="e.g. 123-456-7890"
                         />
                     </div>
@@ -51,16 +60,16 @@ const ContactInfoS4 = () => {
                 <div className="contact-info-notifications">
                     <h1 className="notif-header">Notifications</h1>
                     <input  
-                        type="checkbox" id="emailNotif" name="emailNotif" value="emailNotif"/>
-                    <label for="emailNotif">  Notify by Email</label><br />
+                        type="checkbox" id="emailNotif" name="email" checked={!!notif.email} onChange={onNotifChange} />
+                    <label htmlFor="emailNotif">  Notify by Email</label><br />
                     <input 
-                        type="checkbox" id="textNotif" name="textNotif" value="textNotif"/>
-                    <label for="textNotif">  Notify by Text Message</label><br />
+                        type="checkbox" id="textNotif" name="text" checked={!!notif.text} onChange={onNotifChange} />
+                    <label htmlFor="textNotif">  Notify by Text Message</label><br />
                 </div>  
-                <button className="contact-info-sbmt-btn">Submit</button>
-  
+                <button className="contact-info-sbmt-btn" type="submit">Submit</button>
+
             </div>
-        </div>
+        </form>
     </div> 
   );
 }
