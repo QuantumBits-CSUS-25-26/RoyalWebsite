@@ -1446,6 +1446,17 @@
 
 
 /* begin customer update */
+.customerUpdate {
+  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.customerUpdate .customerUpdate-inner {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .customerUpdate .title {
   margin-left: 100px;
 }
@@ -1453,25 +1464,93 @@
 .customerUpdate .updateForm {
   background-color: #D9D9D9;
   margin-top: 0%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.customerUpdate .container {
+.customerUpdate .container.updateForm-grid {
   display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .customerUpdate .contentRight {
-  height: 20vh;
-  width: 100vh;
+  height: auto;
+  min-height: 20vh;
+  width: 50%;
+  box-sizing: border-box;
 }
 
 .customerUpdate .contentLeft {
-  height: 20vh;
-  width: 100vh;
+  height: auto;
+  min-height: 20vh;
+  width: 50%;
+  box-sizing: border-box;
 }
 
+.customerUpdate .form-group-update {
+  margin-left: 2rem;
+  margin-right: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.customerUpdate .btn.update-submit-btn,
 .customerUpdate .btn {
   width: 40%;
+  min-width: 140px;
   background-color: #2F6DAB;
+}
+
+/* RW-151: Update account information – mobile: form visible, no horizontal scroll */
+@media (max-width: 767.98px) {
+  .customerUpdate .title {
+    margin-left: 0;
+  }
+
+  .customerUpdate .container.updateForm-grid {
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .customerUpdate .contentLeft,
+  .customerUpdate .contentRight {
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+  }
+
+  .customerUpdate .form-group-update {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .customerUpdate .updateForm {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .customerUpdate .btn.update-submit-btn,
+  .customerUpdate .btn {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .customerUpdate .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .customerUpdate .col,
+  .customerUpdate [class*="col-"] {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    max-width: 100%;
+  }
 }
 .contact-info-s4{
   margin-top: 1rem;
