@@ -551,7 +551,7 @@
 
 /* begin admin side bar */
 .adminNav {
-  margin: 10px 0 10px 10px;
+  margin: 10px ;
   width: 225px;
   background-color: #2F6DAB;
   color: white;
@@ -1675,48 +1675,6 @@
       height: auto;
     }
 
-    /* ADMIN DASHBOARD */
-    .admin-dashboard-content,
-    .adminServices,
-    .adminCustomers,
-    .adminApts,
-    .updates,
-    .messages,
-    .settings,
-    .invoices {
-      margin-top: 0;
-      margin-left: 0;
-    }
-
-    .admin-totals {
-      flex-direction: column;
-      margin-left: 0;
-    }
-
-    .admin-content {
-      margin-left: 0;
-    }
-
-    /* CUSTOMER DASHBOARD */
-    .customerDashboard .info {
-      width: 95%;
-      font-size: medium;
-    }
-
-    .customerDashboard .btn {
-      width: 90%;
-    }
-
-    /* TABLES */
-    .table-wrapper,
-    .rc-customer-table {
-      overflow-x: auto;
-    }
-
-    table {
-      min-width: 600px;
-
-    }
 
   /* ADMIN DASHBOARD */
   .admin-dashboard-content,
@@ -1729,6 +1687,7 @@
   .invoices {
     margin-top: 0;
     margin-left: 0;
+  
   }
 
   .admin-totals {
@@ -2079,5 +2038,65 @@
   /* total fixed height = 20px infobar + 56px header */
   body:has(.mobileOffcanvasNav) {
     padding-top: 76px;
+  }
+}
+
+/* start admin invoices */
+.invoice-table {
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+}
+.invoice-table-columns {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  padding: 1vh;
+  width: 50vw;
+}
+.invoice-table-content {
+  display: flex;
+  flex-direction: column;
+  width: 45vw;
+  margin-left: 5%;
+  margin-right: 5%;
+  gap: 8px;
+}
+.invoice-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 5vw;
+  color: #6b7280;
+  font-size: 18px;
+}
+.invoice-table-content-search {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 8px;
+}
+.invoice-table-content .btn {
+  width: 30%;
+  background-color: #2F6DAB;
+}
+@media (max-width: 767px) {
+  .invoice-table {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  }
+  .invoice-table-columns {
+    width: fit-content;
+  }
+  .invoice-table-content {
+    width: 100vw;
+  }
+  .invoice-table-content-search {
+    width: 70vw;
+    gap: 8px;
   }
 }
