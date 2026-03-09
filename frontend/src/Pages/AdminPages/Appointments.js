@@ -1,323 +1,298 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import "./Appointments.css";
 import AdminSideBar from "../../Components/AdminSideBar";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-
-const initialAppointments = [
-    {
-        id: 1,
-        user: "Najaf Ali Mohammady",
-        phone: "916-000-0000",
-        vehicle: "Toyota Camry 2016",
-        name: "Brake Work",
-        description: "Brake inspection",
-        date: "2026-02-20",
-        time: "10:20 AM",
-        status : "upcoming",
-    },
-    {
-        id: 1,
-        user: "Najaf Ali Mohammady",
-        phone: "916-000-0000",
-        vehicle: "Toyota Camry 2016",
-        name: "Brake Work",
-        description: "Brake inspection",
-        date: "2026-02-20",
-        time: "01:20 PM",
-        status : "complete",
-    },
-    {
-        id: 2,
-        user: "Najaf Ali Mohammady",
-        phone: "916-000-0000",
-        vehicle: "Toyota Camry 2016",
-        name: "Oil Change",
-        description: "Oil and oil filter replacement",
-        date: "2026-02-21",
-        time: "01:20 PM",
-        status : "reschedule",
-    },
-    {
-        id: 3,
-        user: "Najaf Ali Mohammady",
-        phone: "916-000-0000",
-        vehicle: "Toyota Camry 2016",
-        name: "Tune Up",
-        description: "Full vehicle tune up",
-        paymentStatus: "Paid",
-        date: "2026-02-22",
-        time: "10:20 AM",
-        status : "reschedule",
-    },
-];
-const initialUsers = [
-    { id: 1, name: "Najaf Ali Mohammady", phone: "916-000-0000" },
-    { id: 2, name: "John", phone: "916-000-0000" },
-    { id: 3, name: "Mike", phone: "916-000-0000" },
-];
-const initialSatus = [
-    { id: 1, name: "upcoming",  },
-    { id: 2, name: "reschedule",  },
-    { id: 3, name: "complete",  },
-];
+import { API_BASE_URL } from "../../config";
 
 const Appointments = () => {
-    const [appointments, setAppointments] = useState(initialAppointments);
-    const [tooltip, setTooltip] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [showOptionModal, setOptionModal] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [services, setServices] = useState([]);
+  const [tooltip, setTooltip] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showOptionModal, setOptionModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const [newAppointment, setNewAppointment] = useState({
-        name: "",
-        description: "",
-        user: "",
-        phone: "",
-        vehicle: "",
-        date: "",
-        time: "",
-        status: "upcoming",
-    });
+  useEffect(() => {
+    const token = sessionStorage.getItem("authToken");
+    const headers = { Accept: "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    /* ---------------- Handlers ---------------- */
+    const fetchAppts = fetch(`${API_BASE_URL}/api/admin/appointments/`, { headers });
+    const fetchVehicles = fetch(`${API_BASE_URL}/api/admin/vehicles/`, { headers });
+    const fetchServices = fetch(`${API_BASE_URL}/api/services/`, { headers });
 
-    const handleCreate = () => {
-        if (!newAppointment.name || !newAppointment.date) {
-            alert("Title and Date are required");
-            return;
+    Promise.all([fetchAppts, fetchVehicles, fetchServices])
+      .then(async ([resAppts, resVehicles, resServices]) => {
+        if (!resAppts.ok) throw new Error("Failed to load appointments");
+        if (!resVehicles.ok) throw new Error("Failed to load vehicles");
+        if (!resServices.ok) throw new Error("Failed to load services");
+
+        const apptsData = await resAppts.json().catch(() => []);
+        const vehiclesData = await resVehicles.json().catch(() => []);
+        const servicesData = await resServices.json().catch(() => []);
+
+        const normalized = (apptsData || []).map((a) => ({
+          ...a,
+          id: a.appointment_id,
+          date: a.scheduled_at ? a.scheduled_at.split("T")[0] : "",
+          time: a.scheduled_at ? a.scheduled_at.split("T")[1]?.slice(0, 5) : "",
+        }));
+
+        setAppointments(normalized);
+        setVehicles(vehiclesData || []);
+        setServices(servicesData || []);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message || "Failed to load admin data");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  /* ---------------- Handlers ---------------- */
+  const handleCreate = () => {
+    if (!newAppointment.name || !newAppointment.datetime || !newAppointment.vehicle) {
+      alert("Service, Date/time and Vehicle are required");
+      return;
+    }
+
+    const token = sessionStorage.getItem("authToken");
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const payload = {
+      vehicle: newAppointment.vehicle,
+      service_type: newAppointment.name,
+      scheduled_at: newAppointment.datetime,
+    };
+
+    fetch(`${API_BASE_URL}/api/appointments/`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const txt = await res.text().catch(() => null);
+          throw new Error(txt || "Failed to create appointment");
         }
-
-        setAppointments((prev) => [
-            ...prev,
-            {id: Date.now(), ...newAppointment},
-        ]);
-
+        return res.json();
+      })
+      .then((created) => {
+        const normalized = {
+          ...created,
+          id: created.appointment_id || Date.now(),
+          date: created.scheduled_at ? created.scheduled_at.split("T")[0] : "",
+          time: created.scheduled_at ? created.scheduled_at.split("T")[1]?.slice(0, 5) : "",
+        };
+        setAppointments((prev) => [...prev, normalized]);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Failed to create appointment");
+      })
+      .finally(() => {
         setShowModal(false);
-        setNewAppointment({
-            name: "",
-            description: "",
-            user: "",
-            phone: "",
-            vehicle: "",
-            date: "",
-            time: "",
-            paymentStatus: "Pending",
-        });
-    };
+        setNewAppointment({ name: "", description: "", vehicle: "", datetime: "", paymentStatus: "Pending" });
+      });
+  };
 
-    const handleUpdate = (appointment) => {
-        console.log("Update:", appointment);
-        // open update modal later
-    };
+  const handleUpdate = (appointment) => {
+    console.log("Update:", appointment);
+  };
 
-    const handleDelete = (id) => {
-        if (window.confirm("Delete this appointment?")) {
-            setAppointments((prev) => prev.filter((a) => a.id !== id));
-            setTooltip(null);
-        }
-    };
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this appointment?")) return;
+    const token = sessionStorage.getItem("authToken");
+    const headers = { Accept: "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    /* ---------------- Calendar Events ---------------- */
+    fetch(`${API_BASE_URL}/api/appointments/${id}/`, { method: "DELETE", headers })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to delete");
+        setAppointments((prev) => prev.filter((a) => (a.appointment_id || a.id) !== id));
+        setTooltip(null);
+      })
+      .catch((err) => console.error(err));
+  };
 
-    const events = appointments.map((item) => ({
-        id: item.id,
-        title: item.name,
-        date: item.date,
-        backgroundColor:
-            item.status === "complete" ? "#22c55e" : "#f97316",
-        extendedProps: {...item},
-    }));
+  /* ---------- local form state ---------- */
+  const [newAppointment, setNewAppointment] = useState({ name: "", description: "", vehicle: "", datetime: "", paymentStatus: "Pending" });
 
-    return (
-        <section className="admin-dashboard">
-            <AdminSideBar/>
+  /* ---------------- Calendar Events ---------------- */
+  const events = appointments.map((item) => ({
+    id: item.appointment_id || item.id,
+    title: item.service_type || item.name || item.title,
+    date: item.scheduled_at ? item.scheduled_at.split("T")[0] : item.date,
+    backgroundColor: item.finished_at || item.status === "complete" ? "#22c55e" : "#f97316",
+    extendedProps: { ...item },
+  }));
 
-            <div className="admin-dashboard-content">
-                <div className="admin-dashboard-header">
-                    <span className="admin-dashboard-title">Appointments</span>
+  return (
+    <section className="admin-dashboard">
+      <AdminSideBar />
 
-                    <button className="btn-create" onClick={() => setShowModal(true)}>
-                        + New Appointment
-                    </button>
-                </div>
+      <div className="admin-dashboard-content">
+        <div className="admin-dashboard-header">
+          <span className="admin-dashboard-title">Appointments</span>
 
-                <div className="admin-content">
-                    <FullCalendar
-                        plugins={[dayGridPlugin]}
-                        initialView="dayGridMonth"
-                        events={events}
-                        eventMouseEnter={(info) => {
-                            const data = info.event.extendedProps;
-                            setTooltip({
-                                ...data,
-                                title: info.event.title,
-                                x: info.jsEvent.pageX,
-                                y: info.jsEvent.pageY,
-                            });
-                        }}
-                        eventMouseLeave={() => setOptionModal(true)}
-                    />
+          <button className="btn-create" onClick={() => setShowModal(true)}>
+            + New Appointment
+          </button>
+        </div>
 
-                    {/* ---------- Option Modal ---------- */}
-                    {showOptionModal && (
-                        <div className="modal-overlay">
-
-                            <div style={{
-                                position: "absolute",
-                                background: "#111827",
-                                color: "#fff",
-                                padding: "40px",
-                                borderRadius: "8px",
-                                fontSize: "13px",
-                                zIndex: 1000,
-                                width: "380px",
-                            }} >
-                                <h3>Option Appointment</h3>
-                                <div className="modal-body mt-5" >
-                                    <div><span>User:</span> {tooltip.user}</div>
-                                    <div><span>Phone:</span> {tooltip.phone}</div>
-                                    <div><span>Vehicle:</span> {tooltip.vehicle}</div>
-                                    <div><span>Time:</span> {tooltip.time}</div>
-                                    <strong>{tooltip.title}</strong>
-                                    <p style={{margin: "6px 0"}}>{tooltip.description}</p>
-                                    {/* User Select */}
-                                    <select  className="modal-select">
-                                        <option value="">Select Status</option>
-                                        {initialSatus.map((status) => (
-                                            <option key={status.id} value={status.id}>
-                                                {status.name}
-                                            </option>
-                                        ))}
-                                    </select>
-
-
-
-                                </div>
-
-                                <div className="modal-actions">
-                                    <button className="btn btn-primary" onClick={handleCreate}>
-                                        Save
-                                    </button>
-                                    <button
-                                        className="btn btn-secondary"
-                                        onClick={() => setOptionModal(false)}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        // <div
-                        //     style={{
-                        //         position: "absolute",
-                        //         top: tooltip.y + 10,
-                        //         left: tooltip.x + 10,
-                        //         background: "#111827",
-                        //         color: "#fff",
-                        //         padding: "10px",
-                        //         borderRadius: "8px",
-                        //         fontSize: "13px",
-                        //         zIndex: 1000,
-                        //         width: "220px",
-                        //     }}
-                        // >
-
-                        //
-                        //     <div className="tooltip-actions">
-                        //         <button className="btn-update">
-                        //            Status
-                        //         </button>
-                        //
-                        //         <button
-                        //             className="btn-update"
-                        //             onClick={() => handleUpdate(tooltip)}
-                        //         >
-                        //             Update
-                        //         </button>
-                        //
-                        //         <button
-                        //             className="btn-delete"
-                        //             onClick={() => handleDelete(tooltip.id)}
-                        //         >
-                        //             Delete
-                        //         </button>
-                        //     </div>
-                        // </div>
-
-
-                    )}
-
-                    {/* ---------- Create Modal ---------- */}
-                    {showModal && (
-                        <div className="modal-overlay">
-
-                            <div style={{
-                                position: "absolute",
-                                background: "#111827",
-                                color: "#fff",
-                                padding: "40px",
-                                borderRadius: "8px",
-                                fontSize: "13px",
-                                zIndex: 1000,
-                                width: "750px",
-                            }} >
-                                <h3>Create Appointment</h3>
-                                <div className="modal-body mt-5" >
-                                    {/* User Select */}
-                                    <select  className="modal-select">
-                                        <option value="">Select user</option>
-                                        {initialUsers.map((user) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name} ({user.phone})
-                                            </option>
-                                        ))}
-                                    </select>
-
-                                    {/* Appointment Select */}
-                                    <select className="modal-select">
-                                        <option value="">Select Appointment</option>
-                                        {initialAppointments.map((appointment) => (
-                                            <option key={appointment.name} value={appointment.name}>
-                                                {appointment.name}
-                                            </option>
-                                        ))}
-                                    </select>
-
-                                    {/* Date */}
-                                    <input
-                                        type="datetime-local"
-                                        className="modal-input"
-                                        value={newAppointment.datetime}
-                                        onChange={(e) =>
-                                            setNewAppointment({
-                                                ...newAppointment,
-                                                datetime: e.target.value,
-                                            })
-                                        }
-                                    />
-
-                                </div>
-
-                                <div className="modal-actions">
-                                    <button className="btn btn-primary" onClick={handleCreate}>
-                                        Save
-                                    </button>
-                                    <button
-                                        className="btn btn-secondary"
-                                        onClick={() => setShowModal(false)}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-
-                </div>
+        <div className="admin-content">
+          {error && (
+            <div className="form-error" role="alert" style={{ marginBottom: 12 }}>
+              {error}
             </div>
-        </section>
-    );
+          )}
+
+          {loading ? (
+            <div style={{ padding: 20 }}>Loading appointments...</div>
+          ) : (
+            <FullCalendar
+              plugins={[dayGridPlugin]}
+              initialView="dayGridMonth"
+              events={events}
+              eventMouseEnter={(info) => {
+                const data = info.event.extendedProps;
+                setTooltip({ ...data, title: info.event.title, x: info.jsEvent.pageX, y: info.jsEvent.pageY });
+              }}
+              eventClick={(info) => {
+                const data = info.event.extendedProps;
+                setTooltip({ ...data, title: info.event.title, x: info.jsEvent.pageX, y: info.jsEvent.pageY });
+                setOptionModal(true);
+              }}
+              eventMouseLeave={() => setTooltip(null)}
+            />
+          )}
+
+          {/* ---------- Option Modal ---------- */}
+          {showOptionModal && tooltip && (
+            <div className="modal-overlay">
+              <div
+                style={{
+                  position: "absolute",
+                  background: "#111827",
+                  color: "#fff",
+                  padding: "40px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  zIndex: 1000,
+                  width: "380px",
+                }}
+              >
+                <h3>Appointment</h3>
+                <div className="modal-body mt-5">
+                  <div>
+                    <span>Customer:</span> {tooltip.customer_name || tooltip.customer || "-"}
+                  </div>
+                  <div>
+                    <span>Phone:</span> {tooltip.vehicle?.customer?.phone || "-"}
+                  </div>
+                  <div>
+                    <span>Vehicle:</span>{" "}
+                    {tooltip.vehicle ? `${tooltip.vehicle.make} ${tooltip.vehicle.model} ${tooltip.vehicle.year}` : "-"}
+                  </div>
+                  <div>
+                    <span>Time:</span> {tooltip.scheduled_at || tooltip.time || "-"}
+                  </div>
+                  <strong>{tooltip.title}</strong>
+                  <p style={{ margin: "6px 0" }}>{tooltip.description || tooltip.service_type || ""}</p>
+
+                  <select className="modal-select">
+                    <option value="">Select Status</option>
+                    {["upcoming", "reschedule", "complete"].map((s, i) => (
+                      <option key={i} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="modal-actions">
+                  <button className="btn btn-primary" onClick={() => setOptionModal(false)}>
+                    Close
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => setOptionModal(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ---------- Create Modal ---------- */}
+          {showModal && (
+            <div className="modal-overlay">
+              <div
+                style={{
+                  position: "absolute",
+                  background: "#111827",
+                  color: "#fff",
+                  padding: "40px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  zIndex: 1000,
+                  width: "750px",
+                }}
+              >
+                <h3>Create Appointment</h3>
+                <div className="modal-body mt-5">
+                  {/* Vehicle Select (admin) */}
+                  <select
+                    className="modal-select"
+                    value={newAppointment.vehicle}
+                    onChange={(e) => setNewAppointment({ ...newAppointment, vehicle: e.target.value })}
+                  >
+                    <option value="">Select vehicle (customer)</option>
+                    {vehicles.map((v) => (
+                      <option key={v.vehicle_id} value={v.vehicle_id}>
+                        {`${v.make} ${v.model} ${v.year} (${v.license_plate}) — ${v.customer?.first_name || ""} ${v.customer?.last_name || ""}`}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Service Select */}
+                  <select className="modal-select" value={newAppointment.name} onChange={(e) => setNewAppointment({ ...newAppointment, name: e.target.value })}>
+                    <option value="">Select Service</option>
+                    {services.map((s) => (
+                      <option key={s.service_id} value={s.name}>
+                        {s.name} {s.cost ? `($${s.cost})` : ""}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Date */}
+                  <input
+                    type="datetime-local"
+                    className="modal-input"
+                    value={newAppointment.datetime}
+                    onChange={(e) => setNewAppointment({ ...newAppointment, datetime: e.target.value })}
+                  />
+
+                </div>
+
+                <div className="modal-actions">
+                  <button className="btn btn-primary" onClick={handleCreate}>
+                    Save
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default Appointments;

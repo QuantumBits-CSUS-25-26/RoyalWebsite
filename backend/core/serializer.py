@@ -115,6 +115,17 @@ class EmployeeRegistrationSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     """Flat IDs — used for create / update."""
+    def validate(self, data):
+        """Ensure we don't create duplicate appointments for the same vehicle at the same time."""
+        scheduled_at = data.get('scheduled_at')
+        if scheduled_at:
+            qs = Appointment.objects.filter(scheduled_at=scheduled_at)
+            # If updating, exclude the instance being updated
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise serializers.ValidationError({'scheduled_at': 'An appointment already exists at the specified date/time.'})
+        return data
     class Meta:
         model = Appointment
         fields = [

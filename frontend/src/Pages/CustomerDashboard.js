@@ -2,98 +2,64 @@ import "./Homepage.css";
 import "../App.css";
 import { Row, Col, Button, Form, FormGroup, Label } from "reactstrap";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppSumm from "../Components/AppointmentSummary";
+import { API_BASE_URL } from "../config";
 
 const CustomerDashboard = () => {
   const [showAppointments, setShowAppointments] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [vehicles, setVehicles] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [serviceHistory, setServiceHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const appointments = [
-    {
-      id: 1,
-      name: "Brake Work",
-      description: "Brake inspection",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 2,
-      name: "Oil Change",
-      description: "Oil and oil filter replacement",
-      paymentStatus: "Pending",
-    },
-    {
-      id: 3,
-      name: "Tune Up",
-      description: "Full vehicle tune up",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 4,
-      name: "Brake Work",
-      description: "Brake inspection",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 5,
-      name: "Oil Change",
-      description: "Oil and oil filter replacement",
-      paymentStatus: "Pending",
-    },
-    {
-      id: 6,
-      name: "Tune Up",
-      description: "Full vehicle tune up",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 7,
-      name: "Brake Work",
-      description: "Brake inspection",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 8,
-      name: "Oil Change",
-      description: "Oil and oil filter replacement",
-      paymentStatus: "Pending",
-    },
-    {
-      id: 9,
-      name: "Tune Up",
-      description: "Full vehicle tune up",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 10,
-      name: "Brake Work",
-      description: "Brake inspection",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 11,
-      name: "Oil Change",
-      description: "Oil and oil filter replacement",
-      paymentStatus: "Pending",
-    },
-    {
-      id: 12,
-      name: "Tune Up",
-      description: "Full vehicle tune up",
-      paymentStatus: "Paid",
-    },
-  ];
-  const serviceHistory = [
-    {
-      service: "Brake Inspection",
-      date: "17/2/2026",
-      cost: "$20",
-    },
-    {
-      service: "Oil Change",
-      date: "17/2/2026",
-      cost: "$17",
-    },
-  ];
+  useEffect(() => {
+    const token = sessionStorage.getItem("authToken");
+    const headers = { "Accept": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const fetchProfile = fetch(`${API_BASE_URL}/api/customers/me/`, { headers });
+    const fetchVehicles = fetch(`${API_BASE_URL}/api/vehicles/`, { headers });
+    const fetchAppointments = fetch(`${API_BASE_URL}/api/appointments/`, { headers });
+
+    Promise.all([fetchProfile, fetchVehicles, fetchAppointments])
+      .then(async ([resProfile, resVehicles, resAppts]) => {
+        if (!resProfile.ok) throw new Error('Failed to load profile');
+        if (!resVehicles.ok) throw new Error('Failed to load vehicles');
+        if (!resAppts.ok) throw new Error('Failed to load appointments');
+
+        const profileData = await resProfile.json().catch(() => null);
+        const vehiclesData = await resVehicles.json().catch(() => []);
+        const apptsData = await resAppts.json().catch(() => []);
+
+        setProfile(profileData);
+        setVehicles(vehiclesData || []);
+
+        // normalize appointments (backend returns appointment_id)
+        const normalized = (apptsData || []).map(a => ({
+          id: a.appointment_id,
+          service_type: a.service_type,
+          scheduled_at: a.scheduled_at,
+          cost: a.cost,
+          vehicle: a.vehicle,
+        }));
+        setAppointments(normalized);
+
+        // use recent appointments as service history fallback
+        setServiceHistory((normalized || []).slice(0, 5).map(a => ({
+          service: a.service_type,
+          date: a.scheduled_at ? a.scheduled_at.split('T')[0] : '',
+          cost: a.cost ? `$${a.cost}` : '-',
+        })));
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message || 'Failed to load data');
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
 
   const navigate = useNavigate();
@@ -108,20 +74,23 @@ const CustomerDashboard = () => {
           <Col md="10" sm="2">
             <Form className="updateForm fs-3 p-4">
               <div className=" my-4">Account Info</div>
+              {error && (
+                <div className="form-error" role="alert">{error}</div>
+              )}
               <Row>
                 <Col md="6" sm="12">
                   <div className="info text-start px-5 py-4 mb-5">
                     <FormGroup>
                       <Label for="name">Account Owner:</Label>
-                      <div className="info-text">John Doe</div>
+                      <div className="info-text">{profile ? `${profile.first_name} ${profile.last_name}` : "-"}</div>
                     </FormGroup>
                     <FormGroup>
                       <Label for="email">Email:</Label>
-                      <div className="info-text">JohnDoe@email.com</div>
+                      <div className="info-text">{profile ? profile.email : "-"}</div>
                     </FormGroup>
                     <FormGroup>
                       <Label for="phone">Phone Number:</Label>
-                      <div className="info-text">555-123-4567</div>
+                      <div className="info-text">{profile ? profile.phone || '-' : "-"}</div>
                     </FormGroup>
                   </div>
                   <div className="info text-start px-5 py-4 mb-5">
@@ -137,16 +106,18 @@ const CustomerDashboard = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>10/15/2025</td>
-                              <td>10:00 AM</td>
-                              <td>Brake Inspection</td>
-                            </tr>
-                            <tr>
-                              <td>09/12/2025</td>
-                              <td>11:00 AM</td>
-                              <td>Oil Change</td>
-                            </tr>
+                            {appointments.length === 0 && (
+                              <tr>
+                                <td colSpan={3}>{loading ? 'Loading...' : 'No appointments found'}</td>
+                              </tr>
+                            )}
+                            {appointments.map((a) => (
+                              <tr key={`appt-${a.id}`}>
+                                <td>{a.scheduled_at ? a.scheduled_at.split('T')[0] : '-'}</td>
+                                <td>{a.scheduled_at ? a.scheduled_at.split('T')[1]?.slice(0,5) : '-'}</td>
+                                <td>{a.service_type}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
@@ -166,18 +137,19 @@ const CustomerDashboard = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>Toyota</td>
-                              <td>Camry</td>
-                              <td>2020</td>
-                              <td>ABC123</td>
-                            </tr>
-                            <tr>
-                              <td>Honda</td>
-                              <td>Civic</td>
-                              <td>2018</td>
-                              <td>XYZ789</td>
-                            </tr>
+                            {vehicles.length === 0 && (
+                              <tr>
+                                <td colSpan={4}>{loading ? 'Loading...' : 'No vehicles found'}</td>
+                              </tr>
+                            )}
+                            {vehicles.map((v) => (
+                              <tr key={`v-${v.vehicle_id}`}>
+                                <td>{v.make}</td>
+                                <td>{v.model}</td>
+                                <td>{v.year}</td>
+                                <td>{v.license_plate}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
@@ -204,6 +176,11 @@ const CustomerDashboard = () => {
                                 <td>{item.cost}</td>
                               </tr>
                             ))}
+                            {serviceHistory.length === 0 && (
+                              <tr>
+                                <td colSpan={3}>{loading ? 'Loading...' : 'No service history'}</td>
+                              </tr>
+                            )}
                           </tbody>
                         </table>
                       </div>
