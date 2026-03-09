@@ -863,24 +863,20 @@
 }
 
 /* begin service pop up bar */
-.services-drawer {
+.services-drawer{
   position: fixed;
   padding: 1rem;
   left: 100px;
-  top: 20px;
-  height: 100vh;
-  width: 250px;
-  background: #ffff;
+  top: 10rem;
+  width: 15rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  margin: auto; 
+  max-width: 90%; 
   z-index: 10;
-
   display: flex;
   flex-direction: column;
-}
-
-.services-drawer-header {
- /* 
-  not sure if still needed, merge conflict had open bracket only
-  */
 }
 .services-drawer h2{
   font-size: 1.4rem;
@@ -889,51 +885,51 @@
   color: #2F6DAB;
   transition: color 0.2s;
 }
-
 .services-drawer .service-popup-close-btn{
   cursor: pointer;
   background-color: #2F6DAB; 
   color: #ffffff; 
 }
-
 .services-drawer .service-popup-close-btn:hover{
   color: #111827;
 }
 .services-drawer-header{ 
   color: #2F6DAB;
-  display: flex;
+  display: flex; 
   justify-content: space-between;
   align-items: center;
   padding: 5px;
   border-bottom: 1px solid #eee;
 }
-
-.services-list {
+.services-list{
   overflow: auto;
 }
-
-.services-list li {
+.services-list li{
   list-style: none;
   padding: 5px 15px 5px 0px;
   display: flex;
-
-
 }
-
-.service-list-buttons {
+.service-list-buttons{
+  display: block;
   background-color: #2f6dab;
   border-radius: 5px;
   width: 100%;
-  color: white;
+  color: white;  
   padding-right: 10px;
-
+  cursor: pointer; 
+  transition: color 0.2s, transform 0.2s;
 }
-
-.services-backdrop {
+.service-list-buttons:hover{
+  background: #3b7fc7;
+  transform: translateY(-2px); 
+}
+.service-list-buttons:active{
+  transform: translateY(0);
+}
+.services-backdrop{
   position: fixed;
   inset: 0;
   z-index: 10;
-
 }
 
 /* begin customer dashboard */
@@ -1497,6 +1493,7 @@
 }
 .contact-info-form{
   background: #2F6DAB;
+  justify-self: center;
   padding: 28px 28px;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
@@ -1546,8 +1543,6 @@
 }
 
 .contact-info .contact-info-content {
-  /* display:flex;
-  flex-direction: column; */
   align-items: center;
   width: 75%;
   margin-top: 3vh;

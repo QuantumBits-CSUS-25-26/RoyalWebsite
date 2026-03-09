@@ -50,5 +50,7 @@
     "baseline-browser-mapping": "^2.9.19",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.15"
-  }
+  },
+  "proxy": "http://localhost:8000"
+
 }

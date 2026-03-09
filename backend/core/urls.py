@@ -37,4 +37,7 @@ urlpatterns = [
     path('business-info/', views.BusinessInformationView.as_view(), name='business_info'),
     path('business-info/<int:info_id>/', views.BusinessInformationDetailView.as_view(), name='business_info_detail'),
 
+
+    # ── Facebook Posts ───────────────────────────────────────────
+    path('facebook-posts/', views.FacebookPostsView.as_view(), name='facebook_posts'),
 ]
