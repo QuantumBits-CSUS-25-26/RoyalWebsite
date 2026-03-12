@@ -811,6 +811,7 @@
 /* begin customer login */
 .customerLogin{
   min-height: 100vh;
+  background-image: url('./images/HeroImage.jpg');
 }
 .customerLogin .content {
   margin-left: 100px;
@@ -1250,6 +1251,10 @@
   font-size: 14px;
 }
 
+.customerUpdate{
+  min-height: 100vh;
+  background-image: url('./images/HeroImage.jpg');
+}
 
 /* begin customer update */
 .customerUpdate .title {
