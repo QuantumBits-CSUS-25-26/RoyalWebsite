@@ -2,6 +2,7 @@ import './Homepage.css';
 import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useState } from 'react';
+import axios from "axios";
 
 const currentEntries = [
   {
@@ -15,231 +16,148 @@ const currentEntries = [
 ];
 
 const CustomerUpdate = () => {
+  const navigate = useNavigate();
 
-  const [ firstName, setFirstName ] = useState(currentEntries[0].firstName);
-  const [ lastName, setLastName ] = useState(currentEntries[0].lastName);
-  const [ email, setEmail ] = useState(currentEntries[0].email);
-  const [ phoneNumber, setPhoneNumber ] = useState(currentEntries[0].phoneNumber);
-  const [ password, setPassword] = useState(currentEntries[0].password);
+  const [formValues, setFormValues] = useState({
+    firstName: currentEntries[0].firstName,
+    lastName: currentEntries[0].lastName,
+    email: currentEntries[0].email,
+    phoneNumber: currentEntries[0].phoneNumber,
+    password: '',
+    confirmPassword: ''
+  });
 
-  const [ newFirstName, setNewFirstName ] = useState('');
-  const [ newLastName, setNewLastName ] = useState('');
-  const [ newEmail, setNewEmail ] = useState('');
-  const [ newPhoneNumber, setNewPhoneNumber ] = useState('');
-  const [ newPassword, setNewPassword] = useState('');
-  const [ newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [errors, setErrors] = useState({});
 
-  const [ firstNamePlaceHolder, setFirstNamePlaceholder] = useState("Enter First Name Here");
-  const [ lastNamePlaceHolder, setLastNamePlaceholder] = useState("Enter Last Name Here");
-  const [ emailPlaceHolder, setEmailPlaceholder] = useState("Enter Email Here");
-  const [ phoneNumberPlaceHolder, setPhoneNumberPlaceholder] = useState("Enter Phone Number Here");
-  const [ passPlaceHolder, setPassPlaceholder] =  useState("Enter Password Here");
-  const [ passPlaceHolderConfirm, setPassPlaceholderConfirm] =  useState("Confirm Password Here");
-
-  const [ phoneError, setPhoneError] = useState(false);
-  const [ emailError, setEmailError] = useState(false);
-  const [ passError, setPassError] = useState(false);
-  const [ passMatchError, setPassMatchError] = useState(false);
-  
-
-  const validateFirst = (value) => {
-    if (!value) {
-      setNewFirstName(firstName);
-      return "";
-    }
-    return "";
-  }
-
-  const validateLast = (value) => {
-    if (!value) {
-      setNewLastName(lastName);
-      return "";
-    }
-  }
-
-  const validateEmail = (value) => {
-     if (!value) {
-      setNewEmail(email);
-      return "";
-     }
-     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-     if (!emailRegex.test(value)) {
-      setEmailError(true);
-      return "Please enter a valid email address.";
-     }
-     return "";
-  }
-
-  const validatePassword = (value) => {
-      if (!value) {
-        setNewPassword(password);
-        return "";
-      }
-      if (value.length < 8) {
-        setPassError(true);
-        return "Password must be at least 8 characters.";
-      }
-      return "";
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
   };
 
-  const validatePasswordMatch = (value) => {
-    if (value !== newPassword) {
-      setPassMatchError(true);
-      return "Passwords do not match.";
-    }
-    return "";
-  };
-
-  const validatePhoneNumber = (value) => {
-    if (!value) {
-      setNewPhoneNumber(phoneNumber);
-      return "";
-    }
-    const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
-    if (!phoneRegex.test(value)) {
-      setPhoneError(true);
-      return "Please enter a valid phone number (e.g., 123-456-7890).";
-    }
-  }
-
-  const handleClickUpdate = async(e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
-    const emailErrorMsg = validateEmail(newEmail);
-    const phoneErrorMsg = validatePhoneNumber(newPhoneNumber);
-    const passErrorMsg = validatePassword(newPassword);
-    const passMatchErrorMsg = validatePasswordMatch(newPasswordConfirm);
+    const nextErrors = {};
 
-    if (emailError){
-      setEmailPlaceholder(emailErrorMsg);
-      setNewEmail('');
+    if (!formValues.firstName) nextErrors.firstName = "First name required";
+    if (!formValues.lastName) nextErrors.lastName = "Last name required";
+    if (!formValues.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) nextErrors.email = "Invalid email";
+    if (!formValues.phoneNumber.match(/^\d{3}-\d{3}-\d{4}$/)) nextErrors.phoneNumber = "Invalid phone number";
+    if (formValues.password && formValues.password.length < 8) nextErrors.password = "Password must be 8+ chars";
+    if (formValues.password !== formValues.confirmPassword) nextErrors.confirmPassword = "Passwords do not match";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+
+    // Send API
+    try {
+      const response = await axios.put(
+          `http://127.0.0.1:8000/api/customers/update/${currentEntries[0].id}/`,
+          formValues
+      );
+      console.log("Customer updated:", response.data);
+      alert("Update successful!");
+      // Optionally navigate
+      // navigate("/dashboard");
+    } catch (err) {
+      console.error("Update failed:", err);
+      alert("Update failed");
     }
-    if (passError){
-      setPassPlaceholder(passErrorMsg);
-      setNewPassword('');
-    }
-    if (passMatchError){
-      setPassPlaceholderConfirm(passMatchErrorMsg);
-      setNewPasswordConfirm('');
-    }
-    if (phoneError){
-      setPhoneNumberPlaceholder(phoneErrorMsg);
-      setNewPhoneNumber('');
-    }
-    
-    if (!emailError && !passError && !passMatchError && !phoneError){
-      // make api call to update information in database
-      setFirstName(newFirstName);
-      setLastName(newLastName);
-      setEmail(newEmail);
-      setNewPassword(newPassword);
-      setNewPasswordConfirm(newPasswordConfirm);
-      setNewPhoneNumber(newPhoneNumber);
-    } 
-      
-
-  }
-
-
-
+  };
 
   return (
-    <div className="customerUpdate">
-      <div className="customerUpdate-inner">
+      <div className="customerUpdate">
         <div className="title">
           <Row className='justify-content-center'>
-            <Col xs='12' md='10' sm='12'>
-              <Form className='updateForm fs-3 p-4'>
+            <Col md='10' sm='2'>
+              <Form className='updateForm fs-3 p-4' onSubmit={handleUpdate}>
                 <div className=' my-4'>Update Account Information</div>
-                <div className="container updateForm-grid">
-                  <div className="contentLeft">
-                    <FormGroup className='form-group-update my-4 text-start'>
-                      <Label for="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        placeholder={firstNamePlaceHolder}
-                        type="text"
-                        value={newFirstName}
-                        onChange={(e) => setNewFirstName(e.target.value)}
-                      />
-                    </FormGroup>
-                  </div>
-                  <div className="contentRight">
-                    <FormGroup className='form-group-update my-4 text-start'>
-                      <Label for="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        placeholder={lastNamePlaceHolder}
-                        type="text"
-                        value={newLastName}
-                        onChange={(e) => setNewLastName(e.target.value)}
-                      />
-                    </FormGroup>
-                  </div>
-                </div>
-                <div className="container updateForm-grid">
-                  <div className="contentLeft">
-                    <FormGroup className='form-group-update my-4 text-start'>
-                      <Label for="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        placeholder={emailPlaceHolder}
-                        type="email"
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                      />
-                    </FormGroup>
-                  </div>
-                  <div className="contentRight">
-                    <FormGroup className='form-group-update my-4 text-start'>
-                      <Label for="phoneNumber">Phone Number</Label>
-                      <Input
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        placeholder={phoneNumberPlaceHolder}
-                        type="tel"
-                        value={newPhoneNumber}
-                        onChange={(e) => setNewPhoneNumber(e.target.value)}
-                      />
-                    </FormGroup>
-                  </div>
-                </div>
-                <div className="container updateForm-grid">
-                  <div className="contentLeft">
-                    <FormGroup className='form-group-update my-4 text-start'>
-                      <Label for="newPassword">New Password</Label>
-                      <Input
-                        id="newPassword"
-                        name="newPassword"
-                        placeholder={passPlaceHolder}
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                      />
-                    </FormGroup>
-                  </div>
-                  <div className="contentRight">
-                    <FormGroup className='form-group-update my-4 text-start'>
-                      <Label for="confirmNewPassword">Confirm New Password</Label>
-                      <Input
-                        id="confirmNewPassword"
-                        name="confirmNewPassword"
-                        placeholder={passPlaceHolderConfirm}
-                        type="password"
-                        value={newPasswordConfirm}
-                        onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                      />
-                    </FormGroup>
-                  </div>
-                </div>
-                <Button
-                  type='button'
-                  className='btn btn-lg my-4 py-3 update-submit-btn'
-                  onClick={handleClickUpdate}
-                >
+
+                <FormGroup className='mx-5 px-5 my-3 text-start'>
+                  <Label for="firstName">First Name</Label>
+                  <Input
+                      id="firstName"
+                      name="firstName"
+                      placeholder="Enter First Name"
+                      type="text"
+                      value={formValues.firstName}
+                      onChange={handleChange}
+                      invalid={!!errors.firstName}
+                  />
+                  {errors.firstName && <div className="text-danger">{errors.firstName}</div>}
+                </FormGroup>
+
+                <FormGroup className='mx-5 px-5 my-3 text-start'>
+                  <Label for="lastName">Last Name</Label>
+                  <Input
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Enter Last Name"
+                      type="text"
+                      value={formValues.lastName}
+                      onChange={handleChange}
+                      invalid={!!errors.lastName}
+                  />
+                  {errors.lastName && <div className="text-danger">{errors.lastName}</div>}
+                </FormGroup>
+
+                <FormGroup className='mx-5 px-5 my-3 text-start'>
+                  <Label for="email">Email</Label>
+                  <Input
+                      id="email"
+                      name="email"
+                      placeholder="Enter Email"
+                      type="email"
+                      value={formValues.email}
+                      onChange={handleChange}
+                      invalid={!!errors.email}
+                  />
+                  {errors.email && <div className="text-danger">{errors.email}</div>}
+                </FormGroup>
+
+                <FormGroup className='mx-5 px-5 my-3 text-start'>
+                  <Label for="phoneNumber">Phone Number</Label>
+                  <Input
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="123-456-7890"
+                      type="tel"
+                      value={formValues.phoneNumber}
+                      onChange={handleChange}
+                      invalid={!!errors.phoneNumber}
+                  />
+                  {errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
+                </FormGroup>
+
+                <FormGroup className='mx-5 px-5 my-3 text-start'>
+                  <Label for="password">New Password</Label>
+                  <Input
+                      id="password"
+                      name="password"
+                      placeholder="Enter New Password"
+                      type="password"
+                      value={formValues.password}
+                      onChange={handleChange}
+                      invalid={!!errors.password}
+                  />
+                  {errors.password && <div className="text-danger">{errors.password}</div>}
+                </FormGroup>
+
+                <FormGroup className='mx-5 px-5 my-3 text-start'>
+                  <Label for="confirmPassword">Confirm New Password</Label>
+                  <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Confirm Password"
+                      type="password"
+                      value={formValues.confirmPassword}
+                      onChange={handleChange}
+                      invalid={!!errors.confirmPassword}
+                  />
+                  {errors.confirmPassword && <div className="text-danger">{errors.confirmPassword}</div>}
+                </FormGroup>
+
+                <Button type='submit' className='btn btn-lg my-4 py-4'>
                   Update
                 </Button>
               </Form>
@@ -247,8 +165,7 @@ const CustomerUpdate = () => {
           </Row>
         </div>
       </div>
-    </div>
   );
-}
+};
 
 export default CustomerUpdate;

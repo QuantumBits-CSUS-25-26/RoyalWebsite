@@ -3,7 +3,7 @@ import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-
+import axios from "axios";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[0-9\s-.()]{7,15}$/;
 
@@ -64,32 +64,41 @@ const CustomerCreation = () => {
     setValues((s) => ({ ...s, [name]: value }));
     setErrors((s) => ({ ...s, [name]: validateField(name, value) }));
   };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (validateAll()) {
-      // build payload that can be sent to a backend/database
       const p = {
         first_name: values.fname.trim(),
         last_name: values.lname.trim(),
         email: values.email.trim(),
-        password: values.password, 
+        password: values.password,
         phone: values.phone.trim(),
-        createdAt: new Date().toISOString(),
       };
+
       setPayload(p);
-      console.log('Account payload ready:', p);
 
-      // placeholder send function - replace URL and uncomment to send
-      const sendPayload = async (payloadObj) => {
-        console.log('sendPayload placeholder:', payloadObj);
-        return Promise.resolve({ ok: true });
-      };
+      const res = await sendPayload(p);
 
-      sendPayload(p).then((res) => console.log('sendPayload result:', res));
-      navigate('/dashboard');
+      if (res) {
+        navigate("/dashboard");
+      }
     }
-  }
+  };
+  const sendPayload = async (payloadObj) => {
+    try {
+      const response = await axios.post(
+          "http://127.0.0.1:8000/api/customers/register/",
+          payloadObj
+      );
+
+      console.log("Customer created:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating customer:", error);
+    }
+  };
+
   return (
     <div className="customer-creation">
       <div className="content">
