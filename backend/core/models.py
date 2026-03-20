@@ -120,3 +120,18 @@ class BusinessInformation(models.Model):
 
     def __str__(self):
         return self.name
+
+class PaymentOption(models.Model):
+    TYPE_CHOICES = [
+        ('cash', 'Cash'),
+        ('card', 'Card'),
+        ('digital', 'Digital'),
+    ]
+
+    name = models.CharField(max_length=50)
+    logo = models.CharField(max_length=100)  # emoji or image URL
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name

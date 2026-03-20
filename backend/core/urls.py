@@ -6,6 +6,7 @@ urlpatterns = [
     path('customers/register/', views.CustomerRegisterView.as_view(), name='customer_register'),
     path('customers/login/', views.CustomerLoginView.as_view(), name='customer_login'),
     path('customers/me/', views.CustomerProfileView.as_view(), name='customer_profile'),
+    path('payment/options/', views.PaymentOptionView.as_view(), name='payment_options'),
 
     # ── Employee / Staff auth ──────────────────────────────────
     path('employees/login/', views.EmployeeLoginView.as_view(), name='employee_login'),

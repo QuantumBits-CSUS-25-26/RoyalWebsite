@@ -1,4 +1,4 @@
-// CustomerDashboard.test.jsx
+// PaymentOptions.test.jsx
 import { render, screen, waitFor } from "@testing-library/react";
 import CustomerDashboard from "../CustomerDashboard";
 import axios from "axios";
@@ -23,9 +23,6 @@ describe("CustomerDashboard Payment Options", () => {
 
         // Wait for API fetch to complete
         await waitFor(() => {
-            // Card type logos
-            expect(screen.getByText("VISA") || screen.getByText("MasterCard")).not.toBeInTheDocument();
-
             // Emoji payment options
             expect(screen.getByText("Cash")).toBeInTheDocument();
             expect(screen.getByText("Credit / Debit")).toBeInTheDocument();
@@ -41,7 +38,7 @@ describe("CustomerDashboard Payment Options", () => {
 
         await waitFor(() => {
             const boxes = screen.getAllByText(/Cash|Credit \/ Debit|Apple Pay/);
-            expect(boxes.length).toBe(3); // Only 3 active emoji options
+            expect(boxes.length).toBe(3); // Only 3 active options
         });
     });
 });

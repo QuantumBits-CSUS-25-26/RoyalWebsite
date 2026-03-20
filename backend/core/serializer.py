@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation,PaymentOption
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -150,3 +150,7 @@ class BusinessInformationSerializer(serializers.ModelSerializer):
             'info_id', 'name', 'address', 'phone', 'email', 'hours'
         ]
         read_only_fields = ['info_id']
+class PaymentOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentOption
+        fields = '__all__'
