@@ -102,41 +102,41 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="customerDashboard">
-      <div className="content">
-        <Row className="justify-content-center">
-          <Col md="10" sm="2">
-            <Form className="updateForm fs-3 p-4">
-              <div className=" my-4">Account Info</div>
-              <Row>
-                <Col md="6" sm="12">
-                  <div className="info text-start px-5 py-4 mb-5">
-                    <FormGroup>
-                      <Label for="name">Account Owner:</Label>
-                      <div className="info-text">John Doe</div>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label for="email">Email:</Label>
-                      <div className="info-text">JohnDoe@email.com</div>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label for="phone">Phone Number:</Label>
-                      <div className="info-text">555-123-4567</div>
-                    </FormGroup>
-                  </div>
-                  <div className="info text-start px-5 py-4 mb-5">
-                    <FormGroup>
-                      <Label for="appts">Appointments:</Label>
-                      <div className="info-text">
-                        <table className="dash-table">
-                          <thead>
+      <div className="customerDashboard">
+        <div className="content">
+          <Row className="justify-content-center">
+            <Col md="10" sm="2">
+              <Form className="updateForm fs-3 p-4">
+                <div className=" my-4">Account Info</div>
+                <Row>
+                  <Col md="6" sm="12">
+                    <div className="info text-start px-5 py-4 mb-5">
+                      <FormGroup>
+                        <Label for="name">Account Owner:</Label>
+                        <div className="info-text">John Doe</div>
+                      </FormGroup>
+                      <FormGroup>
+                        <Label for="email">Email:</Label>
+                        <div className="info-text">JohnDoe@email.com</div>
+                      </FormGroup>
+                      <FormGroup>
+                        <Label for="phone">Phone Number:</Label>
+                        <div className="info-text">555-123-4567</div>
+                      </FormGroup>
+                    </div>
+                    <div className="info text-start px-5 py-4 mb-5">
+                      <FormGroup>
+                        <Label for="appts">Appointments:</Label>
+                        <div className="info-text">
+                          <table className="dash-table">
+                            <thead>
                             <tr>
                               <th>Date</th>
                               <th>Time</th>
                               <th>Service</th>
                             </tr>
-                          </thead>
-                          <tbody>
+                            </thead>
+                            <tbody>
                             <tr>
                               <td>10/15/2025</td>
                               <td>10:00 AM</td>
@@ -147,25 +147,25 @@ const CustomerDashboard = () => {
                               <td>11:00 AM</td>
                               <td>Oil Change</td>
                             </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </FormGroup>
-                  </div>
-                  <div className="info text-start px-5 py-4 mb-5">
-                    <FormGroup>
-                      <Label for="vehicles">Vehicles:</Label>
-                      <div className="info-text">
-                        <table className="dash-table">
-                          <thead>
+                            </tbody>
+                          </table>
+                        </div>
+                      </FormGroup>
+                    </div>
+                    <div className="info text-start px-5 py-4 mb-5">
+                      <FormGroup>
+                        <Label for="vehicles">Vehicles:</Label>
+                        <div className="info-text">
+                          <table className="dash-table">
+                            <thead>
                             <tr>
                               <th>Make</th>
                               <th>Model</th>
                               <th>Year</th>
                               <th>Plate</th>
                             </tr>
-                          </thead>
-                          <tbody>
+                            </thead>
+                            <tbody>
                             <tr>
                               <td>Toyota</td>
                               <td>Camry</td>
@@ -178,103 +178,134 @@ const CustomerDashboard = () => {
                               <td>2018</td>
                               <td>XYZ789</td>
                             </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </FormGroup>
-                  </div>
-                  <div className="info text-start px-5 py-4 mb-5">
-                    <FormGroup>
-                      <Label>Service History:</Label>
+                            </tbody>
+                          </table>
+                        </div>
+                      </FormGroup>
+                    </div>
+                    <div className="info text-start px-5 py-4 mb-5">
+                      <FormGroup>
+                        <Label>Service History:</Label>
 
-                      <div className="info-text">
-                        <table className="dash-table">
-                          <thead>
+                        <div className="info-text">
+                          <table className="dash-table">
+                            <thead>
                             <tr>
                               <th>Service</th>
                               <th>Date</th>
                               <th>Cost</th>
                             </tr>
-                          </thead>
-                          <tbody>
+                            </thead>
+                            <tbody>
                             {serviceHistory.map((item, index) => (
-                              <tr key={`sh-${index}`}>
-                                <td>{item.service}</td>
-                                <td>{item.date}</td>
-                                <td>{item.cost}</td>
-                              </tr>
+                                <tr key={`sh-${index}`}>
+                                  <td>{item.service}</td>
+                                  <td>{item.date}</td>
+                                  <td>{item.cost}</td>
+                                </tr>
                             ))}
-                          </tbody>
-                        </table>
-                      </div>
+                            </tbody>
+                          </table>
+                        </div>
 
-                      {/* Pagination */}
-                      <div className="info-text mt-2">
-                        <Row className="vehiclesRow">
-                          <div className="pagination">
-                            <button>&laquo;</button>
-                            {[1, 2, 3, 4].map((page) => (
-                                <button
-                                    key={page}
-                                    className={page === 2 ? "active" : ""}
-                                >
-                                  {page}
-                                </button>
-                            ))}
-                            <button>&raquo;</button>
-                          </div>
-                        </Row>
-                      </div>
-                    </FormGroup>
-                  </div>
-
-
-                </Col>
-                <Col md="6" sm="12" className="buttonsCol">
-                  <Row className="mb-4">
-                    <Button type="button" onClick={handleClickUpdateInfo} className="btn btn-lg py-4">
-                      Update Account Info
-                    </Button>
-                  </Row>
-                  <Row className="mb-4">
-                    <Button type="button" className="btn btn-lg py-4">
-                      Book an Appointment
-                    </Button>
-                  </Row>
-                  <Row className="mb-4">
-                    {!showAppointments && (
-                      <Button
-                        className="appSummBtn btn-lg py-4"
-                        onClick={() => setShowAppointments(true)}
-                      >
-                        Appointment Summary
+                        {/* Pagination */}
+                        <div className="info-text mt-2">
+                          <Row className="vehiclesRow">
+                            <div className="pagination">
+                              <button>&laquo;</button>
+                              {[1, 2, 3, 4].map((page) => (
+                                  <button
+                                      key={page}
+                                      className={page === 2 ? "active" : ""}
+                                  >
+                                    {page}
+                                  </button>
+                              ))}
+                              <button>&raquo;</button>
+                            </div>
+                          </Row>
+                        </div>
+                      </FormGroup>
+                    </div>
+                  </Col>
+                  <Col md="6" sm="12" className="buttonsCol">
+                    <Row className="mb-4">
+                      <Button type="button" onClick={handleClickUpdateInfo} className="btn btn-lg py-4">
+                        Update Account Info
                       </Button>
-                    )}
+                    </Row>
+                    <Row className="mb-4">
+                      <Button type="button" className="btn btn-lg py-4">
+                        Book an Appointment
+                      </Button>
+                    </Row>
+                    <Row className="mb-4">
+                      {!showAppointments && (
+                          <Button
+                              className="appSummBtn btn-lg py-4"
+                              onClick={() => setShowAppointments(true)}
+                          >
+                            Appointment Summary
+                          </Button>
+                      )}
 
-                    {showAppointments && (
-                      <div
-                        className="appointment-page-overlay"
-                        onClick={() => setShowAppointments(false)}
-                      >
-                        <AppSumm
-                          appointments={appointments}
-                          onClose={() => setShowAppointments(false)}
-                        />
+                      {showAppointments && (
+                          <div
+                              className="appointment-page-overlay"
+                              onClick={() => setShowAppointments(false)}
+                          >
+                            <AppSumm
+                                appointments={appointments}
+                                onClose={() => setShowAppointments(false)}
+                            />
+                          </div>
+                      )}
+                    </Row>
+                    <Row className="mb-4">
+                      <Button type="button" className="btn btn-lg py-4">
+                        New Vehicle
+                      </Button>
+                    </Row>
+                  </Col>
+                  <div className="payment-section text-center px-5 py-5 mb-5">
+                    <h2 className="payment-title mb-4">WE ACCEPT</h2>
+
+                    {/* Top Row (Cards) */}
+                    <div className="payment-row">
+                      <div className="payment-logo visa">VISA</div>
+                      <div className="payment-logo amex">AMEX</div>
+                      <div className="payment-logo discover">DISCOVER</div>
+                      <div className="payment-logo mastercard">MasterCard</div>
+                    </div>
+
+                    {/* Bottom Row */}
+                    <div className="payment-row mt-4">
+                      <div className="payment-box">
+                        💵
+                        <div>CASH</div>
                       </div>
-                    )}
-                  </Row>
-                  <Row className="mb-4">
-                    <Button type="button" className="btn btn-lg py-4">
-                      New Vehicle
-                    </Button>
-                  </Row>
-                </Col>
-              </Row>
-            </Form>
-          </Col>
-        </Row>
+
+                      <div className="payment-box">
+                        💳
+                        <div>CREDIT / DEBIT</div>
+                      </div>
+
+                      <div className="payment-box">
+                        🍏
+                        <div>Apple Pay</div>
+                      </div>
+                      <div className="payment-box">
+                        🅖
+                        <div>Google Pay</div>
+                      </div>
+                    </div>
+                  </div>
+                </Row>
+              </Form>
+            </Col>
+          </Row>
+        </div>
       </div>
-    </div>
   );
 };
 export default CustomerDashboard;
