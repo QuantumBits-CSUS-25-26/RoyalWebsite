@@ -71,8 +71,7 @@ const AdminUpdateBusiness = ({
       }
 
       const updatedData = await response.json();
-      const normalized = Array.isArray(updatedData) ? updatedData[0] : updatedData;
-      setBusinessInfo(normalized);
+      setBusinessInfo(updatedData[0]);
       onClose();
     } catch (error) {
       console.error("Error updating business information:", error);
