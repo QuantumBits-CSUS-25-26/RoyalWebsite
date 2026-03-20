@@ -106,9 +106,9 @@ const CustomerCreation = () => {
           <Col md="8" sm="12">
             <Form className="customerForm fs-3 p-4" onSubmit={handleSubmit} noValidate>
               <div className="my-4"><strong>Sign Up</strong></div>
-              <Row>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Row className="justify-content-center">
+                <Col xs={12} sm={10} md={8} lg={6}>
+                  <FormGroup className="my-3 text-start">
                     <Label for="fname">First Name</Label>
                     <Input
                       id="fname"
@@ -122,9 +122,7 @@ const CustomerCreation = () => {
                     />
                     {errors.fname && <div className="text-danger small">{errors.fname}</div>}
                   </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="lname">Last Name</Label>
                     <Input
                       id="lname"
@@ -138,11 +136,7 @@ const CustomerCreation = () => {
                     />
                     {errors.lname && <div className="text-danger small">{errors.lname}</div>}
                   </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="email">Email</Label>
                     <Input
                       id="email"
@@ -155,9 +149,7 @@ const CustomerCreation = () => {
                     />
                     {errors.email && <div className="text-danger small">{errors.email}</div>}
                   </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="phone">Phone Number</Label>
                     <Input
                       id="phone"
@@ -170,11 +162,7 @@ const CustomerCreation = () => {
                     />
                     {errors.phone && <div className="text-danger small">{errors.phone}</div>}
                   </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="password">Password</Label>
                     <Input
                       id="password"
@@ -187,9 +175,7 @@ const CustomerCreation = () => {
                     />
                     {errors.password && <div className="text-danger small">{errors.password}</div>}
                   </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="confirmPassword">Confirm Password</Label>
                     <Input
                       id="confirmPassword"

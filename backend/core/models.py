@@ -87,6 +87,10 @@ class Appointment(models.Model):
     class Meta:
         db_table = 'appointment'
         ordering = ['-scheduled_at']
+        constraints = [
+            # Prevent any two appointments from being scheduled at the exact same time
+            models.UniqueConstraint(fields=['scheduled_at'], name='unique_scheduled_at'),
+        ]
 
     def __str__(self):
         return f'{self.service_type} – {self.vehicle} @ {self.scheduled_at}'

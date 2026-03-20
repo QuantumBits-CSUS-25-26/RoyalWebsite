@@ -585,7 +585,7 @@
 
 /* begin admin side bar */
 .adminNav {
-  margin: 10px 0 10px 10px;
+  margin: 10px ;
   width: 225px;
   background-color: #2F6DAB;
   color: white;
@@ -656,17 +656,32 @@
 }
 
 .management {
-  margin-top: -800px;
+  margin-top: -1000px;
   margin-left: 5%;
 }
 
 /* begin employee management */
 .employee-list{
-  /* not sure what is needed, closed to stop errors
-  open bracket was cut off by merge */
+  display: flex;
+  flex-direction: column;
+  margin-left: max(10%, 200px);
+  margin-right: 5%;
+  gap: 8px;
+}
+
+.employee-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  color: #6b7280;
 }
 
 /* begin admin customer list */
+
 .customer-list{
   display: flex;
   flex-direction: column;
@@ -806,8 +821,6 @@
   padding: 1.5%;
 }
 
-
-
 /* begin customer login */
 .customerLogin{
   min-height: 100vh;
@@ -843,6 +856,7 @@
 .customer-creation .customerForm {
   background-color: #D9D9D9;
   margin-top: 10%;
+  max-width: 600px;
 }
 
 .customer-creation .btn {
@@ -851,24 +865,20 @@
 }
 
 /* begin service pop up bar */
-.services-drawer {
+.services-drawer{
   position: fixed;
   padding: 1rem;
   left: 100px;
-  top: 20px;
-  height: 100vh;
-  width: 250px;
-  background: #ffff;
+  top: 10rem;
+  width: 15rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  margin: auto; 
+  max-width: 90%; 
   z-index: 10;
-
   display: flex;
   flex-direction: column;
-}
-
-.services-drawer-header {
- /* 
-  not sure if still needed, merge conflict had open bracket only
-  */
 }
 .services-drawer h2{
   font-size: 1.4rem;
@@ -877,51 +887,51 @@
   color: #2F6DAB;
   transition: color 0.2s;
 }
-
 .services-drawer .service-popup-close-btn{
   cursor: pointer;
   background-color: #2F6DAB; 
   color: #ffffff; 
 }
-
 .services-drawer .service-popup-close-btn:hover{
   color: #111827;
 }
 .services-drawer-header{ 
   color: #2F6DAB;
-  display: flex;
+  display: flex; 
   justify-content: space-between;
   align-items: center;
   padding: 5px;
   border-bottom: 1px solid #eee;
 }
-
-.services-list {
+.services-list{
   overflow: auto;
 }
-
-.services-list li {
+.services-list li{
   list-style: none;
   padding: 5px 15px 5px 0px;
   display: flex;
-
-
 }
-
-.service-list-buttons {
+.service-list-buttons{
+  display: block;
   background-color: #2f6dab;
   border-radius: 5px;
   width: 100%;
-  color: white;
+  color: white;  
   padding-right: 10px;
-
+  cursor: pointer; 
+  transition: color 0.2s, transform 0.2s;
 }
-
-.services-backdrop {
+.service-list-buttons:hover{
+  background: #3b7fc7;
+  transform: translateY(-2px); 
+}
+.service-list-buttons:active{
+  transform: translateY(0);
+}
+.services-backdrop{
   position: fixed;
   inset: 0;
   z-index: 10;
-
 }
 
 /* begin customer dashboard */
@@ -975,6 +985,7 @@
   box-shadow:
     0 12px 30px #00000033,
     0 4px 12px #00000026;
+  overflow-x: auto;
 }
 
 .customerDashboard .apptsPlateLabel {
@@ -1060,9 +1071,11 @@
 .service-management {
   display: flex;
   flex-direction: column;
-  margin-left: max(10%, 200px);
-  margin-right: 5%;
   gap: 8px;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
 }
 .service-management-card {
   background-color: white;
@@ -1071,12 +1084,85 @@
   padding: 16px;
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 12px;
   color: #6b7280;
+}
+.service-management-card.dragging {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: #2F6DAB 2px solid;
+}
+.service-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
 }
 .service-management-card:hover {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border: black 1px solid;
+}
+.service-drag-handle {
+  font-size: 24px;
+  color: #9ca3af;
+  cursor: grab;
+  user-select: none;
+  padding: 4px 8px;
+  line-height: 1;
+}
+.service-drag-handle:hover {
+  color: #2F6DAB;
+}
+
+/* Drag zone layout */
+.service-zones {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.service-zone {
+  display: flex;
+  flex-direction: column;
+}
+.service-zone-label {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  width: fit-content;
+}
+.active-label {
+  color: #15803d;
+  background-color: #dcfce7;
+}
+.inactive-label {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+.service-drop-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+.service-drop-area.drop-hover {
+  border-color: #2F6DAB;
+  background-color: #eff6ff;
+}
+.inactive-area {
+  background-color: #fef2f2;
+}
+.inactive-area.drop-hover {
+  border-color: #dc3545;
+  background-color: #fee2e2;
+}
+.service-zone-empty {
+  color: #9ca3af;
+  text-align: center;
+  padding: 16px;
+  font-style: italic;
 }
 .service-management-delete-button{
   width: 20%;
@@ -1096,10 +1182,8 @@
   background: #fff;
   color: #111;
   position: fixed;
-  height: 25%;
   width: 75%;
   max-width: 625px;
-  min-height: 415px;
   min-width: 415px;
   top: 50%;
   left: 50%;
@@ -1137,18 +1221,49 @@
   text-align: center;
   display: block;
 }
-.services-management-delete .content{
-  padding-top: 1%;
-  padding-bottom: 1%;
+
+/* Delete confirmation step */
+.delete-confirm {
+  padding: 24px 30px;
+  text-align: center;
 }
-.services-management-delete .btn {
-  width: 50%;
-  margin-left: auto;
-  color: white;
-  background-color: #2F6DAB;
-  border: #dbdbdb 1px solid;
-  border-radius: 8px;
+.delete-confirm-text {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 24px;
+}
+.delete-confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.delete-confirm-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
+  color: white;
+}
+.delete-confirm-btn.cancel {
+  background-color: #6b7280;
+}
+.delete-confirm-btn.cancel:hover {
+  background-color: #4b5563;
+}
+.delete-confirm-btn.disable {
+  background-color: #f59e0b;
+}
+.delete-confirm-btn.disable:hover {
+  background-color: #d97706;
+}
+.delete-confirm-btn.delete {
+  background-color: #dc3545;
+}
+.delete-confirm-btn.delete:hover {
+  background-color: #c82333;
 }
 
 /* begin admin add service popup */
@@ -1255,8 +1370,96 @@
   min-height: 100vh;
   background-image: url('./images/HeroImage.jpg');
 }
+/* begin admin update service button */
+.service-management-update-button {
+  width: 20%;
+  padding: 10px;
+  margin-top: 8px;
+  background-color: #2F6DAB;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.service-management-update-button:hover {
+  background-color: #245a8d;
+}
+
+/* begin admin update service popup */
+.services-management-update {
+  background: #fff;
+  color: #111;
+  position: fixed;
+  width: 75%;
+  max-width: 625px;
+  min-width: 415px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: solid black 1px;
+  z-index: 1001;
+  animation: fadeIn 0.08s ease-in;
+}
+.services-management-update-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.08s ease-in;
+}
+.services-management-update .title {
+  background-color: #2F6DAB;
+  box-shadow: 0px -3px 6px 2px rgba(0, 0, 0, 0.15) inset;
+  color: white;
+  font-size: 40px;
+  text-align: center;
+  display: block;
+}
+.update-service-select {
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.update-service-select p {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+.update-service-select-btn {
+  width: 100%;
+  padding: 10px;
+  color: white;
+  background-color: #2F6DAB;
+  border: #dbdbdb 1px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.update-service-select-btn:hover {
+  background-color: #245a8d;
+}
+
 
 /* begin customer update */
+.customerUpdate {
+  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.customerUpdate .customerUpdate-inner {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .customerUpdate .title {
   margin-left: 100px;
 }
@@ -1264,25 +1467,93 @@
 .customerUpdate .updateForm {
   background-color: #D9D9D9;
   margin-top: 0%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.customerUpdate .container {
+.customerUpdate .container.updateForm-grid {
   display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .customerUpdate .contentRight {
-  height: 20vh;
-  width: 100vh;
+  height: auto;
+  min-height: 20vh;
+  width: 50%;
+  box-sizing: border-box;
 }
 
 .customerUpdate .contentLeft {
-  height: 20vh;
-  width: 100vh;
+  height: auto;
+  min-height: 20vh;
+  width: 50%;
+  box-sizing: border-box;
 }
 
+.customerUpdate .form-group-update {
+  margin-left: 2rem;
+  margin-right: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.customerUpdate .btn.update-submit-btn,
 .customerUpdate .btn {
   width: 40%;
+  min-width: 140px;
   background-color: #2F6DAB;
+}
+
+/* RW-151: Update account information – mobile: form visible, no horizontal scroll */
+@media (max-width: 767.98px) {
+  .customerUpdate .title {
+    margin-left: 0;
+  }
+
+  .customerUpdate .container.updateForm-grid {
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .customerUpdate .contentLeft,
+  .customerUpdate .contentRight {
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+  }
+
+  .customerUpdate .form-group-update {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .customerUpdate .updateForm {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .customerUpdate .btn.update-submit-btn,
+  .customerUpdate .btn {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .customerUpdate .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .customerUpdate .col,
+  .customerUpdate [class*="col-"] {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    max-width: 100%;
+  }
 }
 .contact-info-s4{
   margin-top: 1rem;
@@ -1308,6 +1579,7 @@
 }
 .contact-info-form{
   background: #2F6DAB;
+  justify-self: center;
   padding: 28px 28px;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
@@ -1357,8 +1629,6 @@
 }
 
 .contact-info .contact-info-content {
-  /* display:flex;
-  flex-direction: column; */
   align-items: center;
   width: 75%;
   margin-top: 3vh;
@@ -1549,14 +1819,24 @@
     display: none;
   }
 
-  .appointments-table, .appointments-table tbody, .appointments-table tr, .appointments-table td {
+  .appointments-table,
+  .appointments-table tbody,
+  .appointments-table tr,
+  .appointments-table td {
     display: block;
     width: 100%;
+  }
+  
+  .appointments-table,
+  .appointments-table tr,
+  .appointments-table td {
+    max-width: 100%;
   }
 
   .appointments-table td {
     box-sizing: border-box;
-    padding: 8px 12px;
+    border-bottom: 1px solid #eaeaea;
+    padding: 10px;
   }
 
   .appointments-table td::before {
@@ -1614,36 +1894,6 @@
   .customer-creation .content {
     margin-left: 0;
   }
-
-  /* responsive: stack cells on very small screens (optional) */
-  @media (max-width: 520px) {
-    .appointments-table thead {
-      display: none;
-
-    }
-
-    .appointments-table,
-    .appointments-table tbody,
-    .appointments-table tr,
-    .appointments-table td {
-      display: block;
-      width: 100%;
-    }
-
-    .appointments-table td {
-      box-sizing: border-box;
-      padding: 8px 12px;
-    }
-
-    .appointments-table td::before {
-      content: attr(data-label);
-      display: block;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #374151;
-    }
-   }
-    
 
   /* CONTACT FORM */
   .contact_form {
@@ -1714,48 +1964,6 @@
       height: auto;
     }
 
-    /* ADMIN DASHBOARD */
-    .admin-dashboard-content,
-    .adminServices,
-    .adminCustomers,
-    .adminApts,
-    .updates,
-    .messages,
-    .settings,
-    .invoices {
-      margin-top: 0;
-      margin-left: 0;
-    }
-
-    .admin-totals {
-      flex-direction: column;
-      margin-left: 0;
-    }
-
-    .admin-content {
-      margin-left: 0;
-    }
-
-    /* CUSTOMER DASHBOARD */
-    .customerDashboard .info {
-      width: 95%;
-      font-size: medium;
-    }
-
-    .customerDashboard .btn {
-      width: 90%;
-    }
-
-    /* TABLES */
-    .table-wrapper,
-    .rc-customer-table {
-      overflow-x: auto;
-    }
-
-    table {
-      min-width: 600px;
-
-    }
 
   /* ADMIN DASHBOARD */
   .admin-dashboard-content,
@@ -1768,6 +1976,7 @@
   .invoices {
     margin-top: 0;
     margin-left: 0;
+  
   }
 
   .admin-totals {
@@ -2118,5 +2327,65 @@
   /* total fixed height = 20px infobar + 56px header */
   body:has(.mobileOffcanvasNav) {
     padding-top: 76px;
+  }
+}
+
+/* start admin invoices */
+.invoice-table {
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+}
+.invoice-table-columns {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  padding: 1vh;
+  width: 50vw;
+}
+.invoice-table-content {
+  display: flex;
+  flex-direction: column;
+  width: 45vw;
+  margin-left: 5%;
+  margin-right: 5%;
+  gap: 8px;
+}
+.invoice-card {
+  background-color: white;
+  border-radius: 12px;
+  border: #dbdbdb 1px solid;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 5vw;
+  color: #6b7280;
+  font-size: 18px;
+}
+.invoice-table-content-search {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 8px;
+}
+.invoice-table-content .btn {
+  width: 30%;
+  background-color: #2F6DAB;
+}
+@media (max-width: 767px) {
+  .invoice-table {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  }
+  .invoice-table-columns {
+    width: fit-content;
+  }
+  .invoice-table-content {
+    width: 100vw;
+  }
+  .invoice-table-content-search {
+    width: 70vw;
+    gap: 8px;
   }
 }

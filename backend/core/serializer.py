@@ -69,14 +69,44 @@ class VehicleSerializer(serializers.ModelSerializer):
 #  Employee serializers
 # ══════════════════════════════════════════════════════════════════
 
+
 class EmployeeProfileSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, min_length=8, max_length=24)
+
     class Meta:
         model = Employee
         fields = [
             'employee_id', 'first_name', 'last_name',
-            'email', 'phone', 'role',
+            'email', 'phone', 'role', 'password',
         ]
         read_only_fields = ['employee_id', 'role']
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            validated_data['password_hash'] = make_password(password)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            instance.password_hash = make_password(password)
+        return super().update(instance, validated_data)
+
+class EmployeeRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8, max_length=24)
+
+    class Meta:
+        model = Employee
+        fields = [
+            'employee_id', 'first_name', 'last_name',
+            'email', 'phone', 'role', 'password',
+        ]
+        read_only_fields = ['employee_id']
+
+    def create(self, validated_data):
+        validated_data['password_hash'] = make_password(validated_data.pop('password'))
+        return super().create(validated_data)
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -85,6 +115,17 @@ class EmployeeProfileSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     """Flat IDs — used for create / update."""
+    def validate(self, data):
+        """Ensure we don't create duplicate appointments for the same vehicle at the same time."""
+        scheduled_at = data.get('scheduled_at')
+        if scheduled_at:
+            qs = Appointment.objects.filter(scheduled_at=scheduled_at)
+            # If updating, exclude the instance being updated
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise serializers.ValidationError({'scheduled_at': 'An appointment already exists at the specified date/time.'})
+        return data
     class Meta:
         model = Appointment
         fields = [

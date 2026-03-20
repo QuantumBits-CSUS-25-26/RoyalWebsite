@@ -24,11 +24,9 @@ const formatTime = (hour24) => {
   return `${hour12}${period}`;
 };
 
-const AppStepThree = () => {
+const AppStepThree = ({ selectedDate, selectedTime, onSelectDate = () => {}, onSelectTime = () => {} }) => {
   const [viewDate, setViewDate] = useState(() => new Date());
   // *****Selected time/date is the value to submit with the appointment payload*****
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
   const [showSameDayNotice, setShowSameDayNotice] = useState(false);
 
   const { monthLabel, yearLabel, calendarDays } = useMemo(() => {
@@ -101,8 +99,8 @@ const AppStepThree = () => {
     const selected = new Date(day.date);
     selected.setHours(0, 0, 0, 0);
     setShowSameDayNotice(selected.getTime() === today.getTime());
-    setSelectedDate(day.date);
-    setSelectedTime(null);
+    onSelectDate(day.date);
+    onSelectTime(null);
   };
 
   return (
@@ -174,7 +172,7 @@ const AppStepThree = () => {
                   key={slot}
                   type="button"
                   className={`time-slot ${selectedTime === slot ? "selected" : ""}`}
-                  onClick={() => setSelectedTime(slot)}
+                  onClick={() => onSelectTime(slot)}
                   disabled={showSameDayNotice}
                 >
                   {slot}

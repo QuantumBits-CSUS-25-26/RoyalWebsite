@@ -10,7 +10,10 @@ urlpatterns = [
     # ── Employee / Staff auth ──────────────────────────────────
     path('employees/login/', views.EmployeeLoginView.as_view(), name='employee_login'),
     path('login/', views.EmployeeLoginView.as_view(), name='staff_login'),  # alias for Login.js
-
+    path('admin/employees/create/', views.AdminEmployeeCreateView.as_view(), name='admin_employee_create'),
+    path('admin/employees/<int:employee_id>/delete/', views.AdminEmployeeDeleteView.as_view(), name='admin_employee_delete'),
+    path('admin/employees/<int:employee_id>/edit/', views.AdminEmployeeEditView.as_view(), name='admin_employee_edit'),
+    
     # ── Vehicles (customer-scoped) ─────────────────────────────
     path('vehicles/', views.VehicleListCreateView.as_view(), name='vehicle_list_create'),
     path('vehicles/<int:vehicle_id>/', views.VehicleDetailView.as_view(), name='vehicle_detail'),
@@ -28,9 +31,13 @@ urlpatterns = [
     path('admin/customers/', views.AdminCustomerListView.as_view(), name='admin_customer_list'),
     path('admin/appointments/', views.AdminAppointmentListView.as_view(), name='admin_appointment_list'),
     path('admin/vehicles/', views.AdminVehicleListView.as_view(), name='admin_vehicle_list'),
+    path('admin/employees/', views.AdminEmployeeListView.as_view(), name='admin_employee_list'),
 
     # ── Business Information ───────────────────────────────────
     path('business-info/', views.BusinessInformationView.as_view(), name='business_info'),
     path('business-info/<int:info_id>/', views.BusinessInformationDetailView.as_view(), name='business_info_detail'),
 
+
+    # ── Facebook Posts ───────────────────────────────────────────
+    path('facebook-posts/', views.FacebookPostsView.as_view(), name='facebook_posts'),
 ]
