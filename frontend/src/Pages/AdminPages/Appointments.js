@@ -3,9 +3,32 @@ import "./Appointments.css";
 import AdminSideBar from "../../Components/AdminSideBar";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../../config";
 
 const Appointments = () => {
+  // determine authorization from stored user object
+  const parseStoredUser = () => {
+    try {
+      const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const storedUser = parseStoredUser();
+
+  const isAuthorized = (user) => {
+    // if a token exists assume authenticated and allow; stored user may not be saved by login flow
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    if (!user && token) return true;
+    if (!user) return false;
+    if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) return true;
+    if (user.role && (user.role === "employee" || user.role === "admin")) return true;
+    if (Array.isArray(user.roles) && (user.roles.includes("employee") || user.roles.includes("admin"))) return true;
+    return false;
+  };
   const [appointments, setAppointments] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [services, setServices] = useState([]);
@@ -130,6 +153,8 @@ const Appointments = () => {
     backgroundColor: item.finished_at || item.status === "complete" ? "#22c55e" : "#f97316",
     extendedProps: { ...item },
   }));
+
+  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
 
   return (
     <section className="admin-dashboard">

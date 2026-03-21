@@ -12,12 +12,10 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^1.13.6",
     "bootstrap": "^5.3.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.9.5",
     "react-scripts": "^5.0.1",
     "reactstrap": "^9.2.3",
     "web-vitals": "^2.1.4"
@@ -47,11 +45,12 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/user-event": "^14.6.1",
     "autoprefixer": "^10.4.21",
     "baseline-browser-mapping": "^2.9.19",
     "postcss": "^8.5.6",
+    "react-router-dom": "^7.13.1",
     "tailwindcss": "^4.1.15"
   },
   "proxy": "http://localhost:8000"
-
 }

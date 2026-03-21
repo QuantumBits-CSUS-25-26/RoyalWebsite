@@ -3,6 +3,7 @@ import {useState, useEffect} from 'react';
 import AddEmployeeForm from "../EmployeeManagmentPopups/AddEmployee";
 import RemoveEmployeeForm from "../EmployeeManagmentPopups/RemoveEmployee";
 import EditEmployeeForm from "../EmployeeManagmentPopups/EditEmployee";
+import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
 import '../EmployeeManagementPopup.css';
 
 const DisplayEmployee = ({ employee }) => {
@@ -18,6 +19,28 @@ const DisplayEmployee = ({ employee }) => {
 }
 
 const Management = () => {
+   // determine authorization from stored user object
+  const parseStoredUser = () => {
+    try {
+      const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const storedUser = parseStoredUser();
+
+  const isAuthorized = (user) => {
+    // if a token exists assume authenticated and allow; stored user may not be saved by login flow
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    if (!user && token) return true;
+    if (!user) return false;
+    if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) return true;
+    if (user.role && (user.role === "employee" || user.role === "admin")) return true;
+    if (Array.isArray(user.roles) && (user.roles.includes("employee") || user.roles.includes("admin"))) return true;
+    return false;
+  };
     const[employees, setEmployees] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showRemoveForm, setShowRemoveForm] = useState(false);
@@ -120,7 +143,7 @@ const Management = () => {
       const updatedEmployee = await res.json();
       setEmployees(prev => prev.map(e => (e.employee_id ?? e.id) === employeeId ? updatedEmployee : e));
     };
-
+    if (!isAuthorized(storedUser)) return <AuthErrorPage />;
   return (
     <div>
         <AdminSideBar />

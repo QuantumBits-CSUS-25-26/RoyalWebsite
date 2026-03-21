@@ -4,9 +4,32 @@ import { Row, Col, Button, Form, FormGroup, Label } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AppSumm from "../Components/AppointmentSummary";
+import AuthErrorPage from "../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../config";
 
 const CustomerDashboard = () => {
+  const parseStoredUser = () => {
+        try {
+            const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    };
+
+    const storedUser = parseStoredUser();
+
+    const isAuthorized = (user) => {
+        // if a token exists assume authenticated and allow; stored user may not be saved by login flow
+        const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+        if (!user && token) return true;
+        if (!user) return false;
+        if (user.is_customer || user.is_superuser) return true;
+        if (user.role && (user.role === "customer")) return true;
+        if (Array.isArray(user.roles) && (user.roles.includes("customer"))) return true;
+        return false;
+    };
+
   const [showAppointments, setShowAppointments] = useState(false);
   const [profile, setProfile] = useState(null);
   const [vehicles, setVehicles] = useState([]);
@@ -66,7 +89,8 @@ const CustomerDashboard = () => {
   const handleClickUpdateInfo = () => {
     navigate("/account-update");
   };
-
+  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+  
   return (
     <div className="customerDashboard">
       <div className="content">
