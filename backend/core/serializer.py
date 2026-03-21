@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -191,3 +191,59 @@ class BusinessInformationSerializer(serializers.ModelSerializer):
             'info_id', 'name', 'address', 'phone', 'email', 'hours'
         ]
         read_only_fields = ['info_id']
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Service Recommendation serializers
+# ══════════════════════════════════════════════════════════════════
+
+class ServiceRecommendationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceRecommendation
+        fields = [
+            'recommendation_id', 'customer', 'vehicle', 'service',
+            'recommended_by', 'note', 'status', 'created_at',
+        ]
+        read_only_fields = ['recommendation_id', 'created_at']
+
+
+class ServiceRecommendationReadSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source='service.name', read_only=True)
+    vehicle_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ServiceRecommendation
+        fields = [
+            'recommendation_id', 'customer', 'vehicle', 'service',
+            'service_name', 'vehicle_display', 'recommended_by',
+            'note', 'status', 'created_at',
+        ]
+
+    def get_vehicle_display(self, obj):
+        v = obj.vehicle
+        return f'{v.year} {v.make} {v.model}'
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Admin Customer Detail serializer (nested vehicles + appointments)
+# ══════════════════════════════════════════════════════════════════
+
+class AdminCustomerDetailSerializer(serializers.ModelSerializer):
+    vehicles = VehicleSerializer(many=True, read_only=True)
+    appointments = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Customer
+        fields = [
+            'customer_id', 'first_name', 'last_name',
+            'email', 'phone', 'created_at',
+            'vehicles', 'appointments',
+        ]
+        read_only_fields = ['customer_id', 'created_at']
+
+    def get_appointments(self, obj):
+        vehicle_ids = obj.vehicles.values_list('vehicle_id', flat=True)
+        appointments = Appointment.objects.filter(
+            vehicle_id__in=vehicle_ids
+        ).select_related('vehicle', 'employee').order_by('-scheduled_at')
+        return AppointmentReadSerializer(appointments, many=True).data

@@ -29,6 +29,9 @@ urlpatterns = [
     path('services/<int:service_id>/', views.SiteServiceDetailView.as_view(), name='site_service_detail'),
 
     path('admin/customers/', views.AdminCustomerListView.as_view(), name='admin_customer_list'),
+    path('admin/customers/<int:customer_id>/book-appointment/', views.AdminBookAppointmentView.as_view(), name='admin_book_appointment'),
+    path('admin/customers/<int:customer_id>/recommend-services/', views.AdminRecommendServicesView.as_view(), name='admin_recommend_services'),
+    path('admin/customers/<int:customer_id>/vehicles/', views.AdminAddVehicleView.as_view(), name='admin_add_vehicle'),
     path('admin/appointments/', views.AdminAppointmentListView.as_view(), name='admin_appointment_list'),
     path('admin/vehicles/', views.AdminVehicleListView.as_view(), name='admin_vehicle_list'),
     path('admin/employees/', views.AdminEmployeeListView.as_view(), name='admin_employee_list'),
