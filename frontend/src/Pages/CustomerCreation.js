@@ -81,15 +81,33 @@ const CustomerCreation = () => {
       console.log('Account payload ready:', p);
 
       // placeholder send function - replace URL and uncomment to send
-      const sendPayload = async (payloadObj) => {
-        console.log('sendPayload placeholder:', payloadObj);
-        return Promise.resolve({ ok: true });
-      };
-
-      sendPayload(p).then((res) => console.log('sendPayload result:', res));
-      navigate('/dashboard');
+      const sendPayload = async (payLoadObject) =>{
+        try{
+          const response = await fetch('http://localhost:8000/api/customers/register/', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payLoadObject)
+          });
+          if(!response.ok) throw new Error('Failed to create account');
+          return await response.json();
+        }catch (error){
+          console.error(error);
+          return { ok: false, error: error.message };
+        }
+      }
+      sendPayload(p).then((res) => {
+        if (res.ok === false) {
+          alert('Account creation failed: ' + res.error);
+        } else {
+          if (res.access) {
+            sessionStorage.setItem('authToken', res.access);
+          }
+          navigate('/dashboard');
+        }
+      });
     }
-  }
+  };
+  
   return (
     <div className="customer-creation">
       <div className="content">
