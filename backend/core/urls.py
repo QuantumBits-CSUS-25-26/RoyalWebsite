@@ -46,4 +46,5 @@ urlpatterns = [
 
     # ── Facebook Posts ───────────────────────────────────────────
     path('facebook-posts/', views.FacebookPostsView.as_view(), name='facebook_posts'),
+    path('api/vehicles/<int:vehicle_id>/service-history/', views.VehicleServiceHistoryView.as_view(), name= 'vehicle_service_history'),
 ]

@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation
 from .serializer import (
@@ -933,3 +934,27 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         tokens = serializer.validated_data
         response = Response(tokens)
         return response
+    
+#customer single vehicle view
+class VehicleServiceHistoryView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomer]
+
+    def get(self, request, vehicle_id):
+        # makes sure the vehicle belongs to the requesting customer
+        try:
+            vehicle = Vehicle.objects.get(vehicle_id=vehicle_id, customer=request.user)
+        except Vehicle.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        appointments = Appointment.objects.filter(vehicle=vehicle).order_by('-scheduled_at')
+        data = [
+            {
+                'service_type': appt.service_type,
+                'scheduled_at': appt.scheduled_at,
+                'finished_at': appt.finished_at,
+                'cost': appt.cost,
+            }
+            for appt in appointments
+        ]
+        return Response(data)
