@@ -434,7 +434,7 @@ const CustomerDashboard = () => {
                     onVehicleAdded={fetchVehicles}
                   />
                 </Col>
-              </div>
+              </Row>
             </Form>
           </Col>
         </Row>

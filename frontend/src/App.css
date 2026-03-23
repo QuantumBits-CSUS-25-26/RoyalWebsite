@@ -2764,7 +2764,8 @@
 .vehicle-popup-modal .form-control:focus {
   border-color: #2F6DAB;
   box-shadow: 0 0 0 0.2rem rgba(47, 109, 171, 0.25);
-  
+}
+
 /* ── Customer Management mobile styles ─────────────────────── */
 @media (max-width: 767.98px) {
   .customer-list {

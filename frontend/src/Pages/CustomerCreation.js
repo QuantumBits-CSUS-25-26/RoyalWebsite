@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { useState } from 'react';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import axios from "axios";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[0-9\s-.()]{7,15}$/;
 
@@ -65,7 +64,25 @@ const CustomerCreation = () => {
     setValues((s) => ({ ...s, [name]: value }));
     setErrors((s) => ({ ...s, [name]: validateField(name, value) }));
   };
-  const handleSubmit = async (e) => {
+  const sendPayload = async (payloadObj) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/customers/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadObj),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create account');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      return { ok: false, error: error.message };
+    }
+  };
+    const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateAll()) {
@@ -79,52 +96,16 @@ const CustomerCreation = () => {
 
       setPayload(p);
 
-      // placeholder send function - replace URL and uncomment to send
-      const sendPayload = async (payLoadObject) =>{
-        try{
-          const response = await fetch('http://localhost:8000/api/customers/register/', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payLoadObject)
-          });
-          if(!response.ok) throw new Error('Failed to create account');
-          return await response.json();
-        }catch (error){
-          console.error(error);
-          return { ok: false, error: error.message };
-        }
-      }
-      sendPayload(p).then((res) => {
-        if (res.ok === false) {
-          alert('Account creation failed: ' + res.error);
-        } else {
-          if (res.access) {
-            sessionStorage.setItem('authToken', res.access);
-          }
-          navigate('/dashboard');
-        }
-      });
-    }
-  };
-  
       const res = await sendPayload(p);
 
-      if (res) {
-        navigate("/dashboard");
+      if (res.ok === false) {
+        alert('Account creation failed: ' + res.error);
+      } else {
+        if (res.access) {
+          sessionStorage.setItem('authToken', res.access);
+        }
+        navigate('/dashboard');
       }
-    }
-  };
-  const sendPayload = async (payloadObj) => {
-    try {
-      const response = await axios.post(
-          "http://127.0.0.1:8000/api/customers/register/",
-          payloadObj
-      );
-
-      console.log("Customer created:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating customer:", error);
     }
   };
 
