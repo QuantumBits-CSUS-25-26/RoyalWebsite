@@ -18,6 +18,9 @@ urlpatterns = [
     path('vehicles/', views.VehicleListCreateView.as_view(), name='vehicle_list_create'),
     path('vehicles/<int:vehicle_id>/', views.VehicleDetailView.as_view(), name='vehicle_detail'),
 
+    # ── Service Recommendations ────────────────────────────────
+    path('recommendations/', views.CustomerRecommendationsView.as_view(), name='customer_recommendations'),
+
     # ── Appointments ───────────────────────────────────────────
     path('appointments/', views.AppointmentListCreateView.as_view(), name='appointment_list_create'),
     path('appointments/<int:appointment_id>/', views.AppointmentDetailView.as_view(), name='appointment_detail'),

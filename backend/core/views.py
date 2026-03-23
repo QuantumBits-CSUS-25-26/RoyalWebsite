@@ -302,6 +302,21 @@ class VehicleDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class CustomerRecommendationsView(APIView):
+    """
+    GET /api/recommendations/ → customer's service recommendations
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomer]
+
+    def get(self, request):
+        recommendations = ServiceRecommendation.objects.filter(
+            customer=request.user
+        ).select_related('vehicle', 'service', 'recommended_by')
+        serializer = ServiceRecommendationReadSerializer(recommendations, many=True)
+        return Response(serializer.data)
+
+
 # ══════════════════════════════════════════════════════════════════
 #  Appointments
 # ══════════════════════════════════════════════════════════════════
