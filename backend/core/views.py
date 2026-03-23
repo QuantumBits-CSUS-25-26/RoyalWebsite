@@ -15,6 +15,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice
 from .serializer import (
@@ -306,6 +307,21 @@ class VehicleDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         vehicle.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CustomerRecommendationsView(APIView):
+    """
+    GET /api/recommendations/ → customer's service recommendations
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomer]
+
+    def get(self, request):
+        recommendations = ServiceRecommendation.objects.filter(
+            customer=request.user
+        ).select_related('vehicle', 'service', 'recommended_by')
+        serializer = ServiceRecommendationReadSerializer(recommendations, many=True)
+        return Response(serializer.data)
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -975,7 +991,30 @@ class ContactMessageView(APIView):
         # TODO: store in a Message model or send email
         return Response({'detail': 'Message received.'}, status=status.HTTP_201_CREATED)
 
+class AdminDashboardTotalsView(APIView):
+    """GET /api/admin/dashboard-totals/"""
+    authentication_classes = [CustomJWTAuthentication]
 
+    def get(self, request):
+        total_customers = Customer.objects.count()
+        total_appointments = Appointment.objects.count()
+        total_messages = 0  # Placeholder since messages aren't stored yet
+        total_services = SiteService.objects.count()
+        return Response({
+            'total_customers': total_customers,
+            'total_appointments': total_appointments,
+            'total_messages': total_messages,
+            'total_services': total_services,
+        })
+    
+class AdminRecentCustomersView(APIView):
+    """GET /api/admin/recent-customers/"""
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get(self, request):
+        recent_customers = Customer.objects.all().order_by('-created_at')[:5]
+        serializer = CustomerProfileSerializer(recent_customers, many=True)
+        return Response(serializer.data)
 
 @require_GET
 def place_reviews(request):
@@ -1038,3 +1077,27 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         tokens = serializer.validated_data
         response = Response(tokens)
         return response
+    
+#customer single vehicle view
+class VehicleServiceHistoryView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomer]
+
+    def get(self, request, vehicle_id):
+        # makes sure the vehicle belongs to the requesting customer
+        try:
+            vehicle = Vehicle.objects.get(vehicle_id=vehicle_id, customer=request.user)
+        except Vehicle.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        appointments = Appointment.objects.filter(vehicle=vehicle).order_by('-scheduled_at')
+        data = [
+            {
+                'service_type': appt.service_type,
+                'scheduled_at': appt.scheduled_at,
+                'finished_at': appt.finished_at,
+                'cost': appt.cost,
+            }
+            for appt in appointments
+        ]
+        return Response(data)

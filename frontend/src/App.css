@@ -1202,7 +1202,15 @@
   position: relative;
   z-index: 2;
 }
-
+.customerDashboardRows{
+  --bs-gutter-x: 1.5rem !important;
+  --bs-gutter-y: 0 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  margin-top: calc(-1 * var(--bs-gutter-y)) !important;
+  margin-right: calc(-.5 * var(--bs-gutter-x)) !important;;
+  margin-left: calc(-.5 * var(--bs-gutter-x)) !important;;
+}
 .customerDashboard .updateForm {
   --dashboard-btn-height: 72px;
   background-color: rgba(217, 217, 217, 0.8);
@@ -1211,6 +1219,12 @@
   border-radius: 16px;
   align-items: center;
   gap: calc(var(--dashboard-btn-height) / 2);
+}
+
+.customerDashboard .flexContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
 }
 
 .customerDashboard .info {
@@ -1294,8 +1308,6 @@
 .customerDashboard .buttonsCol {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-top: -10%;
 }
 
 .customerDashboard .btn {
@@ -1318,6 +1330,13 @@
   padding: 1.5%;
   width: 60%;
   cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .customerDashboard .flexContainer {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* begin admin services management */
@@ -2691,6 +2710,72 @@
     width: 70vw;
     gap: 8px;
   }
+}
+
+  .custom-close-btn {
+  position: absolute;
+  right: 16px;
+  top: 0px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+}
+.custom-close-btn:hover {
+  color: #ffcccc;
+}
+.vehicle-popup-modal .modal-header {
+  background-color: #2F6DAB;
+  color: #ffff;
+  border-bottom: none;
+}
+
+.vehicle-popup-modal .modal-title {
+  color: #ffff;
+}
+
+.vehicle-popup-modal .modal-body,
+.vehicle-popup-modal .modal-content {
+  color: #2F6DAB;
+  border-radius: 8px;
+}
+
+.vehicle-popup-modal label,
+.vehicle-popup-modal h5,
+.vehicle-popup-modal h6,
+.vehicle-popup-modal ul,
+.vehicle-popup-modal li,
+.vehicle-popup-modal .info-text {
+  color: #2F6DAB;
+}
+
+.vehicle-popup-modal hr,
+.vehicle-popup-modal .dash-table th,
+.vehicle-popup-modal .dash-table td {
+  border-color: #2F6DAB;
+}
+
+.vehicle-popup-modal .btn,
+.vehicle-popup-modal button {
+  background-color: #2F6DAB;
+  color: #ffff;
+  border: none;
+  transition: background 0.2s;
+}
+
+.vehicle-popup-modal .btn:hover,
+.vehicle-popup-modal button:hover {
+  background-color: #1e4c7a;
+  color: #ffff;
+}
+
+.vehicle-popup-modal .form-control:focus {
+  border-color: #2F6DAB;
+  box-shadow: 0 0 0 0.2rem rgba(47, 109, 171, 0.25);
 }
 
 /* ── Customer Management mobile styles ─────────────────────── */
