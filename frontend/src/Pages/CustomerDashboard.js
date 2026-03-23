@@ -4,6 +4,8 @@ import { Row, Col, Button, Form, FormGroup, Label } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AppSumm from "../Components/AppointmentSummary";
+import VehicleInfoPopUp from "../Components/VehicleInfoPopup";
+import NewVehiclePopUp from "../Components/newVehiclePopup";
 import AuthErrorPage from "../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../config";
 
@@ -37,6 +39,8 @@ const CustomerDashboard = () => {
   const [serviceHistory, setServiceHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showVehiclePopup, setShowVehiclePopup] = useState(false);
+  const [showNewVehicleModal, setShowNewVehicleModal] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("authToken");
@@ -89,6 +93,17 @@ const CustomerDashboard = () => {
   const handleClickUpdateInfo = () => {
     navigate("/account-update");
   };
+
+  // Helper to refresh vehicles after adding
+  const fetchVehicles = () => {
+    const token = sessionStorage.getItem("authToken");
+    const headers = { "Accept": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    fetch(`${API_BASE_URL}/api/vehicles/`, { headers })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setVehicles(data || []));
+  };
+
   if (!isAuthorized(storedUser)) return <AuthErrorPage />;
   
   return (
@@ -101,7 +116,7 @@ const CustomerDashboard = () => {
               {error && (
                 <div className="form-error" role="alert">{error}</div>
               )}
-              <Row>
+              <Row className="customerDashboardRows">
                 <Col md="6" sm="12">
                   <div className="info text-start px-5 py-4 mb-5">
                     <FormGroup>
@@ -265,10 +280,26 @@ const CustomerDashboard = () => {
                     )}
                   </Row>
                   <Row className="mb-4">
-                    <Button type="button" className="btn btn-lg py-4">
+                    <Button type="button" className="btn btn-lg py-4" onClick={() => setShowVehiclePopup(true)}>
+                      View Vehicle Info
+                    </Button>
+                  </Row>
+                  <VehicleInfoPopUp
+                    isOpen={showVehiclePopup}
+                    onClose={() => setShowVehiclePopup(false)}
+                    vehicles={vehicles}
+                    appointments={appointments}
+                  />
+                  <Row className="mb-4">
+                    <Button type="button" className="btn btn-lg py-4" onClick={() => setShowNewVehicleModal(true)}>
                       New Vehicle
                     </Button>
                   </Row>
+                  <NewVehiclePopUp
+                    isOpen={showNewVehicleModal}
+                    onClose={() => setShowNewVehicleModal(false)}
+                    onVehicleAdded={fetchVehicles}
+                  />
                 </Col>
               </Row>
             </Form>
