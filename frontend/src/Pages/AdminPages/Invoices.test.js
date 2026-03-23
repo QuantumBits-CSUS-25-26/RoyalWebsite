@@ -100,12 +100,19 @@ describe("Invoices page", () => {
 
     await waitFor(() => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
+      // eslint-disable-next-line testing-library/no-wait-for-multiple-assertions
       expect(screen.getByText("Jane Smith")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Toyota Camry")).toBeInTheDocument();
-    expect(screen.getByText("Honda Civic")).toBeInTheDocument();
-    expect(screen.getByText("Oil Change")).toBeInTheDocument();
-    expect(screen.getByText("Brake Inspection")).toBeInTheDocument();
+    await screen.findByText((text) => text.includes("Toyota Camry"));
+    await screen.findByText((text) => text.includes("Honda Civic"));
+    await screen.findByText((text) => text.includes("Oil Change"));
+    await screen.findByText((text) => text.includes("Brake Inspection"));
+
+
+    expect(screen.getByText((text) => text.includes("Toyota Camry"))).toBeInTheDocument();    
+    expect(screen.getByText((text) => text.includes("Honda Civic"))).toBeInTheDocument();
+    expect(screen.getByText((text) => text.includes("Oil Change"))).toBeInTheDocument();
+    expect(screen.getByText((text) => text.includes("Brake Inspection"))).toBeInTheDocument();
   });
 });

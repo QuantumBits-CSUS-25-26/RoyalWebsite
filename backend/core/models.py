@@ -58,6 +58,29 @@ class Employee(models.Model):
         return f'{self.first_name} {self.last_name} ({self.role})'
 
 
+class Invoice(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+    ]
+
+    invoice_id = models.AutoField(primary_key=True)
+    appointment = models.OneToOneField(
+        'Appointment',
+        on_delete=models.CASCADE,
+        related_name='invoice',
+    )
+    services = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'invoice'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Invoice #{self.invoice_id} – {self.appointment} – {self.status}'
+
 class Appointment(models.Model):
     """
     A scheduled service appointment for a vehicle.

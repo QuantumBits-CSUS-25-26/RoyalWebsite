@@ -2641,9 +2641,13 @@
   align-items: center;
 }
 
+
+
 .invoice-page-header {
   margin-bottom: 24px;
   text-align: left;
+  display: flex;
+  flex-direction: row;
 }
 
 .invoice-page-header h1 {
@@ -2651,6 +2655,14 @@
   font-size: 32px;
   font-weight: 700;
   color: #2d358d;
+}
+
+.invoices .dropdown {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .invoice-table-content-search {

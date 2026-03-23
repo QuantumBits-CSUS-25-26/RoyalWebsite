@@ -1,9 +1,14 @@
 import os
+from urllib import request
 import requests as http_requests  # renamed to avoid clash with DRF request
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.hashers import make_password, check_password
 from dotenv import load_dotenv
+from django.db.models import Q
+from datetime import datetime
+import calendar
+
 
 from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -11,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -25,6 +30,8 @@ from .serializer import (
     BusinessInformationSerializer,
     ServiceRecommendationReadSerializer,
     AdminCustomerDetailSerializer,
+    InvoiceSerializer,
+    InvoiceReadSerializer,
 )
 from django.utils import timezone
 import datetime
@@ -459,10 +466,6 @@ class AppointmentListCreateView(APIView):
             status=status.HTTP_201_CREATED,
         )
 
-
-
-
-
 class AppointmentDetailView(APIView):
     """
     GET / PUT / DELETE  /api/appointments/<appointment_id>/
@@ -503,7 +506,122 @@ class AppointmentDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         appt.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+# ══════════════════════════════════════════════════════════════════
+#  Invoices
+# ══════════════════════════════════════════════════════════════════
+
+class InvoiceListCreateView(APIView):
+    """
+    GET  /api/invoices/   → list invoices
+    POST /api/invoices/   → create invoice
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [permissions.AllowAny]  # TODO: change to IsEmployee or IsAdmin in production
+
+    def get(self, request):
+        qs = Invoice.objects.select_related(
+            'appointment',
+            'appointment__vehicle',
+            'appointment__vehicle__customer',
+            'appointment__employee',
+        ).all().order_by('-created_at')
+
+        status_filter = request.query_params.get('status')
+        month_filter = request.query_params.get('month')
+        year_filter = request.query_params.get('year')
+        search = request.query_params.get('search', '').strip()
+
+        if status_filter:
+            qs = qs.filter(status__iexact=status_filter)
+
+        if month_filter and month_filter.isdigit():
+            qs = qs.filter(appointment__scheduled_at__month=int(month_filter))
+
+        if year_filter and year_filter.isdigit():
+            qs = qs.filter(appointment__scheduled_at__year=int(year_filter))
+
+        if search:
+            text_q = (
+                Q(appointment__vehicle__customer__first_name__icontains=search) |
+                Q(appointment__vehicle__customer__last_name__icontains=search) |
+                Q(appointment__vehicle__make__icontains=search) |
+                Q(appointment__vehicle__model__icontains=search) |
+                Q(services__icontains=search) |
+                Q(status__icontains=search)
+            )
+            qs = qs.filter(text_q).distinct()
+
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 4))
+
+        start = (page - 1) * page_size
+        end = start + page_size
+
+        total_count = qs.count()
+        invoices = qs[start:end]
+
+        serializer = InvoiceReadSerializer(invoices, many=True)
+
+        return Response({
+            'count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'results': serializer.data,
+        })
+
+    def post(self, request):
+        serializer = InvoiceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            InvoiceReadSerializer(serializer.instance).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class InvoiceDetailView(APIView):
+    """
+    GET / PUT / DELETE  /api/invoices/<invoice_id>/
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [permissions.AllowAny]  # TODO: change to IsEmployee or IsAdmin in production
+
+    def _get_invoice(self, invoice_id):
+        try:
+            return Invoice.objects.select_related(
+                'appointment',
+                'appointment__vehicle',
+                'appointment__vehicle__customer',
+                'appointment__employee',
+            ).get(invoice_id=invoice_id)
+        except Invoice.DoesNotExist:
+            return None
+
+    def get(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(InvoiceReadSerializer(invoice).data)
+
+    def put(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = InvoiceSerializer(invoice, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(InvoiceReadSerializer(serializer.instance).data)
+
+    def delete(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        invoice.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+ 
 # ══════════════════════════════════════════════════════════════════
 #  Business Information
 # ══════════════════════════════════════════════════════════════════
@@ -568,6 +686,8 @@ class BusinessInformationDetailView(APIView):
 
         info.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 # ══════════════════════════════════════════════════════════════════

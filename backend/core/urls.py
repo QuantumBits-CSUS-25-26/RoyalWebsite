@@ -40,6 +40,9 @@ urlpatterns = [
     path('business-info/', views.BusinessInformationView.as_view(), name='business_info'),
     path('business-info/<int:info_id>/', views.BusinessInformationDetailView.as_view(), name='business_info_detail'),
 
+    # ── Invoices ──────────────────────────────────────────────
+    path('invoices/', views.InvoiceListCreateView.as_view(), name='invoice_list_create'),
+    path('invoices/<int:invoice_id>/', views.InvoiceDetailView.as_view(), name='invoice_detail'),
 
     # ── Facebook Posts ───────────────────────────────────────────
     path('facebook-posts/', views.FacebookPostsView.as_view(), name='facebook_posts'),

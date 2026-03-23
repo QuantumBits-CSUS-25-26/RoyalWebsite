@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -179,6 +179,55 @@ class SiteServiceSerializer(serializers.ModelSerializer):
             'service_id', 'name', 'description',
             'cost', 'image', 'display_order', 'is_active',
         ]
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Invoice serializers
+# ══════════════════════════════════════════════════════════════════
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    """Flat IDs — used for create / update."""
+    class Meta:
+        model = Invoice
+        fields = [
+            'invoice_id',
+            'appointment',
+            'services',
+            'status',
+            'created_at',
+        ]
+        read_only_fields = ['invoice_id', 'created_at']
+
+
+class InvoiceReadSerializer(serializers.ModelSerializer):
+    appointment = AppointmentReadSerializer(read_only=True)
+    customer = serializers.SerializerMethodField()
+    vehicle = serializers.SerializerMethodField()
+    date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Invoice
+        fields = [
+            'invoice_id',
+            'appointment',
+            'customer',
+            'vehicle',
+            'date',
+            'services',
+            'status',
+            'created_at',
+        ]
+
+    def get_customer(self, obj):
+        c = obj.appointment.vehicle.customer
+        return f'{c.first_name} {c.last_name}'
+
+    def get_vehicle(self, obj):
+        v = obj.appointment.vehicle
+        return f'{v.make} {v.model}'
+
+    def get_date(self, obj):
+        return obj.appointment.scheduled_at
 
 # ══════════════════════════════════════════════════════════════════
 #  Business Information serializers
