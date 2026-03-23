@@ -18,6 +18,9 @@ urlpatterns = [
     path('vehicles/', views.VehicleListCreateView.as_view(), name='vehicle_list_create'),
     path('vehicles/<int:vehicle_id>/', views.VehicleDetailView.as_view(), name='vehicle_detail'),
 
+    # ── Service Recommendations ────────────────────────────────
+    path('recommendations/', views.CustomerRecommendationsView.as_view(), name='customer_recommendations'),
+
     # ── Appointments ───────────────────────────────────────────
     path('appointments/', views.AppointmentListCreateView.as_view(), name='appointment_list_create'),
     path('appointments/<int:appointment_id>/', views.AppointmentDetailView.as_view(), name='appointment_detail'),
@@ -29,6 +32,9 @@ urlpatterns = [
     path('services/<int:service_id>/', views.SiteServiceDetailView.as_view(), name='site_service_detail'),
 
     path('admin/customers/', views.AdminCustomerListView.as_view(), name='admin_customer_list'),
+    path('admin/customers/<int:customer_id>/book-appointment/', views.AdminBookAppointmentView.as_view(), name='admin_book_appointment'),
+    path('admin/customers/<int:customer_id>/recommend-services/', views.AdminRecommendServicesView.as_view(), name='admin_recommend_services'),
+    path('admin/customers/<int:customer_id>/vehicles/', views.AdminAddVehicleView.as_view(), name='admin_add_vehicle'),
     path('admin/appointments/', views.AdminAppointmentListView.as_view(), name='admin_appointment_list'),
     path('admin/vehicles/', views.AdminVehicleListView.as_view(), name='admin_vehicle_list'),
     path('admin/employees/', views.AdminEmployeeListView.as_view(), name='admin_employee_list'),
@@ -44,4 +50,7 @@ urlpatterns = [
     # ── Admin Dashboard ───────────────────────────────────
     path('admin/dashboard-totals/', views.AdminDashboardTotalsView.as_view(), name='admin_dashboard_totals'),
     path('admin/recent-customers/', views.AdminRecentCustomersView.as_view(), name='admin_recent_customers'),
+  
+  
+    path('api/vehicles/<int:vehicle_id>/service-history/', views.VehicleServiceHistoryView.as_view(), name= 'vehicle_service_history'),
 ]

@@ -124,3 +124,45 @@ class BusinessInformation(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ServiceRecommendation(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('sent', 'Sent'),
+        ('dismissed', 'Dismissed'),
+    ]
+
+    recommendation_id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        related_name='recommendations',
+    )
+    vehicle = models.ForeignKey(
+        Vehicle,
+        on_delete=models.CASCADE,
+        related_name='recommendations',
+    )
+    service = models.ForeignKey(
+        SiteService,
+        on_delete=models.CASCADE,
+        related_name='recommendations',
+    )
+    recommended_by = models.ForeignKey(
+        Employee,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='recommendations_made',
+    )
+    note = models.TextField(blank=True, default='')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'service_recommendation'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.service.name} → {self.customer} ({self.vehicle})'

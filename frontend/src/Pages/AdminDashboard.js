@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from 'react';
 import { API_BASE_URL } from "../config";
 import { Button } from "reactstrap";
+import AuthErrorPage from "../Components/AuthErrorPage/AuthErrorPage";
 import AdminUpdateBusiness from "../Components/AdminUpdateBusiness";
 
 const DisplayCustomer = ({ customer }) => {
@@ -64,7 +65,30 @@ export default function AdminDashboard() {
             .then(data => setRecentCustomers(data))
             .catch(err => console.error('Failed to fetch recent customers:', err));
     }, []);
-    
+
+    const parseStoredUser = () => {
+        try {
+            const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    };
+
+    const storedUser = parseStoredUser();
+
+    const isAuthorized = (user) => {
+        // if a token exists assume authenticated and allow; stored user may not be saved by login flow
+        const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+        if (!user && token) return true;
+        if (!user) return false;
+        if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) return true;
+        if (user.role && (user.role === "employee" || user.role === "admin")) return true;
+        if (Array.isArray(user.roles) && (user.roles.includes("employee") || user.roles.includes("admin"))) return true;
+        return false;
+    };
+
+    if (!isAuthorized(storedUser)) return <AuthErrorPage />;
 
     return (
         <section className="admin-dashboard">

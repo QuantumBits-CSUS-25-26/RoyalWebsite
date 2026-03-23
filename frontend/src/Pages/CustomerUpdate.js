@@ -2,7 +2,9 @@ import './Homepage.css';
 import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import AuthErrorPage from "../Components/AuthErrorPage/AuthErrorPage";
 
 const currentEntries = [
   {
@@ -16,8 +18,28 @@ const currentEntries = [
 ];
 
 const CustomerUpdate = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
+ const parseStoredUser = () => {
+        try {
+            const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    };
 
+    const storedUser = parseStoredUser();
+
+    const isAuthorized = (user) => {
+        // if a token exists assume authenticated and allow; stored user may not be saved by login flow
+        const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+        if (!user && token) return true;
+        if (!user) return false;
+        if (user.is_customer || user.is_superuser) return true;
+        if (user.role && (user.role === "customer")) return true;
+        if (Array.isArray(user.roles) && (user.roles.includes("customer"))) return true;
+        return false;
+    };
   const [formValues, setFormValues] = useState({
     firstName: currentEntries[0].firstName,
     lastName: currentEntries[0].lastName,
@@ -64,6 +86,10 @@ const CustomerUpdate = () => {
       alert("Update failed");
     }
   };
+
+  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+  
+
 
   return (
       <div className="customerUpdate">
