@@ -871,7 +871,30 @@ class ContactMessageView(APIView):
         # TODO: store in a Message model or send email
         return Response({'detail': 'Message received.'}, status=status.HTTP_201_CREATED)
 
+class AdminDashboardTotalsView(APIView):
+    """GET /api/admin/dashboard-totals/"""
+    authentication_classes = [CustomJWTAuthentication]
 
+    def get(self, request):
+        total_customers = Customer.objects.count()
+        total_appointments = Appointment.objects.count()
+        total_messages = 0  # Placeholder since messages aren't stored yet
+        total_services = SiteService.objects.count()
+        return Response({
+            'total_customers': total_customers,
+            'total_appointments': total_appointments,
+            'total_messages': total_messages,
+            'total_services': total_services,
+        })
+    
+class AdminRecentCustomersView(APIView):
+    """GET /api/admin/recent-customers/"""
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get(self, request):
+        recent_customers = Customer.objects.all().order_by('-created_at')[:5]
+        serializer = CustomerProfileSerializer(recent_customers, many=True)
+        return Response(serializer.data)
 
 @require_GET
 def place_reviews(request):

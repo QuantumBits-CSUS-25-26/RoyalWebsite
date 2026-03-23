@@ -1,77 +1,110 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import AdminDashboard from "./AdminDashboard";
 
+jest.mock("../Components/AdminSideBar", () => () => <div>AdminSideBar</div>);
 
-jest.mock("../Components/AdminSideBar", () => () => <div>Mock Sidebar</div>);
+jest.mock("../Components/AdminUpdateBusiness", () => ({ visible, onClose }) =>
+  visible ? (
+    <div>
+      <p>Edit Business Modal</p>
+      <button onClick={onClose}>Close</button>
+    </div>
+  ) : null
+);
 
-jest.mock("../images/customer_Icon.png", () => "customer.png");
-jest.mock("../images/appointment_Icon.png", () => "appointment.png");
-jest.mock("../images/message_Icon.png", () => "message.png");
-jest.mock("../images/services_Icon.png", () => "services.png");
-jest.mock("../images/sign_in_Icon.png", () => "signin.png");
+beforeEach(() => {
+  global.fetch = jest.fn((url) => {
+    if (url.includes("/api/business-info/")) {
+      return Promise.resolve({
+        json: async () => [
+          {
+            name: "Royal Auto",
+            phone: "123-456-7890",
+            address: "123 Main St",
+            hours: "9AM - 5PM",
+            email: "info@royalauto.com",
+          },
+        ],
+      });
+    }
 
-jest.mock("../config", () => ({
-  API_BASE_URL: "http://test-api"
-}));
+    if (url.includes("/api/admin/dashboard-totals/")) {
+      return Promise.resolve({
+        json: async () => ({
+          total_customers: 25,
+          total_appointments: 10,
+          total_messages: 5,
+          total_services: 7,
+        }),
+      });
+    }
 
-describe("AdminDashboard", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    global.fetch = jest.fn();
+    if (url.includes("/api/admin/recent-customers/")) {
+      return Promise.resolve({
+        json: async () => [
+          {
+            id: 1,
+            first_name: "John",
+            last_name: "Doe",
+            created_at: "2025-01-01T10:30:00Z",
+          },
+          {
+            id: 2,
+            first_name: "Jane",
+            last_name: "Smith",
+            created_at: "2025-01-02T11:00:00Z",
+          },
+        ],
+      });
+    }
+
+    return Promise.resolve({
+      json: async () => ({}),
+    });
   });
+});
 
-  test("fetches and displays business information", async () => {
-    global.fetch.mockResolvedValueOnce({
-      json: async () => [
-        {
-          info_id: 1,
-          name: "Royal Auto",
-          phone: "9165551212",
-          email: "royal@auto.com",
-          hours: "9-5",
-          address: "123 Main St"
-        }
-      ]
-    });
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
-    render(<AdminDashboard />);
+test("fetches and displays business information", async () => {
+  render(
+    <MemoryRouter>
+      <AdminDashboard />
+    </MemoryRouter>
+  );
 
-    await waitFor(() => {
-      expect(screen.getByText("Royal Auto")).toBeInTheDocument();
-    });
+  expect(await screen.findByText("Royal Auto")).toBeInTheDocument();
+  expect(screen.getByText("123-456-7890")).toBeInTheDocument();
+  expect(screen.getByText("123 Main St")).toBeInTheDocument();
+  expect(screen.getByText("9AM - 5PM")).toBeInTheDocument();
+  expect(screen.getByText("info@royalauto.com")).toBeInTheDocument();
+});
 
-    expect(screen.getByText("9165551212")).toBeInTheDocument();
-    expect(screen.getByText("royal@auto.com")).toBeInTheDocument();
-    expect(screen.getByText("9-5")).toBeInTheDocument();
-    expect(screen.getByText("123 Main St")).toBeInTheDocument();
-  });
+test("opens edit modal when Edit is clicked", async () => {
+  render(
+    <MemoryRouter>
+      <AdminDashboard />
+    </MemoryRouter>
+  );
 
-  test("opens edit modal when Edit is clicked", async () => {
-    const user = userEvent.setup();
+  const editButton = await screen.findByRole("button", { name: /edit/i });
+  await userEvent.click(editButton);
 
-    global.fetch.mockResolvedValueOnce({
-      json: async () => [
-        {
-          info_id: 1,
-          name: "Royal Auto",
-          phone: "9165551212",
-          email: "royal@auto.com",
-          hours: "9-5",
-          address: "123 Main St"
-        }
-      ]
-    });
+  expect(screen.getByText("Edit Business Modal")).toBeInTheDocument();
+});
 
-    render(<AdminDashboard />);
+test("displays recent customers", async () => {
+  render(
+    <MemoryRouter>
+      <AdminDashboard />
+    </MemoryRouter>
+  );
 
-    await waitFor(() => {
-      expect(screen.getByText("Royal Auto")).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByRole("button", { name: /edit/i }));
-
-    expect(screen.getByText(/edit business information/i)).toBeInTheDocument();
-  });
+  expect(await screen.findByText("John Doe")).toBeInTheDocument();
+  expect(screen.getByText("Jane Smith")).toBeInTheDocument();
 });
