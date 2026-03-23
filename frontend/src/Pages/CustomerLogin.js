@@ -3,7 +3,7 @@ import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-
+import axios from "axios";
 
 
 const CustomerLogin = () => {
@@ -44,23 +44,41 @@ const CustomerLogin = () => {
     navigate('/account-creation');
   }
 
-  const handleClickLogin = async (e) => {
-    e.preventDefault();
+    const handleClickLogin = async (e) => {
+        e.preventDefault();
 
-    const emailErrorMsg = validateEmail(email);
-    const passErrorMsg = validatePassword(password);
+        const emailErrorMsg = validateEmail(email);
+        const passErrorMsg = validatePassword(password);
 
-    if (emailError){
-      setEmailPlaceholder(emailErrorMsg);
-      setEmail('');
-    }
-    if (passError){
-      setPassPlaceholder(passErrorMsg);
-      setPassword('');
-    }
-    
-  }
+        if (emailErrorMsg || passErrorMsg) {
+            setEmailPlaceholder(emailErrorMsg);
+            setPassPlaceholder(passErrorMsg);
+            return;
+        }
 
+        try {
+            const response = await axios.post(
+                "http://127.0.0.1:8000/api/customers/login/",
+                {
+                    email: email,
+                    password: password
+                }
+            );
+
+            console.log("Login success:", response.data);
+
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token);
+            }
+
+            navigate("/dashboard");
+
+        } catch (error) {
+            console.error("Login error:", error);
+            setPassPlaceholder("Invalid email or password");
+            setPassword("");
+        }
+    };
 
   const navigate = useNavigate();
 

@@ -9,10 +9,10 @@ const AdminNewCustomer = ({ isOpen, onClose }) => {
   const [ email, setEmail ] = useState("");
   const [ phoneNumber, setPhoneNumber ] = useState("");
 
-  const [ fNamePlaceHolder, setFNamePlaceholder] = useState("Enter Customer's First Name Here");
-  const [ lNamePlaceHolder, setLNamePlaceholder] = useState("Enter Customer's Last Name Here");
-  const [ emailPlaceHolder, setEmailPlaceholder] = useState("Enter Customer's Email Here");
-  const [ phoneNumberPlaceHolder, setPhoneNumberPlaceholder] = useState("Enter Customer's Phone Number Here");
+  const [ fNamePlaceHolder, setFNamePlaceholder] = useState("e.g. John");
+  const [ lNamePlaceHolder, setLNamePlaceholder] = useState("e.g. Smith");
+  const [ emailPlaceHolder, setEmailPlaceholder] = useState("e.g. john.smith@email.com");
+  const [ phoneNumberPlaceHolder, setPhoneNumberPlaceholder] = useState("e.g. (555) 123-4567");
 
   const [ fNameError, setFNameError ] = useState(false);
   const [ lNameError, setLNameError ] = useState(false);
@@ -164,8 +164,8 @@ const AdminNewCustomer = ({ isOpen, onClose }) => {
 
   // Only close if both mousedown and mouseup happen outside box thing
   const handleMouseUp = (e) => {
-    if (e.target.className === 'customer-list-popup-overlay' && 
-        mouseDownTarget?.className === 'customer-list-popup-overlay') {
+    if (e.target.className === 'services-management-add-overlay' && 
+        mouseDownTarget?.className === 'services-management-add-overlay') {
       onClose();
     }
     setMouseDownTarget(null);
@@ -173,60 +173,67 @@ const AdminNewCustomer = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="customer-list-popup-overlay" 
+      className="services-management-add-overlay" 
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
-      <div className="customer-list-popup">
+      <div className="services-management-add">
         <div className="title">
           Add New Customer
         </div>
-      <form onSubmit={handleSubmit}>
-        <div className="content">
-          <div className="entries">
-            First Name<br />
-            <input 
-              type="text" 
-              name="fname"
-              placeholder={fNamePlaceHolder}
-              value={fName}
-              onChange={(e) => setFName(e.target.value)}
-            />
-            <br />
-            
-            Last Name<br />
-            <input 
-              type="text" 
-              name="lname"
-              placeholder={lNamePlaceHolder}
-              value={lName}
-              onChange={(e) => setLName(e.target.value)}
-            />
-            <br />
-            
-            Phone Number<br />
-            <input 
-              type="text" 
-              name="phone"
-              placeholder={phoneNumberPlaceHolder}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-            <br />
-            
-            Email<br />
-            <input 
-              type="text" 
-              name="email"
-              placeholder={emailPlaceHolder}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <br />
+        <form onSubmit={handleSubmit}>
+          <div className="add-service-content">
+            <div className="add-service-field">
+              <label htmlFor="fname">First Name *</label>
+              <input 
+                id="fname"
+                type="text" 
+                name="fname"
+                placeholder={fNamePlaceHolder}
+                value={fName}
+                onChange={(e) => setFName(e.target.value)}
+              />
+            </div>
+
+            <div className="add-service-field">
+              <label htmlFor="lname">Last Name *</label>
+              <input 
+                id="lname"
+                type="text" 
+                name="lname"
+                placeholder={lNamePlaceHolder}
+                value={lName}
+                onChange={(e) => setLName(e.target.value)}
+              />
+            </div>
+
+            <div className="add-service-field">
+              <label htmlFor="phone">Phone Number *</label>
+              <input 
+                id="phone"
+                type="text" 
+                name="phone"
+                placeholder={phoneNumberPlaceHolder}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </div>
+
+            <div className="add-service-field">
+              <label htmlFor="email">Email *</label>
+              <input 
+                id="email"
+                type="text" 
+                name="email"
+                placeholder={emailPlaceHolder}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <button type="submit">Add Customer</button>
           </div>
-        </div>
-        <button type="submit">Submit</button>
-      </form>
+        </form>
       </div>
     </div>
   );

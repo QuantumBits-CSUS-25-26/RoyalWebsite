@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, Vehicle, Employee, Appointment, SiteService
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, ServiceRecommendation
 
 
 @admin.register(Customer)
@@ -36,3 +36,11 @@ class SiteServiceAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('is_active',)
     list_editable = ('display_order', 'is_active')
+
+
+@admin.register(ServiceRecommendation)
+class ServiceRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'customer', 'vehicle', 'service', 'recommended_by', 'status', 'created_at')
+    search_fields = ('customer__first_name', 'customer__last_name', 'service__name')
+    list_filter = ('status', 'created_at')
+    raw_id_fields = ('customer', 'vehicle', 'service', 'recommended_by')
