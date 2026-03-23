@@ -40,4 +40,8 @@ urlpatterns = [
 
     # ── Facebook Posts ───────────────────────────────────────────
     path('facebook-posts/', views.FacebookPostsView.as_view(), name='facebook_posts'),
+
+    # ── Admin Dashboard ───────────────────────────────────
+    path('admin/dashboard-totals/', views.AdminDashboardTotalsView.as_view(), name='admin_dashboard_totals'),
+    path('admin/recent-customers/', views.AdminRecentCustomersView.as_view(), name='admin_recent_customers'),
 ]
