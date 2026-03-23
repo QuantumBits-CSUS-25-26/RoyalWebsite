@@ -1217,6 +1217,12 @@
   gap: calc(var(--dashboard-btn-height) / 2);
 }
 
+.customerDashboard .flexContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
 .customerDashboard .info {
   display: block;
   margin-left: auto;
@@ -1322,6 +1328,13 @@
   padding: 1.5%;
   width: 60%;
   cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .customerDashboard .flexContainer {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* begin admin services management */
