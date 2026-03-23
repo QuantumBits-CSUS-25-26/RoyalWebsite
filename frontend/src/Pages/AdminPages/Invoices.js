@@ -8,7 +8,7 @@ import {
   DropdownItem,
 } from "reactstrap";
 import { useState, useEffect } from "react";
-// import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
+import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../../config";
 
 const DisplayInvoice = ({ invoice }) => {
@@ -179,7 +179,7 @@ const Invoices = () => {
     fetchPaidInvoices(1, paidSearch);
   };
 
-  //  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+   if (!isAuthorized(storedUser)) return <AuthErrorPage />;
 
   return (
     <div className="invoice-adminLayout">
