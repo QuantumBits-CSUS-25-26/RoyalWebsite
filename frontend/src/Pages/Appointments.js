@@ -117,8 +117,7 @@ const Appointments = () => {
   }
 
   return (
-    <div>
-      Appointments
+    <div className="app-background">
         <AppStepOne 
           vehicleInfo={vehicleInfo} 
           onVehicleChange={handleVehicleChange}

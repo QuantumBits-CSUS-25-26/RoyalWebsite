@@ -96,7 +96,7 @@ const CustomerUpdate = () => {
         <div className="title">
           <Row className='justify-content-center'>
             <Col md='10' sm='2'>
-              <Form className='updateForm fs-3 p-4' onSubmit={handleUpdate}>
+              <Form className='updateForm fs-3 p-4 rounded-3 mt-4' onSubmit={handleUpdate}>
                 <div className=' my-4'>Update Account Information</div>
 
                 <FormGroup className='mx-5 px-5 my-3 text-start'>

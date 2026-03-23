@@ -3,6 +3,25 @@
   background-color: #f8f9fa;
 }
 
+.app-background {
+    min-height: 100vh;
+    background: url("images/login-car.jpg") center/cover no-repeat;
+    background-attachment: fixed;
+}
+
+.app-background::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+.app-background > * {
+    position: relative;
+    z-index: 1;
+}
+
 /* begin header */
 .Header {
   margin-top: 20px;
@@ -142,6 +161,7 @@
   border: solid black 1px;
   z-index: 1001;
   animation: fadeIn 0.08s ease-in;
+  border-radius: 16px;
 }
 
 .contact-form-overlay {
@@ -175,6 +195,8 @@
   font-size: 40px;
   text-align: center;
   display: block;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
 }
 
 .contact_form .content {
@@ -1084,6 +1106,7 @@
 .customerLogin .customerForm {
   background-color: #d9d9d9;
   margin-top: 10%;
+  border-radius: 16px;
 }
 
 .customerLogin .btn {
@@ -1108,6 +1131,7 @@
   background-color: #d9d9d9;
   margin-top: 10%;
   max-width: 600px;
+  border-radius: 16px;
 }
 
 .customer-creation .btn {
@@ -1849,7 +1873,7 @@
   justify-content: center;
 }
 .contact-info-form {
-  background: #2f6dab;
+  background-color: rgba(217, 217, 217, 0.8);
   justify-self: center;
   padding: 28px 28px;
   border-radius: 14px;
@@ -1884,7 +1908,7 @@
 .contact-info-email,
 .contact-info-phone {
   width: 100%;
-  color: #ffffff;
+  color: black;
   font-size: 24px;
 }
 
@@ -1941,7 +1965,7 @@
   padding-right: 5%;
 }
 .contact-info-notifications {
-  color: #ffffff;
+  color: black;
   text-align: left;
 }
 
@@ -1979,13 +2003,15 @@
 .contact-info-sbmt-btn {
   margin-top: auto;
   align-self: flex-end;
-  color: #2f6dab;
+  background-color: #2f6dab; 
+  color: white;
   border-radius: 8px;
   padding: 1vh;
   transition:
     color 0.3s ease-in,
     background-color 0.3s ease-in;
 }
+
 .contact-info-sbmt-btn:hover {
   color: white;
   background-color: #0a335c;
