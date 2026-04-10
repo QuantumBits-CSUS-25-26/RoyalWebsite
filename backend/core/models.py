@@ -57,6 +57,19 @@ class Employee(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.role})'
 
+class Messsage(models.Model):
+    message_id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)
+    message = models.TextField()
+    response = models.BooleanField(default=False)
+    current_customer = models.BooleanField(default=False)
+    read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.email}: {self.message[:50]}"
 
 class Invoice(models.Model):
     STATUS_CHOICES = [
