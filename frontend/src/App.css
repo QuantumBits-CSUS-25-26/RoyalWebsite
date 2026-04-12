@@ -2645,9 +2645,15 @@
 .invoice-list {
   min-width: 900px;
 }
+.invoiceStatusButton {
+  white-space: nowrap;
+  white-space: nowrap;
+  min-width: 150px;
+
+}
 .invoice-card {
   display: grid;
-  grid-template-columns: 1.5fr 1.5fr 1fr 2fr 1fr; /* tweak ratios as needed */
+  grid-template-columns: 1.5fr 1.5fr 1fr 2fr 1fr 1fr auto; /* tweak ratios as needed */
   gap: 20px;
 
   padding: 12px 20px;

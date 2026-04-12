@@ -11,7 +11,9 @@ import { useState, useEffect } from "react";
 import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../../config";
 
-const DisplayInvoice = ({ invoice }) => {
+
+
+const DisplayInvoice = ({ invoice, handleStatusToggle }) => {
   return (
     <div className="invoice-card">
       <p style={{ color: "#2F6DAB" }}>{invoice.customer}</p>
@@ -31,9 +33,19 @@ const DisplayInvoice = ({ invoice }) => {
         {invoice.services}
       </p>
       <p>
+        Cost:
+        <br />
+        {invoice.cost}
+      </p>
+      <p>
         Status:
         <br />
         {invoice.status}
+      </p>
+      <p>
+        <Button className="btn invoiceStatusButton" onClick={() => handleStatusToggle(invoice)}>
+          {invoice.status === "pending" || invoice.status === "Pending" ? "Mark as Paid" : "Mark as Pending"}
+        </Button>
       </p>
     </div>
   );
@@ -179,7 +191,32 @@ const Invoices = () => {
     fetchPaidInvoices(1, paidSearch);
   };
 
-   if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+  const handleStatusToggle = async (invoice) => {
+    try {
+      const newStatus = invoice.status === "pending" || invoice.status === "Pending" ? "paid" : "pending";
+      const res = await fetch(`${API_BASE_URL}/api/invoices/${invoice.invoice_id}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update invoice status");
+      } else {
+        alert("Invoice status updated.");
+      }
+
+      await fetchPendingInvoices(pendingPage, pendingSearch);
+      await fetchPaidInvoices(paidPage, paidSearch);
+    } catch (err) {
+      console.error("Failed to update invoice status:", err);
+    }
+  }
+
+
+
+  //  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
 
   return (
     <div className="invoice-adminLayout">
@@ -374,7 +411,7 @@ const Invoices = () => {
                 </Button>
               </div>
               {pendingInvoices.map((invoice) => (
-                <DisplayInvoice key={invoice.invoice_id} invoice={invoice} />
+                <DisplayInvoice key={invoice.invoice_id} invoice={invoice} handleStatusToggle={handleStatusToggle} />
               ))}
             </div>
             <div className="invoice-pagination">
@@ -419,7 +456,7 @@ const Invoices = () => {
               </Button>
             </div>
             {paidInvoices.map((invoice) => (
-              <DisplayInvoice key={invoice.invoice_id} invoice={invoice} />
+              <DisplayInvoice key={invoice.invoice_id} invoice={invoice} handleStatusToggle={handleStatusToggle} />
             ))}
           </div>
         </div>

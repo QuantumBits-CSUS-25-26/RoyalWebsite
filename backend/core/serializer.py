@@ -192,7 +192,6 @@ class InvoiceSerializer(serializers.ModelSerializer):
         fields = [
             'invoice_id',
             'appointment',
-            'services',
             'status',
             'created_at',
         ]
@@ -204,6 +203,8 @@ class InvoiceReadSerializer(serializers.ModelSerializer):
     customer = serializers.SerializerMethodField()
     vehicle = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
+    services = serializers.SerializerMethodField()
+    cost = serializers.SerializerMethodField()
 
     class Meta:
         model = Invoice
@@ -214,6 +215,7 @@ class InvoiceReadSerializer(serializers.ModelSerializer):
             'vehicle',
             'date',
             'services',
+            'cost',
             'status',
             'created_at',
         ]
@@ -228,6 +230,12 @@ class InvoiceReadSerializer(serializers.ModelSerializer):
 
     def get_date(self, obj):
         return obj.appointment.scheduled_at
+    
+    def get_services(self, obj):
+        return obj.appointment.service_type
+    
+    def get_cost(self, obj):
+        return obj.appointment.cost
 
 # ══════════════════════════════════════════════════════════════════
 #  Business Information serializers
