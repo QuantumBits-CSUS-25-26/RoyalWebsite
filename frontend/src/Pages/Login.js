@@ -111,22 +111,30 @@ function Login() {
 
                     {error && <div className="form-error" role="alert">{error}</div>}
 
-                    <label>Email</label>
+                    <label htmlFor="email">Email</label>
                     <input
+                        id="email"
                         type="email"
                         placeholder="Email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (error) setError("");
+                        }}
                         required
                         aria-invalid={!!validateEmail(email)}
                     />
 
-                    <label>Password</label>
+                    <label htmlFor="password">Password</label>
                     <input
+                        id="password"
                         type="password"
                         placeholder="Password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            if (error) setError("");
+                        }}
                         required
                         aria-invalid={!!validatePassword(password)}
                     />
@@ -134,11 +142,11 @@ function Login() {
                     <div className="remember">
                         <label className="switch">
                             <input type="checkbox" id="remember" />
-                            <span class="slider round"></span>
+                            <span className="slider round"></span>
                         </label>
                         <label className="remember-label" htmlFor="remember">Remember me</label>
                     </div>
-                    <button type="submit" disabled={!submitting}>{submitting ? "Signing in..." : "SIGN IN"}</button>
+                    <button type="submit" disabled={submitting}>{submitting ? "Signing in..." : "SIGN IN"}</button>
                 </form>
             </div>
 

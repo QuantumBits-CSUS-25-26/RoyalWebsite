@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -33,6 +33,7 @@ from .serializer import (
     AdminCustomerDetailSerializer,
     InvoiceSerializer,
     InvoiceReadSerializer,
+    MessageSerializer
 )
 from django.utils import timezone
 import datetime
@@ -637,6 +638,7 @@ class InvoiceDetailView(APIView):
 
         invoice.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
  
 # ══════════════════════════════════════════════════════════════════
 #  Business Information
@@ -981,15 +983,10 @@ class ContactMessageView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        required = ['fname', 'lname', 'email', 'message']
-        missing = [f for f in required if not request.data.get(f)]
-        if missing:
-            return Response(
-                {'detail': f'Missing fields: {", ".join(missing)}'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        # TODO: store in a Message model or send email
-        return Response({'detail': 'Message received.'}, status=status.HTTP_201_CREATED)
+        serializer = MessageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class AdminDashboardTotalsView(APIView):
     """GET /api/admin/dashboard-totals/"""

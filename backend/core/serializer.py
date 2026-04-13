@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -64,6 +64,18 @@ class VehicleSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['vehicle_id']
 
+
+# ══════════════════════════════════════════════════════════════════
+#  Message serializers
+# ══════════════════════════════════════════════════════════════════
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Messsage
+        fields = [
+            'message_id', 'first_name', 'last_name', 'phone_number',
+            'email', 'message', 'response', 'current_customer', 'read',
+        ]
+        read_only_fields = ['message_id']
 
 # ══════════════════════════════════════════════════════════════════
 #  Employee serializers
