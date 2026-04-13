@@ -296,6 +296,7 @@ const Appointments = () => {
                   <input
                     type="datetime-local"
                     className="modal-input"
+                    aria-label="scheduled-at"
                     value={newAppointment.datetime}
                     onChange={(e) => setNewAppointment({ ...newAppointment, datetime: e.target.value })}
                   />
