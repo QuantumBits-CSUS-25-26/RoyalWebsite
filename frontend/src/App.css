@@ -402,25 +402,53 @@
 .adminNav {
   margin: 10px;
   width: 225px;
+  max-width: 100%;
+  flex-shrink: 0;
   background-color: #2F6DAB;
   color: white;
   border-radius: 15px;
-  height: 800px;
+  min-height: 640px;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.adminNav .navbar {
+  width: 100%;
+  max-width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.adminNav .container {
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .adminNav .navButton {
   background-color: #2F6DAB;
   color: white;
   border-color: #2F6DAB;
-  width: 200px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   text-align: left;
   display: flex;
   align-items: center;
   gap: 1rem;
   border-radius: 10px;
+}
+
+.adminNav .nav-link {
+  display: block;
+  max-width: 100%;
+  padding: 4px 2px;
+  box-sizing: border-box;
 }
 
 .adminNav .nav-link.active .navButton {

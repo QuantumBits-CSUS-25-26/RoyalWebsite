@@ -1,0 +1,262 @@
+.admin-invoices-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px 24px 48px 16px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #f8f9fa;
+}
+
+.admin-invoices-main {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-invoices-wrap {
+  margin: 0;
+  max-width: 100%;
+  padding-bottom: 24px;
+  text-align: left;
+}
+
+.admin-invoices-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-invoices-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2d358d;
+  margin: 0;
+}
+
+.admin-invoices-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0 0 0;
+}
+
+.admin-invoices-btn-primary {
+  background: #2f6dab;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(47, 109, 171, 0.25);
+  transition: background 0.15s, transform 0.1s;
+}
+
+.admin-invoices-btn-primary:hover {
+  background: #2563a8;
+}
+
+.admin-invoices-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  overflow: auto;
+}
+
+.admin-invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.admin-invoices-table thead th {
+  text-align: left;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eef2f7;
+  background: #fafafa;
+}
+
+.admin-invoices-table tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+.admin-invoices-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-invoices-actions-cell {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-invoices-btn-secondary {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+}
+
+.admin-invoices-btn-secondary:hover {
+  border-color: #2f6dab;
+  color: #2f6dab;
+}
+
+.admin-invoices-btn-danger {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  background: #fff;
+  color: #b91c1c;
+  cursor: pointer;
+}
+
+.admin-invoices-btn-danger:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+}
+
+.admin-invoices-status {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.admin-invoices-status.paid {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.admin-invoices-status.unpaid {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* Modal overlay (match contact form overlay feel) */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+}
+
+.admin-modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.admin-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-modal-body {
+  padding: 20px;
+}
+
+.admin-modal-footer {
+  padding: 12px 20px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-modal-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.admin-modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+
+.admin-modal-input:focus {
+  outline: none;
+  border-color: #2f6dab;
+  box-shadow: 0 0 0 3px rgba(47, 109, 171, 0.2);
+}
+
+.admin-modal-btn-cancel {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-modal-btn-save {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #2f6dab;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-modal-btn-danger-confirm {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #b91c1c;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .admin-invoices-layout {
+    flex-direction: column;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-invoices-layout {
+    padding: 8px;
+  }
+}
