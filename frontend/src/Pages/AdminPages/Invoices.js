@@ -1,487 +1,322 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AdminSideBar from "../../Components/AdminSideBar";
-import {
-  Button,
-  Input,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-} from "reactstrap";
-import { useState, useEffect } from "react";
-import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
-import { API_BASE_URL } from "../../config";
+import "./AdminInvoices.css";
 
+const STORAGE_KEY = "royal_admin_invoices_v1";
 
+const defaultInvoices = () => [
+  {
+    id: "inv-1001",
+    customerName: "Jordan Lee",
+    invoiceNumber: "INV-2026-0142",
+    amount: "428.50",
+    status: "unpaid",
+    dueDate: "2026-03-15",
+    notes: "Brake pads and rotors — front",
+  },
+  {
+    id: "inv-1002",
+    customerName: "Maria Santos",
+    invoiceNumber: "INV-2026-0141",
+    amount: "89.99",
+    status: "paid",
+    dueDate: "2026-02-20",
+    notes: "Synthetic oil change",
+  },
+];
 
-const DisplayInvoice = ({ invoice, handleStatusToggle }) => {
-  return (
-    <div className="invoice-card">
-      <p style={{ color: "#2F6DAB" }}>{invoice.customer}</p>
-      <p>
-        Vehicle:
-        <br />
-        {invoice.vehicle}
-      </p>
-      <p>
-        Date:
-        <br />
-        {new Date(invoice.date).toLocaleDateString()}
-      </p>
-      <p>
-        Services:
-        <br />
-        {invoice.services}
-      </p>
-      <p>
-        Cost:
-        <br />
-        {invoice.cost}
-      </p>
-      <p>
-        Status:
-        <br />
-        {invoice.status}
-      </p>
-      <p>
-        <Button className="btn invoiceStatusButton" onClick={() => handleStatusToggle(invoice)}>
-          {invoice.status === "pending" || invoice.status === "Pending" ? "Mark as Paid" : "Mark as Pending"}
-        </Button>
-      </p>
-    </div>
-  );
+function loadStored() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch {
+    /* ignore */
+  }
+  return defaultInvoices();
+}
+
+function saveStored(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+const emptyForm = {
+  customerName: "",
+  invoiceNumber: "",
+  amount: "",
+  status: "unpaid",
+  dueDate: "",
+  notes: "",
 };
 
 const Invoices = () => {
-  // determine authorization from stored user object
-  const parseStoredUser = () => {
-    try {
-      const raw =
-        localStorage.getItem("user") || sessionStorage.getItem("user");
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const storedUser = parseStoredUser();
-
-  const isAuthorized = (user) => {
-    // if a token exists assume authenticated and allow; stored user may not be saved by login flow
-    const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-    if (!user && token) return true;
-    if (!user) return false;
-    if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser)
-      return true;
-    if (user.role && (user.role === "employee" || user.role === "admin"))
-      return true;
-    if (
-      Array.isArray(user.roles) &&
-      (user.roles.includes("employee") || user.roles.includes("admin"))
-    )
-      return true;
-    return false;
-  };
-
-  const [pendingSearch, setPendingSearch] = useState("");
-  const [paidSearch, setPaidSearch] = useState("");
-
-  const [pendingInvoices, setPendingInvoices] = useState([]);
-  const [paidInvoices, setPaidInvoices] = useState([]);
-
-  const [pendingPage, setPendingPage] = useState(1);
-  const [paidPage, setPaidPage] = useState(1);
-
-  const ITEMS_PER_PAGE = 4;
-
-  const [pendingCount, setPendingCount] = useState(0);
-  const [paidCount, setPaidCount] = useState(0);
-
-  const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
-  const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
-
-  const [monthFilter, setMonthFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
-
-  const toggleMonthDropdown = () =>
-    setMonthDropdownOpen((prevState) => !prevState);
-  const toggleYearDropdown = () =>
-    setYearDropdownOpen((prevState) => !prevState);
-
-  const fetchPendingInvoices = async (page = 1, search = "") => {
-    try {
-      let url = `${API_BASE_URL}/api/invoices/?status=pending&page=${page}&page_size=${ITEMS_PER_PAGE}`;
-
-      if (search) {
-        url += `&search=${encodeURIComponent(search)}`;
-      }
-
-      if (monthFilter) {
-        url += `&month=${monthFilter}`;
-      }
-
-      if (yearFilter) {
-        url += `&year=${yearFilter}`;
-      }
-
-      const res = await fetch(url);
-
-      if (!res.ok) throw new Error("Failed to fetch pending invoices");
-
-      const data = await res.json();
-      setPendingInvoices(data.results || []);
-      setPendingCount(data.count || 0);
-    } catch (err) {
-      console.error("Failed to fetch pending invoices:", err);
-    }
-  };
-
-  const fetchPaidInvoices = async (page = 1, search = "") => {
-    try {
-      let url = `${API_BASE_URL}/api/invoices/?status=paid&page=${page}&page_size=${ITEMS_PER_PAGE}`;
-
-      if (search) {
-        url += `&search=${encodeURIComponent(search)}`;
-      }
-
-      if (monthFilter) {
-        url += `&month=${monthFilter}`;
-      }
-
-      if (yearFilter) {
-        url += `&year=${yearFilter}`;
-      }
-
-      const res = await fetch(url);
-
-      if (!res.ok) throw new Error("Failed to fetch paid invoices");
-
-      const data = await res.json();
-      setPaidInvoices(data.results || []);
-      setPaidCount(data.count || 0);
-    } catch (err) {
-      console.error("Failed to fetch paid invoices:", err);
-    }
-  };
+  const [invoices, setInvoices] = useState(() => loadStored());
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
-    fetchPendingInvoices(pendingPage, pendingSearch);
-  }, [pendingPage]);
+    saveStored(invoices);
+  }, [invoices]);
 
-  useEffect(() => {
-    fetchPaidInvoices(paidPage, paidSearch);
-  }, [paidPage]);
+  const deletingInvoice = useMemo(
+    () => invoices.find((i) => i.id === deletingId),
+    [invoices, deletingId]
+  );
 
-  useEffect(() => {
-    setPendingPage(1);
-    setPaidPage(1);
-    fetchPendingInvoices(1, pendingSearch);
-    fetchPaidInvoices(1, paidSearch);
-  }, [monthFilter, yearFilter]);
-
-  const handleSearch1 = async (e) => {
-    e.preventDefault();
-    setPendingPage(1);
-    fetchPendingInvoices(1, pendingSearch);
+  const openAdd = () => {
+    setForm({ ...emptyForm, invoiceNumber: `INV-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}` });
+    setAddOpen(true);
   };
 
-  const handleSearch2 = async (e) => {
-    e.preventDefault();
-    setPaidPage(1);
-    fetchPaidInvoices(1, paidSearch);
+  const openEdit = (inv) => {
+    setEditingId(inv.id);
+    setForm({
+      customerName: inv.customerName,
+      invoiceNumber: inv.invoiceNumber,
+      amount: inv.amount,
+      status: inv.status,
+      dueDate: inv.dueDate,
+      notes: inv.notes || "",
+    });
+    setEditOpen(true);
   };
 
-  const handleStatusToggle = async (invoice) => {
-    try {
-      const newStatus = invoice.status === "pending" || invoice.status === "Pending" ? "paid" : "pending";
-      const res = await fetch(`${API_BASE_URL}/api/invoices/${invoice.invoice_id}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!res.ok) {
-        throw new Error("Failed to update invoice status");
-      } else {
-        alert("Invoice status updated.");
-      }
+  const openDelete = (id) => {
+    setDeletingId(id);
+    setDeleteOpen(true);
+  };
 
-      await fetchPendingInvoices(pendingPage, pendingSearch);
-      await fetchPaidInvoices(paidPage, paidSearch);
-    } catch (err) {
-      console.error("Failed to update invoice status:", err);
-    }
-  }
+  const closeModals = useCallback(() => {
+    setAddOpen(false);
+    setEditOpen(false);
+    setDeleteOpen(false);
+    setEditingId(null);
+    setDeletingId(null);
+    setForm(emptyForm);
+  }, []);
 
+  const handleAddSave = () => {
+    if (!form.customerName.trim() || !form.invoiceNumber.trim()) return;
+    const id = `inv-${Date.now()}`;
+    setInvoices((prev) => [
+      {
+        id,
+        customerName: form.customerName.trim(),
+        invoiceNumber: form.invoiceNumber.trim(),
+        amount: form.amount.trim() || "0.00",
+        status: form.status === "paid" ? "paid" : "unpaid",
+        dueDate: form.dueDate || "",
+        notes: form.notes.trim(),
+      },
+      ...prev,
+    ]);
+    closeModals();
+  };
 
+  const handleEditSave = () => {
+    if (!editingId || !form.customerName.trim()) return;
+    setInvoices((prev) =>
+      prev.map((i) =>
+        i.id === editingId
+          ? {
+              ...i,
+              customerName: form.customerName.trim(),
+              invoiceNumber: form.invoiceNumber.trim(),
+              amount: form.amount.trim() || "0.00",
+              status: form.status === "paid" ? "paid" : "unpaid",
+              dueDate: form.dueDate || "",
+              notes: form.notes.trim(),
+            }
+          : i
+      )
+    );
+    closeModals();
+  };
 
-  //  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+  const handleDeleteConfirm = () => {
+    if (!deletingId) return;
+    setInvoices((prev) => prev.filter((i) => i.id !== deletingId));
+    closeModals();
+  };
 
   return (
-    <div className="invoice-adminLayout">
+    <div className="admin-invoices-layout">
       <AdminSideBar />
-      <div className="invoices">
-        <div className="invoice-page-header">
-          <h1>Invoices</h1>
-        </div>
-        <div className="dropdown">
-          <Dropdown isOpen={monthDropdownOpen} toggle={toggleMonthDropdown}>
-            <DropdownToggle
-              caret
-              style={{ backgroundColor: "#2f6dab", color: "white" }}
-            >
-              {monthFilter
-                ? [
-                  "",
-                  "January",
-                  "February",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                  "July",
-                  "August",
-                  "September",
-                  "October",
-                  "November",
-                  "December",
-                ][Number(monthFilter)]
-                : "Month"}
-            </DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={() => setMonthFilter("")}>
-                All Months
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("1")}>
-                January
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("2")}>
-                February
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("3")}>
-                March
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("4")}>
-                April
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("5")}>
-                May
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("6")}>
-                June
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("7")}>
-                July
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("8")}>
-                August
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("9")}>
-                September
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("10")}>
-                October
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("11")}>
-                November
-              </DropdownItem>
-              <DropdownItem onClick={() => setMonthFilter("12")}>
-                December
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+      <main className="admin-invoices-main">
+        <div className="admin-invoices-wrap">
+          <header className="admin-invoices-header">
+            <div>
+              <h1 className="admin-invoices-title">Invoices</h1>
+              <p className="admin-invoices-sub">Create, update, or remove invoices. Data is stored in this browser until an API is connected.</p>
+            </div>
+            <button type="button" className="admin-invoices-btn-primary" onClick={openAdd}>
+              Add an invoice
+            </button>
+          </header>
 
-          <Dropdown isOpen={yearDropdownOpen} toggle={toggleYearDropdown}>
-            <DropdownToggle
-              caret
-              style={{ backgroundColor: "#2f6dab", color: "white" }}
-            >
-              {yearFilter || "Year"}
-            </DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={() => setYearFilter("")}>
-                All Years
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2050")}>
-                2050
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2049")}>
-                2049
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2048")}>
-                2048
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2047")}>
-                2047
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2046")}>
-                2046
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2045")}>
-                2045
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2044")}>
-                2044
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2043")}>
-                2043
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2042")}>
-                2042
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2041")}>
-                2041
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2040")}>
-                2040
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2039")}>
-                2039
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2038")}>
-                2038
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2037")}>
-                2037
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2036")}>
-                2036
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2035")}>
-                2035
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2034")}>
-                2034
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2034")}>
-                2034
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2033")}>
-                2033
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2032")}>
-                2032
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2031")}>
-                2031
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2030")}>
-                2030
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2029")}>
-                2029
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2028")}>
-                2028
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2027")}>
-                2027
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2026")}>
-                2026
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2025")}>
-                2025
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2024")}>
-                2024
-              </DropdownItem>
-              <DropdownItem onClick={() => setYearFilter("2023")}>
-                2023
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <div className="admin-invoices-card">
+            <table className="admin-invoices-table">
+              <thead>
+                <tr>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Invoice #</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Due</th>
+                  <th scope="col">Notes</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "32px", color: "#6b7280" }}>
+                      No invoices yet. Click &quot;Add an invoice&quot; to create one.
+                    </td>
+                  </tr>
+                ) : (
+                  invoices.map((inv) => (
+                    <tr key={inv.id}>
+                      <td>{inv.customerName}</td>
+                      <td>{inv.invoiceNumber}</td>
+                      <td>${inv.amount}</td>
+                      <td>
+                        <span className={`admin-invoices-status ${inv.status}`}>
+                          {inv.status === "paid" ? "Paid" : "Unpaid"}
+                        </span>
+                      </td>
+                      <td>{inv.dueDate || "—"}</td>
+                      <td style={{ maxWidth: 200, fontSize: 13, color: "#4b5563" }}>{inv.notes || "—"}</td>
+                      <td>
+                        <div className="admin-invoices-actions-cell">
+                          <button type="button" className="admin-invoices-btn-secondary" onClick={() => openEdit(inv)}>
+                            Update
+                          </button>
+                          <button type="button" className="admin-invoices-btn-danger" onClick={() => openDelete(inv.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="invoice-table">
-          <div className="invoice-table-columns">
-            <div className="invoice-table-content">
-              <div className="invoice-table-content-search">
-                <Input
-                  id="value1"
-                  name="value1"
-                  placeholder={"Search Pending Invoices"}
-                  type="text"
-                  style={{ width: "70vh", height: "50px" }}
-                  value={pendingSearch}
-                  onChange={(e) => setPendingSearch(e.target.value)}
-                />
-                <Button type="button" className="btn" onClick={handleSearch1}>
-                  Search
-                </Button>
-              </div>
-              {pendingInvoices.map((invoice) => (
-                <DisplayInvoice key={invoice.invoice_id} invoice={invoice} handleStatusToggle={handleStatusToggle} />
-              ))}
+      </main>
+
+      {addOpen && (
+        <div className="admin-modal-overlay" role="presentation" onClick={(e) => e.target === e.currentTarget && closeModals()}>
+          <div className="admin-modal" role="dialog" aria-labelledby="add-invoice-title">
+            <div className="admin-modal-header" id="add-invoice-title">
+              New invoice
             </div>
-            <div className="invoice-pagination">
-              <Button
-                type="button"
-                disabled={pendingPage === 1}
-                onClick={() => setPendingPage((prev) => prev - 1)}
-              >
-                Prev
-              </Button>
-              <span>
-                {" "}
-                Page {pendingPage} of{" "}
-                {Math.max(1, Math.ceil(pendingCount / ITEMS_PER_PAGE))}{" "}
-              </span>
-              <Button
-                type="button"
-                disabled={
-                  pendingPage >= Math.ceil(pendingCount / ITEMS_PER_PAGE)
-                }
-                onClick={() => setPendingPage((prev) => prev + 1)}
-              >
-                Next
-              </Button>
+            <div className="admin-modal-body">
+              <label className="admin-modal-label" htmlFor="add-customer">Customer name</label>
+              <input id="add-customer" className="admin-modal-input" value={form.customerName} onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="add-number">Invoice number</label>
+              <input id="add-number" className="admin-modal-input" value={form.invoiceNumber} onChange={(e) => setForm((f) => ({ ...f, invoiceNumber: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="add-amount">Amount</label>
+              <input id="add-amount" className="admin-modal-input" placeholder="e.g. 199.00" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="add-status">Status</label>
+              <select id="add-status" className="admin-modal-input" value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}>
+                <option value="unpaid">Unpaid</option>
+                <option value="paid">Paid</option>
+              </select>
+
+              <label className="admin-modal-label" htmlFor="add-due">Due date</label>
+              <input id="add-due" type="date" className="admin-modal-input" value={form.dueDate} onChange={(e) => setForm((f) => ({ ...f, dueDate: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="add-notes">Notes</label>
+              <textarea id="add-notes" className="admin-modal-input" rows={3} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="admin-modal-btn-cancel" onClick={closeModals}>
+                Cancel
+              </button>
+              <button type="button" className="admin-modal-btn-save" onClick={handleAddSave}>
+                Create invoice
+              </button>
             </div>
           </div>
         </div>
-        <div className="invoice-table-columns" style={{ marginTop: "40px" }}>
-          <div className="invoice-table-content">
-            <div className="invoice-table-content-search">
-              <Input
-                id="value2"
-                name="value2"
-                placeholder={"Search Paid Invoices"}
-                type="text"
-                style={{ width: "70vh", height: "50px" }}
-                value={paidSearch}
-                onChange={(e) => setPaidSearch(e.target.value)}
-              />
-              <Button type="button" className="btn" onClick={handleSearch2}>
-                Search
-              </Button>
+      )}
+
+      {editOpen && (
+        <div className="admin-modal-overlay" role="presentation" onClick={(e) => e.target === e.currentTarget && closeModals()}>
+          <div className="admin-modal" role="dialog" aria-labelledby="edit-invoice-title">
+            <div className="admin-modal-header" id="edit-invoice-title">
+              Update invoice
             </div>
-            {paidInvoices.map((invoice) => (
-              <DisplayInvoice key={invoice.invoice_id} invoice={invoice} handleStatusToggle={handleStatusToggle} />
-            ))}
+            <div className="admin-modal-body">
+              <label className="admin-modal-label" htmlFor="edit-customer">Customer name</label>
+              <input id="edit-customer" className="admin-modal-input" value={form.customerName} onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="edit-number">Invoice number</label>
+              <input id="edit-number" className="admin-modal-input" value={form.invoiceNumber} onChange={(e) => setForm((f) => ({ ...f, invoiceNumber: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="edit-amount">Amount</label>
+              <input id="edit-amount" className="admin-modal-input" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="edit-status">Status</label>
+              <select id="edit-status" className="admin-modal-input" value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}>
+                <option value="unpaid">Unpaid</option>
+                <option value="paid">Paid</option>
+              </select>
+
+              <label className="admin-modal-label" htmlFor="edit-due">Due date</label>
+              <input id="edit-due" type="date" className="admin-modal-input" value={form.dueDate} onChange={(e) => setForm((f) => ({ ...f, dueDate: e.target.value }))} />
+
+              <label className="admin-modal-label" htmlFor="edit-notes">Notes</label>
+              <textarea id="edit-notes" className="admin-modal-input" rows={3} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="admin-modal-btn-cancel" onClick={closeModals}>
+                Cancel
+              </button>
+              <button type="button" className="admin-modal-btn-save" onClick={handleEditSave}>
+                Save changes
+              </button>
+            </div>
           </div>
         </div>
-        <div className="invoice-pagination">
-          <Button
-            type="button"
-            disabled={paidPage === 1}
-            onClick={() => setPaidPage((prev) => prev - 1)}
-          >
-            Prev
-          </Button>
-          <span>
-            {" "}
-            Page {paidPage} of{" "}
-            {Math.max(1, Math.ceil(paidCount / ITEMS_PER_PAGE))}{" "}
-          </span>
-          <Button
-            type="button"
-            disabled={paidPage >= Math.ceil(paidCount / ITEMS_PER_PAGE)}
-            onClick={() => setPaidPage((prev) => prev + 1)}
-          >
-            Next
-          </Button>
+      )}
+
+      {deleteOpen && deletingInvoice && (
+        <div className="admin-modal-overlay" role="presentation" onClick={(e) => e.target === e.currentTarget && closeModals()}>
+          <div className="admin-modal" role="dialog" aria-labelledby="delete-invoice-title">
+            <div className="admin-modal-header" id="delete-invoice-title">
+              Delete invoice
+            </div>
+            <div className="admin-modal-body">
+              <p style={{ margin: 0, fontSize: 15, color: "#374151", lineHeight: 1.5 }}>
+                Do you want to delete this?
+              </p>
+              <p style={{ margin: "12px 0 0", fontSize: 14, color: "#6b7280" }}>
+                <strong>{deletingInvoice.invoiceNumber}</strong> — {deletingInvoice.customerName}
+              </p>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="admin-modal-btn-cancel" onClick={closeModals}>
+                Cancel
+              </button>
+              <button type="button" className="admin-modal-btn-danger-confirm" onClick={handleDeleteConfirm}>
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
