@@ -1,214 +1,100 @@
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import Invoices from "./Invoices";
 
-jest.mock("../../Components/AdminSideBar", () => () => <div>Admin Sidebar</div>);
+jest.mock("../../Components/AdminSideBar", () => () => (
+  <div data-testid="mock-admin-sidebar">Sidebar</div>
+));
 
-const mockInvoicesResponse = {
-  count: 2,
-  page: 1,
-  page_size: 4,
-  results: [
-    {
-      invoice_id: 1,
-      customer: "John Doe",
-      vehicle: "Toyota Camry",
-      date: "2026-03-21T00:00:00Z",
-      services: "Oil Change",
-      cost: "89.99",
-      status: "pending",
-      created_at: "2026-03-21T00:00:00Z",
-    },
-    {
-      invoice_id: 2,
-      customer: "Jane Smith",
-      vehicle: "Honda Civic",
-      date: "2026-03-22T00:00:00Z",
-      services: "Brake Inspection",
-      cost: "120.00",
-      status: "paid",
-      created_at: "2026-03-22T00:00:00Z",
-    },
-  ],
-};
+const INVOICES_KEY = "royal_admin_invoices_v1";
 
-describe("Invoices page", () => {
+describe("Admin Invoices (RW-184)", () => {
   beforeEach(() => {
-    sessionStorage.setItem("authToken", "fake-token");
-    window.alert = jest.fn();
-
-    global.fetch = jest.fn((url, options) => {
-      if (options?.method === "PUT") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({}),
-        });
-      }
-
-      if (url.includes("status=pending")) {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              count: 1,
-              page: 1,
-              page_size: 4,
-              results: [mockInvoicesResponse.results[0]],
-            }),
-        });
-      }
-
-      if (url.includes("status=paid")) {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              count: 1,
-              page: 1,
-              page_size: 4,
-              results: [mockInvoicesResponse.results[1]],
-            }),
-        });
-      }
-
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(mockInvoicesResponse),
-      });
-    });
+    localStorage.removeItem(INVOICES_KEY);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
+    localStorage.removeItem(INVOICES_KEY);
   });
 
-  test("renders invoices page headings and search inputs", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("renders title, sidebar, and Add an invoice button", () => {
+    render(<Invoices />);
 
-    expect(screen.getByText("Admin Sidebar")).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.getByText("Invoices")).toBeInTheDocument();
-    });
-
-    expect(screen.getByPlaceholderText(/search pending invoices/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/search paid invoices/i)).toBeInTheDocument();
+    expect(screen.getByTestId("mock-admin-sidebar")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /invoices/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add an invoice/i })).toBeInTheDocument();
   });
 
-  test("renders pending and paid invoice data from API", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("renders default invoice rows", () => {
+    render(<Invoices />);
 
-    await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText("Jane Smith")).toBeInTheDocument();
-    });
-
-    await screen.findByText((text) => text.includes("Toyota Camry"));
-    await screen.findByText((text) => text.includes("Honda Civic"));
-    await screen.findByText((text) => text.includes("Oil Change"));
-    await screen.findByText((text) => text.includes("Brake Inspection"));
-    await screen.findByText((text) => text.includes("89.99"));
-    await screen.findByText((text) => text.includes("120.00"));
-
-    expect(screen.getByText((text) => text.includes("Toyota Camry"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("Honda Civic"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("Oil Change"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("Brake Inspection"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("89.99"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("120.00"))).toBeInTheDocument();
+    expect(screen.getByText("Jordan Lee")).toBeInTheDocument();
+    expect(screen.getByText("Maria Santos")).toBeInTheDocument();
+    expect(screen.getByText("INV-2026-0142")).toBeInTheDocument();
+    expect(screen.getByText("INV-2026-0141")).toBeInTheDocument();
   });
 
-  test("renders invoice costs from API", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("Add an invoice opens modal and creates a row after submit", async () => {
+    const user = userEvent.setup();
+    render(<Invoices />);
 
-    await waitFor(() => {
-      expect(screen.getByText((text) => text.includes("89.99"))).toBeInTheDocument();
-    });
+    await user.click(screen.getByRole("button", { name: /add an invoice/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText((text) => text.includes("120.00"))).toBeInTheDocument();
-    });
+    expect(screen.getByRole("dialog", { name: /new invoice/i })).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(/customer name/i), "New Customer Inc");
+    await user.click(screen.getByRole("button", { name: /create invoice/i }));
+
+    expect(screen.queryByRole("dialog", { name: /new invoice/i })).not.toBeInTheDocument();
+    expect(screen.getByText("New Customer Inc")).toBeInTheDocument();
   });
 
-  test("renders correct status action buttons", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("Update opens modal and saves field changes", async () => {
+    const user = userEvent.setup();
+    render(<Invoices />);
 
-    expect(await screen.findByRole("button", { name: /mark as paid/i })).toBeInTheDocument();
-    expect(await screen.findByRole("button", { name: /mark as pending/i })).toBeInTheDocument();
+    const jordanRow = screen.getByText("Jordan Lee").closest("tr");
+    await user.click(within(jordanRow).getByRole("button", { name: /^update$/i }));
+
+    expect(screen.getByRole("dialog", { name: /update invoice/i })).toBeInTheDocument();
+
+    const amountInput = screen.getByLabelText(/^amount$/i);
+    await user.clear(amountInput);
+    await user.type(amountInput, "500.00");
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+    expect(screen.getByText("$500.00")).toBeInTheDocument();
   });
 
-  test("clicking status button sends PUT request with updated status", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("Delete shows confirmation and removes row when confirmed", async () => {
+    const user = userEvent.setup();
+    render(<Invoices />);
 
-    await screen.findByText("John Doe");
-    const button = await screen.findByRole("button", { name: /mark as paid/i });
-    fireEvent.click(button);
+    const mariaRow = screen.getByText("Maria Santos").closest("tr");
+    await user.click(within(mariaRow).getByRole("button", { name: /^delete$/i }));
 
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/invoices/1/"),
-        expect.objectContaining({
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: "paid" }),
-        })
-      );
-    });
+    expect(screen.getByRole("dialog", { name: /delete invoice/i })).toBeInTheDocument();
+    expect(screen.getByText(/do you want to delete this\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/INV-2026-0141/)).toBeInTheDocument();
 
-    expect(window.alert).toHaveBeenCalledWith("Invoice status updated.");
+    const dialog = screen.getByRole("dialog", { name: /delete invoice/i });
+    await user.click(within(dialog).getByRole("button", { name: /^delete$/i }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByText("Maria Santos")).not.toBeInTheDocument();
   });
 
-  test("clicking status button refetches pending and paid invoices", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("Delete confirmation can be cancelled", async () => {
+    const user = userEvent.setup();
+    render(<Invoices />);
 
-    await screen.findByText("John Doe");
-    const button = await screen.findByRole("button", { name: /mark as paid/i });
-    fireEvent.click(button);
+    const jordanRow = screen.getByText("Jordan Lee").closest("tr");
+    await user.click(within(jordanRow).getByRole("button", { name: /^delete$/i }));
 
-    await waitFor(() => {
-      const calledUrls = global.fetch.mock.calls.map((call) => call[0]);
-      expect(calledUrls.some((url) => url.includes("/api/invoices/1/"))).toBe(true);
-    });
+    await user.click(screen.getByRole("button", { name: /^cancel$/i }));
 
-    await waitFor(() => {
-      const calledUrls = global.fetch.mock.calls.map((call) => call[0]);
-      expect(calledUrls.some((url) => url.includes("status=pending"))).toBe(true);
-    });
-
-    await waitFor(() => {
-      const calledUrls = global.fetch.mock.calls.map((call) => call[0]);
-      expect(calledUrls.some((url) => url.includes("status=paid"))).toBe(true);
-    });
+    expect(screen.queryByText(/do you want to delete this\?/i)).not.toBeInTheDocument();
+    expect(screen.getByText("Jordan Lee")).toBeInTheDocument();
   });
 });
