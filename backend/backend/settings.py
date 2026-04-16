@@ -91,7 +91,7 @@ DATABASES = {
         #change user/pass as needed
         'USER': 'root',
         #'PASSWORD': '',
-        'PASSWORD': 'Root',
+        'PASSWORD': '',
     }
 }
 
