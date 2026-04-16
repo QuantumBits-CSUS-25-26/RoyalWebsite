@@ -1,38 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Services.module.css";
 import { Link } from "react-router-dom";
-import oilChange from "./asset/services-1.png";
-import brakeRepair from "./asset/services-2.jpeg";
-import suspensionWork from "./asset/services-3.jpeg";
-import vehicleInspection from "./asset/services-4.jpeg";
+import { API_BASE_URL } from '../../config';
 
 const ServicesSection = () => {
-    const services = [
-        {
-            id: 1,
-            img: oilChange,
-            title: "Oil Changes",
-            desc: "Quick and reliable oil changes to keep your engine healthy.",
-        },
-        {
-            id: 2,
-            img: brakeRepair,
-            title: "Brake Repairs",
-            desc: "Professional brake inspection and replacement for safe driving.",
-        },
-        {
-            id: 3,
-            img: suspensionWork,
-            title: "Suspension Work",
-            desc: "Smooth out your ride with full suspension diagnostics and repair.",
-        },
-        {
-            id: 4,
-            img: vehicleInspection,
-            title: "Vehicle Inspections",
-            desc: "Certified inspections for Uber and Lyft drivers.",
-        },
-    ];
+    const [services, setServices] = useState([]);
+
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/api/services/`)
+            .then(res => res.json())
+            .then(data => setServices(data))
+            .catch(err => console.error('Failed to fetch services:', err));
+    }, []);
 
     return (
         <div className={styles.servicesPage}>
@@ -53,16 +32,19 @@ const ServicesSection = () => {
 
                         <div className={styles.serviceList}>
                             {services.map((service) => (
-                                <div key={service.id} className={styles.serviceCard}>
+                                <div key={service.service_id} className={styles.serviceCard}>
 
-                                    <img
-                                        src={service.img}
-                                        alt={service.title}
-                                        className={styles.serviceImage}
-                                    />
-                                    <h3 className={styles.serviceTitle}>{service.title}</h3>
-                                    <p className={styles.serviceDesc}>{service.desc}</p>
-                                    <Link to={`/service/${service.id}`} className={styles.viewMore}>
+                                    {service.image && (
+                                        <img
+                                            src={service.image}
+                                            alt={service.name}
+                                            className={styles.serviceImage}
+                                        />
+                                    )}
+                                    <h3 className={styles.serviceTitle}>{service.name}</h3>
+                                    <h3 className={styles.serviceTitle}>{service.cost ? `$${service.cost}` : ''}</h3>
+                                    <p className={styles.serviceDesc}>{service.description}</p>
+                                    <Link to={`/service/${service.service_id}`} className={styles.viewMore}>
                                         View More →
                                     </Link>
                                 </div>

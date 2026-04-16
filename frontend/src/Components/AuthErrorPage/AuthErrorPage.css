@@ -1,0 +1,26 @@
+.auth-error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f8f8f8;
+}
+.auth-error-page h1 {
+  font-size: 4rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+.auth-error-page p {
+  font-size: 1.5rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+.auth-error-page a {
+  font-size: 1.2rem;
+  color: #007bff;
+  text-decoration: none;
+}
+.auth-error-page a:hover {
+  text-decoration: underline;
+}

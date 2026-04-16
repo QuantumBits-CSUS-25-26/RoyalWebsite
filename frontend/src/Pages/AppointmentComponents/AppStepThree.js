@@ -13,7 +13,7 @@ const monthNames = [
   "September",
   "October",
   "November",
-  "December",
+  "December"
 ];
 
 const weekdayLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -24,24 +24,9 @@ const formatTime = (hour24) => {
   return `${hour12}${period}`;
 };
 
-const prettyServiceLabel = (id) => {
-  const map = {
-    brakes: "Brake Work",
-    body: "Body Work",
-    "engine-transmission": "Engine / Transmission",
-    hybrid: "Hybrid Services",
-    "oil-change": "Oil Change",
-    "suspension-tune-up": "Suspension Work / Tune Up",
-  };
-  return map[id] || id || "None selected";
-};
-
-const AppStepThree = ({ selectedServiceId, onBack }) => {
+const AppStepThree = ({ selectedDate, selectedTime, onSelectDate = () => {}, onSelectTime = () => {} }) => {
   const [viewDate, setViewDate] = useState(() => new Date());
-
   // *****Selected time/date is the value to submit with the appointment payload*****
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
   const [showSameDayNotice, setShowSameDayNotice] = useState(false);
 
   const { monthLabel, yearLabel, calendarDays } = useMemo(() => {
@@ -66,22 +51,26 @@ const AppStepThree = ({ selectedServiceId, onBack }) => {
         date,
         isPast,
         isSunday: date.getDay() === 0,
-        isSaturday: date.getDay() === 6,
+        isSaturday: date.getDay() === 6
       };
     });
 
     return {
       monthLabel: monthNames[month],
       yearLabel: year,
-      calendarDays: days,
+      calendarDays: days
     };
   }, [viewDate]);
 
   const timeSlots = useMemo(() => {
-    if (!selectedDate) return [];
+    if (!selectedDate) {
+      return [];
+    }
 
     const dayOfWeek = selectedDate.getDay();
-    if (dayOfWeek === 0) return []; // Sunday closed
+    if (dayOfWeek === 0) {
+      return [];
+    }
 
     const startHour = dayOfWeek === 6 ? 9 : 8;
     const endHour = dayOfWeek === 6 ? 15 : 16;
@@ -102,43 +91,21 @@ const AppStepThree = ({ selectedServiceId, onBack }) => {
   };
 
   const handleSelectDay = (day) => {
-    if (!day || day.isSunday || day.isPast) return;
-
+    if (!day || day.isSunday || day.isPast) {
+      return;
+    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const selected = new Date(day.date);
     selected.setHours(0, 0, 0, 0);
-
     setShowSameDayNotice(selected.getTime() === today.getTime());
-    setSelectedDate(day.date);
-    setSelectedTime(null);
-  };
-
-  const canSubmit = !!selectedServiceId && !!selectedDate && !!selectedTime && !showSameDayNotice;
-
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-
-    // This is where the payload would go when backend wiring is added
-    const payload = {
-      serviceId: selectedServiceId,
-      date: selectedDate.toDateString(),
-      time: selectedTime,
-    };
-
-    console.log("appointment payload", payload);
-    alert("Appointment info saved (demo). Check console for payload.");
+    onSelectDate(day.date);
+    onSelectTime(null);
   };
 
   return (
     <div className="app-step-three">
       <h1>Date and Time</h1>
-
-      {/* show selected service from step 2 */}
-      <div style={{ padding: "0 16px 12px 16px", opacity: 0.9 }}>
-        <strong>Selected Service:</strong> {prettyServiceLabel(selectedServiceId)}
-      </div>
 
       <div className="calendar-card">
         <div className="calendar-header">
@@ -205,7 +172,7 @@ const AppStepThree = ({ selectedServiceId, onBack }) => {
                   key={slot}
                   type="button"
                   className={`time-slot ${selectedTime === slot ? "selected" : ""}`}
-                  onClick={() => setSelectedTime(slot)}
+                  onClick={() => onSelectTime(slot)}
                   disabled={showSameDayNotice}
                 >
                   {slot}
@@ -214,17 +181,6 @@ const AppStepThree = ({ selectedServiceId, onBack }) => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* step navigation */}
-      <div style={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-        <button type="button" onClick={onBack}>
-          Back
-        </button>
-
-        <button type="button" onClick={handleSubmit} disabled={!canSubmit}>
-          Submit
-        </button>
       </div>
     </div>
   );
