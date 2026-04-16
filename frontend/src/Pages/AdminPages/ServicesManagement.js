@@ -206,7 +206,7 @@ const ServicesManagement = () => {
           </div>
         </DragDropContext>
 
-        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginTop: '8px', marginLeft: '200px' }}>
           <button
             className="service-management-add-button"
             onClick={() => setIsAddFormOpen(true)}
