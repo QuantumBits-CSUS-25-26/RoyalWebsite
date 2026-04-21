@@ -67,8 +67,8 @@ const CustomerLogin = () => {
 
             console.log("Login success:", response.data);
 
-            if (response.data.token) {
-                localStorage.setItem("token", response.data.token);
+            if (response.data.access) {
+                localStorage.setItem("authToken", response.data.access);
             }
 
             navigate("/dashboard");

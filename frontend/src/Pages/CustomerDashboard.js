@@ -125,7 +125,7 @@ const CustomerDashboard = () => {
   const [showNewVehicleModal, setShowNewVehicleModal] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
     const headers = { "Accept": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -197,7 +197,7 @@ const CustomerDashboard = () => {
   ///*
   // Helper to refresh vehicles after adding
   const fetchVehicles = () => {
-    const token = sessionStorage.getItem("authToken");
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
     const headers = { "Accept": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
     fetch(`${API_BASE_URL}/api/vehicles/`, { headers })
