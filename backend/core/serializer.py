@@ -74,8 +74,9 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = [
             'message_id', 'first_name', 'last_name', 'phone_number',
             'email', 'message', 'response', 'current_customer', 'read',
+            'created_at',
         ]
-        read_only_fields = ['message_id']
+        read_only_fields = ['message_id', 'created_at']
 
 # ══════════════════════════════════════════════════════════════════
 #  Employee serializers

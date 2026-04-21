@@ -988,6 +988,92 @@ class ContactMessageView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+class AdminMessageListView(APIView):
+    """GET /api/admin/messages/ — paginated, filterable list for admins.
+
+    Query params:
+      read        true|false - filter by read status
+      search      text - icontains across name, email, phone, message body
+      ordering    -created_at | last_name,first_name | email
+      page        1-based page number (default 1)
+      page_size   items per page, capped at 100 (default 20)
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    _DEFAULT_PAGE_SIZE = 20
+    _ALLOWED_ORDERINGS = {'-created_at', 'created_at', 'first_name,last_name', 'email'}
+
+    def get(self, request):
+        qs = Messsage.objects.all()
+
+        read_param = request.query_params.get('read')
+        if read_param is not None:
+            qs = qs.filter(read=(read_param.lower() == 'true'))
+
+        search = request.query_params.get('search', '').strip()
+        if search:
+            qs = qs.filter(
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone_number__icontains=search) |
+                Q(message__icontains=search)
+            )
+
+        ordering = request.query_params.get('ordering', '-created_at')
+        if ordering not in self._ALLOWED_ORDERINGS:
+            ordering = '-created_at'
+        qs = qs.order_by(*ordering.split(','))
+
+        try:
+            page = max(1, int(request.query_params.get('page', 1)))
+            page_size = min(100, max(1, int(
+                request.query_params.get('page_size', self._DEFAULT_PAGE_SIZE)
+            )))
+        except (ValueError, TypeError):
+            page, page_size = 1, self._DEFAULT_PAGE_SIZE
+
+        total = qs.count()
+        offset = (page - 1) * page_size
+        results = qs[offset:offset + page_size]
+
+        return Response({
+            'count': total,
+            'has_next': (page * page_size) < total,
+            'results': MessageSerializer(results, many=True).data,
+        })
+
+
+class AdminMessageDetailView(APIView):
+    """PATCH/DELETE /api/admin/messages/<message_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    def get_object(self, message_id):
+        try:
+            return Messsage.objects.get(pk=message_id)
+        except Messsage.DoesNotExist:
+            return None
+
+    def patch(self, request, message_id):
+        msg = self.get_object(message_id)
+        if not msg:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = MessageSerializer(msg, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, message_id):
+        msg = self.get_object(message_id)
+        if not msg:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        msg.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class AdminDashboardTotalsView(APIView):
     """GET /api/admin/dashboard-totals/"""
     authentication_classes = [CustomJWTAuthentication]
@@ -995,7 +1081,7 @@ class AdminDashboardTotalsView(APIView):
     def get(self, request):
         total_customers = Customer.objects.count()
         total_appointments = Appointment.objects.count()
-        total_messages = 0  # Placeholder since messages aren't stored yet
+        total_messages = Messsage.objects.count()
         total_services = SiteService.objects.count()
         return Response({
             'total_customers': total_customers,
