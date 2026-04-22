@@ -354,6 +354,9 @@ class AppointmentListCreateView(APIView):
             qs = Appointment.objects.filter(vehicle_id__in=vehicle_ids)
         else:
             qs = Appointment.objects.all()
+        qs = qs.select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines')
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
 
@@ -492,7 +495,9 @@ class AppointmentDetailView(APIView):
 
     def _get_appointment(self, request, appointment_id):
         try:
-            appt = Appointment.objects.get(appointment_id=appointment_id)
+            appt = Appointment.objects.select_related(
+                'vehicle', 'vehicle__customer', 'employee',
+            ).prefetch_related('lines').get(appointment_id=appointment_id)
         except Appointment.DoesNotExist:
             return None
 
@@ -542,7 +547,7 @@ class InvoiceListCreateView(APIView):
             'appointment__vehicle',
             'appointment__vehicle__customer',
             'appointment__employee',
-        ).all().order_by('-created_at')
+        ).prefetch_related('lines', 'appointment__lines').all().order_by('-created_at')
 
         status_filter = request.query_params.get('status')
         month_filter = request.query_params.get('month')
@@ -564,7 +569,8 @@ class InvoiceListCreateView(APIView):
                 Q(appointment__vehicle__customer__last_name__icontains=search) |
                 Q(appointment__vehicle__make__icontains=search) |
                 Q(appointment__vehicle__model__icontains=search) |
-                Q(services__icontains=search) |
+                Q(lines__name__icontains=search) |
+                Q(appointment__service_type__icontains=search) |
                 Q(status__icontains=search)
             )
             qs = qs.filter(text_q).distinct()
@@ -611,7 +617,7 @@ class InvoiceDetailView(APIView):
                 'appointment__vehicle',
                 'appointment__vehicle__customer',
                 'appointment__employee',
-            ).get(invoice_id=invoice_id)
+            ).prefetch_related('lines', 'appointment__lines').get(invoice_id=invoice_id)
         except Invoice.DoesNotExist:
             return None
 
@@ -890,7 +896,9 @@ class AdminAppointmentListView(APIView):
     permission_classes = [IsEmployee]
 
     def get(self, request):
-        qs = Appointment.objects.all()
+        qs = Appointment.objects.select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines').all()
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
 
@@ -1173,7 +1181,9 @@ class VehicleServiceHistoryView(APIView):
         except Vehicle.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        appointments = Appointment.objects.filter(vehicle=vehicle).order_by('-scheduled_at')
+        appointments = Appointment.objects.filter(vehicle=vehicle).select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines').order_by('-scheduled_at')
         data = [
             {
                 'service_type': appt.service_type,

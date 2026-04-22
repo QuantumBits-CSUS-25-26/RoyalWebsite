@@ -260,3 +260,27 @@
     padding: 8px;
   }
 }
+
+/* Services picker in invoice modal */
+.admin-invoices-services-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #f9fafb;
+}
+.admin-invoices-services-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+}
+.admin-invoices-services-item input[type="checkbox"] {
+  cursor: pointer;
+}
