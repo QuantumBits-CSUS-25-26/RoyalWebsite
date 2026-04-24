@@ -14,9 +14,10 @@ const ContactInfoS4 = ({ contactInfo = {}, onFieldChange = () => {}, onNotifChan
         <form className="contact-info-form" onSubmit={onSubmit}>
             <div className="contact-name-info">
                 <div className="contact-info-fName">
-                    First Name<br/>
+                    <label htmlFor="contact-fname">First Name</label><br/>
                     <input className="contact-info-input"
                         type="text" 
+                        id="contact-fname"
                         name="fname"
                         value={contactInfo.fname || ''}
                         onChange={onFieldChange}
@@ -24,9 +25,10 @@ const ContactInfoS4 = ({ contactInfo = {}, onFieldChange = () => {}, onNotifChan
                     />
                 </div>
                 <div className="contact-info-lName">
-                    Last Name<br/>
+                    <label htmlFor="contact-lname">Last Name</label><br/>
                     <input className="contact-info-input"
                         type="text" 
+                        id="contact-lname"
                         name="lname"
                         value={contactInfo.lname || ''}
                         onChange={onFieldChange}
@@ -36,9 +38,10 @@ const ContactInfoS4 = ({ contactInfo = {}, onFieldChange = () => {}, onNotifChan
             </div>
             <div className="contact-info-email-phone">
                     <div className="contact-info-email">
-                        Email<br/>
+                        <label htmlFor="contact-email">Email</label><br/>
                         <input className="contact-info-input"
                             type="email"
+                            id="contact-email"
                             name="email"
                             value={contactInfo.email || ''}
                             onChange={onFieldChange}
@@ -46,9 +49,10 @@ const ContactInfoS4 = ({ contactInfo = {}, onFieldChange = () => {}, onNotifChan
                         />
                     </div>
                     <div className="contact-info-phone">
-                        Phone Number<br/>
+                        <label htmlFor="contact-phone">Phone Number</label><br/>
                         <input className="contact-info-input"
                             type="tel"
+                            id="contact-phone"
                             name="phone"
                             value={contactInfo.phone || ''}
                             onChange={onFieldChange}
