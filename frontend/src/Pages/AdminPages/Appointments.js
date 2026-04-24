@@ -220,6 +220,7 @@ const Appointments = () => {
             <FullCalendar
               plugins={[dayGridPlugin]}
               initialView="dayGridMonth"
+              buttonText={{ today: "Today" }}
               events={events}
               eventMouseEnter={(info) => {
                 if (showOptionModal) return;
@@ -259,7 +260,12 @@ const Appointments = () => {
                     <span>Customer:</span> {tooltip.customer_name || tooltip.customer || "-"}
                   </div>
                   <div>
-                    <span>Phone:</span> {tooltip.vehicle?.customer?.phone || "-"}
+                    <span>Phone:</span>{" "}
+                    {(() => {
+                      const vehicleCustomerId = tooltip.vehicle?.customer;
+                      const cust = customers.find((c) => String(c.customer_id) === String(vehicleCustomerId));
+                      return cust?.phone || "-";
+                    })()}
                   </div>
                   <div>
                     <span>Vehicle:</span>{" "}
