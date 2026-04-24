@@ -149,7 +149,8 @@
   color: #047857;
 }
 
-.admin-invoices-status.unpaid {
+.admin-invoices-status.unpaid,
+.admin-invoices-status.pending {
   background: #fef3c7;
   color: #b45309;
 }

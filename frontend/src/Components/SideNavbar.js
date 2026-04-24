@@ -13,11 +13,11 @@ const SideNavbar = () => {
 
 
   return (
-    <div className ="Navbar">
+    <div className ="Navbar d-none d-md-block">
       <Navbar>
         <Container>
           <Nav vertical>
-            <div class ="btn-group">
+            <div className ="btn-group">
               <NavItem>
                 <NavLink className='nav-link' to='/login' onClick={() => setServiceOpen(false)}>
                   <button>

@@ -45,19 +45,40 @@ const SAMPLE = [
   },
 ];
 
-function mockFetchOnce(data, status = 200) {
-  return jest.fn().mockResolvedValue({
-    ok: status >= 200 && status < 300,
-    status,
-    json: async () => data,
+const UNREAD_ROWS = SAMPLE.filter((m) => !m.read);
+const READ_ROWS = SAMPLE.filter((m) => m.read);
+
+function paginated(messages) {
+  return { results: messages, count: messages.length, has_next: false };
+}
+
+function jsonOk(body) {
+  return { ok: true, status: 200, json: async () => body };
+}
+
+/** Two columns each GET `/api/admin/messages/?read=true|false` with paginated `{ results }`. */
+function mockDefaultListFetch() {
+  return jest.fn().mockImplementation((url) => {
+    const u = String(url);
+    if (u.includes("read=false")) return Promise.resolve(jsonOk(paginated(UNREAD_ROWS)));
+    if (u.includes("read=true")) return Promise.resolve(jsonOk(paginated(READ_ROWS)));
+    return Promise.reject(new Error(`unexpected fetch ${url}`));
   });
 }
+
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
 
 describe("Admin Messages (RW-193)", () => {
   beforeEach(() => {
     sessionStorage.clear();
     localStorage.clear();
-    global.fetch = mockFetchOnce(SAMPLE);
+    global.fetch = mockDefaultListFetch();
   });
 
   afterEach(() => {
@@ -90,17 +111,26 @@ describe("Admin Messages (RW-193)", () => {
   });
 
   test("Mark read issues a PATCH and moves the message", async () => {
-    global.fetch = jest
-      .fn()
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => SAMPLE })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({}) });
+    let readRows = [...READ_ROWS];
+    global.fetch = jest.fn().mockImplementation((url, opts = {}) => {
+      if (opts.method === "PATCH") {
+        readRows = [{ ...SAMPLE[0], read: true }, SAMPLE[2]];
+        return Promise.resolve({ ok: true, status: 200, json: async () => ({}) });
+      }
+      const u = String(url);
+      if (u.includes("read=false")) return Promise.resolve(jsonOk(paginated(UNREAD_ROWS)));
+      if (u.includes("read=true")) return Promise.resolve(jsonOk(paginated(readRows)));
+      return Promise.reject(new Error(`unexpected fetch ${url}`));
+    });
 
     render(<Messages />);
     await waitFor(() => screen.getByText("Jordan Lee"));
 
     const unread = screen.getByRole("region", { name: /^Unread$/i });
-    const btns = within(unread).getAllByRole("button", { name: /mark read/i });
-    fireEvent.click(btns[0]);
+    const markJordan = within(unread).getByRole("button", {
+      name: /mark message from jordan lee as read/i,
+    });
+    fireEvent.click(markJordan);
 
     await waitFor(() => {
       const read = screen.getByRole("region", { name: /^Read$/i });
@@ -115,10 +145,15 @@ describe("Admin Messages (RW-193)", () => {
   });
 
   test("Delete button opens confirm modal and DELETE only fires on confirm", async () => {
-    global.fetch = jest
-      .fn()
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => SAMPLE })
-      .mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) });
+    global.fetch = jest.fn().mockImplementation((url, opts = {}) => {
+      if (opts.method === "DELETE") {
+        return Promise.resolve({ ok: true, status: 204, json: async () => ({}) });
+      }
+      const u = String(url);
+      if (u.includes("read=false")) return Promise.resolve(jsonOk(paginated(UNREAD_ROWS)));
+      if (u.includes("read=true")) return Promise.resolve(jsonOk(paginated(READ_ROWS)));
+      return Promise.reject(new Error(`unexpected fetch ${url}`));
+    });
 
     render(<Messages />);
     await waitFor(() => screen.getByText("Jordan Lee"));
