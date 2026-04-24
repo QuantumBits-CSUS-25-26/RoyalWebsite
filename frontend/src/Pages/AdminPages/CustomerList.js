@@ -502,7 +502,7 @@ const CustomerList = () => {
   }, []);
 
   useEffect(() => {
-    const token = getStoredToken();
+    const token = sessionStorage.getItem("authToken");
     const headers = { Accept: "application/json" };
 
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -563,7 +563,7 @@ const CustomerList = () => {
   };
 
   const handleBookAppointment = async (customerId, bookData) => {
-    const token = getStoredToken();
+    const token = sessionStorage.getItem("authToken");
     const headers = { "Content-Type": "application/json" };
 
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -603,7 +603,7 @@ const CustomerList = () => {
   };
 
   const handleRecommendServices = async (customerId, recData) => {
-    const token = getStoredToken();
+    const token = sessionStorage.getItem("authToken");
     const headers = { "Content-Type": "application/json" };
 
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -633,7 +633,7 @@ const CustomerList = () => {
   };
 
   const handleAddVehicle = async (customerId, vehicleData) => {
-    const token = getStoredToken();
+    const token = sessionStorage.getItem("authToken");
     const headers = { "Content-Type": "application/json" };
 
     if (token) headers["Authorization"] = `Bearer ${token}`;

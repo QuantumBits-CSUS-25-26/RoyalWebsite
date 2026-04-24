@@ -9,7 +9,6 @@ jest.mock("./Components/AuthErrorPage/AuthErrorPage", () => () => (
   <div data-testid="auth-error">Unauthorized</div>
 ));
 
-// Mock AddEmployee popup so we can trigger onAdd without relying on its internal UI
 jest.mock("./Pages/EmployeeManagmentPopups/AddEmployee", () => {
   return function AddEmployeeMock(props) {
     if (!props.visible) return null;
@@ -161,12 +160,13 @@ beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
 
-  localStorage.setItem("token", "test-token");
+  localStorage.setItem("authToken", "test-token");
   localStorage.setItem("user", JSON.stringify({ role: "admin" }));
 
   mockFetchRouter();
   jest.spyOn(window, "alert").mockImplementation(() => {});
   jest.spyOn(console, "error").mockImplementation(() => {});
+  jest.spyOn(console, "log").mockImplementation(() => {});
 });
 
 afterEach(() => {
@@ -271,12 +271,29 @@ describe("Management Component", () => {
     expect(screen.queryByText("Management")).not.toBeInTheDocument();
   });
 
-  test("allows access when authToken exists without stored user", async () => {
+  test("renders auth error page when only authToken exists without admin user", () => {
     localStorage.clear();
     sessionStorage.clear();
 
-    localStorage.setItem("token", "test-token");
     sessionStorage.setItem("authToken", "session-auth-token");
+
+    render(<Management />);
+
+    expect(screen.getByTestId("auth-error")).toBeInTheDocument();
+    expect(screen.queryByText("Management")).not.toBeInTheDocument();
+  });
+
+  test("allows access when stored user is nested under employee", async () => {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    localStorage.setItem("authToken", "test-token");
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        employee: { role: "admin" },
+      })
+    );
 
     mockFetchRouter();
 
