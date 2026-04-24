@@ -89,7 +89,7 @@ const CustomerLogin = () => {
           <Col md='5' sm='2'>
             <Form className='customerForm fs-3 p-4'>
               <div className=' my-4'><strong>Log In</strong></div>
-              <FormGroup className='mx-5 px-5 my-5 text-start'>
+              <FormGroup className='mx-auto px-auto mx-md-5 px-md-5 my-5 text-start textBox'>
                 <Label for="email">Email</Label>
                 <Input
                   id="email"
@@ -100,7 +100,7 @@ const CustomerLogin = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </FormGroup>
-              <FormGroup className='mx-3vh px-5 my-4vh w-150 text-start'>
+              <FormGroup className='mx-auto px-auto mx-md-5 px-md-5 my-5 text-start textBox'>
                 <Label for="password">Password</Label>
                 <Input
                   id="password"

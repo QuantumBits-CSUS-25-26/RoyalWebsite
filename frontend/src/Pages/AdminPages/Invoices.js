@@ -4,7 +4,10 @@ import { API_BASE_URL } from "../../config";
 import "./AdminInvoices.css";
 
 const authHeaders = () => {
-  const token = sessionStorage.getItem("authToken");
+  const token =
+    sessionStorage.getItem("authToken") ||
+    localStorage.getItem("authToken") ||
+    localStorage.getItem("token");
   const headers = { "Content-Type": "application/json", Accept: "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   return headers;

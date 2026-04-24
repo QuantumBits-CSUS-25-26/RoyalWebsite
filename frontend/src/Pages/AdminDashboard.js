@@ -88,7 +88,17 @@ export default function AdminDashboard() {
         return true;
     };
 
-    // if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+    const isAdmin = (user) => {
+        if (!user) return false;
+        if (user.is_admin || user.is_superuser) return true;
+        if (user.role === "admin") return true;
+        if (Array.isArray(user.roles) && user.roles.includes("admin")) return true;
+        return false;
+    };
+
+    const canEditBusiness = isAdmin(storedUser);
+
+    if (!isAuthorized(storedUser)) return <AuthErrorPage />;
 
     return (
         <section className="admin-dashboard">
@@ -157,18 +167,22 @@ export default function AdminDashboard() {
                             </table>
                         </div>
                     </section>
-                    <section className="admin-recent-customers business-table">
+                    <section className="admin-recent-customers business-table my-3 my-md-5">
                         <div className="rc-header business-header">
                             <h2 id="rc-title">Business Information</h2>
-                           <Button className="edit-business-btn btn btn-lg" onClick={() => setShowEditBusiness(true)}>
-                                Edit
-                            </Button>
-                            <AdminUpdateBusiness
-                                visible={showEditBusiness} 
-                                onClose={() => setShowEditBusiness(false)} 
-                                businessInfo={businessInfo}
-                                setBusinessInfo={setBusinessInfo}
-                            />
+                            {canEditBusiness && (
+                                <>
+                                    <Button className="edit-business-btn btn btn-lg" onClick={() => setShowEditBusiness(true)}>
+                                        Edit
+                                    </Button>
+                                    <AdminUpdateBusiness
+                                        visible={showEditBusiness}
+                                        onClose={() => setShowEditBusiness(false)}
+                                        businessInfo={businessInfo}
+                                        setBusinessInfo={setBusinessInfo}
+                                    />
+                                </>
+                            )}
                         </div>
                         <div className="rc-customer-table">
                             <table className="rc-table">
