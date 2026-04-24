@@ -79,7 +79,7 @@ const SideNavbar = () => {
                     }}
                 >
                   <button>
-                    <img src={Lo} alt="LogoutIcon" style={{ height: 30, width: 30 }} />
+                    <img src={NewsSvg} alt="LogoutIcon" style={{ height: 30, width: 30 }} />
                     Logout
                   </button>
                 </NavLink>
