@@ -67,6 +67,7 @@ const SideNavbar = () => {
                   </button>
                 </NavLink>
               </NavItem>
+
               <NavItem>
                 <NavLink
                     className="nav-link"
