@@ -4,46 +4,6 @@ import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "../../config";
 
-const getStoredToken = () =>
-  sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-
-const getStoredUser = () => {
-  try {
-    const raw = sessionStorage.getItem("user") || localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
-};
-
-const isAuthorized = (user) => {
-  if (!user) return false;
-
-  if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) {
-    return true;
-  }
-
-  if (
-    typeof user.role === "string" &&
-    ["employee", "admin", "staff", "superuser"].includes(user.role.toLowerCase())
-  ) {
-    return true;
-  }
-
-  if (
-    Array.isArray(user.roles) &&
-    user.roles.some((r) =>
-      ["employee", "admin", "staff", "superuser"].includes(
-        String(r).toLowerCase()
-      )
-    )
-  ) {
-    return true;
-  }
-
-  return false;
-};
-
 const DisplayCustomer = ({
   customer,
   services,
@@ -75,12 +35,18 @@ const DisplayCustomer = ({
   const [recMsg, setRecMsg] = useState("");
   const [vehicleMsg, setVehicleMsg] = useState("");
 
-  const { first_name, last_name, email, phone, vehicles = [], appointments = [] } = customer;
+  const {
+    first_name,
+    last_name,
+    email,
+    phone,
+    vehicles = [],
+    appointments = [],
+  } = customer;
 
   const handleBook = async (e) => {
     e.preventDefault();
     setBookMsg("");
-
     const result = await onBookAppointment(customer.customer_id, bookData);
 
     if (result.ok) {
@@ -95,7 +61,6 @@ const DisplayCustomer = ({
   const handleRecommend = async (e) => {
     e.preventDefault();
     setRecMsg("");
-
     const result = await onRecommendServices(customer.customer_id, recData);
 
     if (result.ok) {
@@ -110,7 +75,6 @@ const DisplayCustomer = ({
   const handleAddVehicle = async (e) => {
     e.preventDefault();
     setVehicleMsg("");
-
     const result = await onAddVehicle(customer.customer_id, vehicleData);
 
     if (result.ok) {
@@ -133,7 +97,10 @@ const DisplayCustomer = ({
 
   return (
     <div className={`customer-card ${expanded ? "expanded" : ""}`}>
-      <div className="customer-card-header" onClick={() => setExpanded(!expanded)}>
+      <div
+        className="customer-card-header"
+        onClick={() => setExpanded(!expanded)}
+      >
         <div className="customer-card-summary">
           <h5 style={{ color: "#2F6DAB", margin: 0 }}>
             {first_name} {last_name}
@@ -150,7 +117,10 @@ const DisplayCustomer = ({
           </span>
         </div>
 
-        <div className="customer-card-peek" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="customer-card-peek"
+          onClick={(e) => e.stopPropagation()}
+        >
           {vehicles.length > 0 && (
             <div className="dropdown">
               <button className="dropbtn">Vehicles</button>
@@ -186,7 +156,9 @@ const DisplayCustomer = ({
           )}
         </div>
 
-        <span className="customer-card-chevron">{expanded ? "▲" : "▼"}</span>
+        <span className="customer-card-chevron">
+          {expanded ? "▲" : "▼"}
+        </span>
       </div>
 
       {expanded && (
@@ -464,7 +436,9 @@ const DisplayCustomer = ({
                             : "-"}
                         </td>
                         <td>{a.service_type}</td>
-                        <td>{a.vehicle ? `${a.vehicle.make} ${a.vehicle.model}` : "-"}</td>
+                        <td>
+                          {a.vehicle ? `${a.vehicle.make} ${a.vehicle.model}` : "-"}
+                        </td>
                         <td>{a.cost ? `$${a.cost}` : "-"}</td>
                         <td>{a.finished_at ? "Completed" : "Upcoming"}</td>
                       </tr>
@@ -481,7 +455,39 @@ const DisplayCustomer = ({
 };
 
 const CustomerList = () => {
-  const storedUser = getStoredUser();
+  const parseStoredUser = () => {
+    try {
+      const raw =
+        localStorage.getItem("user") || sessionStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const storedUser = parseStoredUser();
+
+  const isAuthorized = (user) => {
+    const token =
+      sessionStorage.getItem("authToken") ||
+      localStorage.getItem("authToken");
+
+    if (!user && token) return true;
+    if (!user) return false;
+    if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) {
+      return true;
+    }
+    if (user.role && (user.role === "employee" || user.role === "admin")) {
+      return true;
+    }
+    if (
+      Array.isArray(user.roles) &&
+      (user.roles.includes("employee") || user.roles.includes("admin"))
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -499,9 +505,7 @@ const CustomerList = () => {
     const token = getStoredToken();
     const headers = { Accept: "application/json" };
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     Promise.all([
       fetch(`${API_BASE_URL}/api/admin/customers/`, { headers }),
@@ -521,13 +525,48 @@ const CustomerList = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleAddCustomer = async (customerData) => {
+    const token = sessionStorage.getItem("authToken");
+    const headers = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const payload = {
+      first_name: customerData.firstName,
+      last_name: customerData.lastName,
+      email: customerData.email,
+      phone: customerData.phoneNumber,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/customers/`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || data.message || "Failed to add customer.");
+      }
+
+      const created = await res.json();
+
+      setCustomers((prev) => [created, ...prev]);
+      return created;
+    } catch (err) {
+      throw new Error(err.message || "Failed to add customer.");
+    }
+  };
+
   const handleBookAppointment = async (customerId, bookData) => {
     const token = getStoredToken();
     const headers = { "Content-Type": "application/json" };
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
       const res = await fetch(
@@ -567,9 +606,7 @@ const CustomerList = () => {
     const token = getStoredToken();
     const headers = { "Content-Type": "application/json" };
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
       const res = await fetch(
@@ -599,9 +636,7 @@ const CustomerList = () => {
     const token = getStoredToken();
     const headers = { "Content-Type": "application/json" };
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
       const res = await fetch(
@@ -677,6 +712,7 @@ const CustomerList = () => {
   return (
     <section className="admin-dashboard">
       <AdminSideBar />
+
       <div className="admin-dashboard-content ms-md-5">
         <div className="admin-dashboard-header">
           <span className="admin-dashboard-title">Customer Management</span>
@@ -690,6 +726,7 @@ const CustomerList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+
           <select
             className="customer-sort-select"
             value={sortBy}
@@ -743,6 +780,7 @@ const CustomerList = () => {
         <AdminNewCustomer
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}
+          onAddCustomer={handleAddCustomer}
         />
       </div>
     </section>

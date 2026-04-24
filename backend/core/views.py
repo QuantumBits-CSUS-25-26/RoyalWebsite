@@ -719,17 +719,61 @@ class BusinessInformationDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════
 
 class AdminCustomerListView(APIView):
-    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments"""
-    authentication_classes = []  # [CustomJWTAuthentication]  # enable permission check at prod
-    # permission_classes = [IsEmployee]                       # enable permission check at prod
+    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments
+       POST /api/admin/customers/ — creates a new customer
+    """
+    authentication_classes = []  # [CustomJWTAuthentication]
+    # permission_classes = [IsEmployee]
 
     def get(self, request):
         qs = Customer.objects.prefetch_related(
-            'vehicles', 'vehicles__appointments', 'vehicles__appointments__employee',
+            'vehicles',
+            'vehicles__appointments',
+            'vehicles__appointments__employee',
         ).all().order_by('-created_at')
+
         serializer = AdminCustomerDetailSerializer(qs, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        first_name = request.data.get("first_name", "").strip()
+        last_name = request.data.get("last_name", "").strip()
+        email = request.data.get("email", "").strip()
+        phone = request.data.get("phone", "").strip()
+
+        if not first_name:
+            return Response(
+                {"detail": "First name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not last_name:
+            return Response(
+                {"detail": "Last name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not email:
+            return Response(
+                {"detail": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if Customer.objects.filter(email__iexact=email).exists():
+            return Response(
+                {"detail": "A customer with this email already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+        )
+
+        serializer = AdminCustomerDetailSerializer(customer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class AdminBookAppointmentView(APIView):
     """POST /api/admin/customers/<customer_id>/book-appointment/"""
