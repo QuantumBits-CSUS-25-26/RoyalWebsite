@@ -33,6 +33,26 @@
   cursor: pointer;
 }
 
+.brandButton {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0;
+  color: #151F27;
+  font-weight: 500;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.brandButton:hover,
+.brandButton:focus,
+.brandButton:active {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 /* begin side nav bar*/
 
 .Navbar {
