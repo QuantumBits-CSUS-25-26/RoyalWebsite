@@ -167,7 +167,7 @@ export default function AdminDashboard() {
                             </table>
                         </div>
                     </section>
-                    <section className="admin-recent-customers business-table">
+                    <section className="admin-recent-customers business-table my-3 my-md-5">
                         <div className="rc-header business-header">
                             <h2 id="rc-title">Business Information</h2>
                             {canEditBusiness && (

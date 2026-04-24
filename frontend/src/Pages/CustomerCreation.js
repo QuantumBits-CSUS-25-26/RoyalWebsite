@@ -117,7 +117,7 @@ const CustomerCreation = () => {
             <Form className="customerForm fs-3 p-4" onSubmit={handleSubmit} noValidate>
               <div className="my-4"><strong>Sign Up</strong></div>
               <Row className="justify-content-center">
-                <Col xs={12} sm={10} md={8} lg={6}>
+                {/* <Col xs={12} sm={10} md={8} lg={6}> */}
                   <FormGroup className="my-3 text-start">
                     <Label for="fname">First Name</Label>
                     <Input
@@ -198,9 +198,9 @@ const CustomerCreation = () => {
                     />
                     {errors.confirmPassword && <div className="text-danger small">{errors.confirmPassword}</div>}
                   </FormGroup>
-                </Col>
+                {/* </Col> */}
               </Row>
-              <Button type="submit" className="btn btn-lg my-4 py-4">
+              <Button type="submit" className="btn btn-lg my-4 py-4 px-5">
                 Sign Up
               </Button>
               <div className="mt-3 mb-4" style={{ fontSize: '1rem' }}>

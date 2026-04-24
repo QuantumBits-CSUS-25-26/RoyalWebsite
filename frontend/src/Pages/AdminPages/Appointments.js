@@ -7,6 +7,18 @@ import AuthErrorPage from "../../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../../config";
 
 const Appointments = () => {
+  const getAuthToken = () =>
+    sessionStorage.getItem("authToken") ||
+    localStorage.getItem("authToken") ||
+    localStorage.getItem("token");
+
+  const toApiDateTime = (value) => {
+    if (!value) return "";
+    const dt = new Date(value);
+    if (Number.isNaN(dt.getTime())) return value;
+    return dt.toISOString();
+  };
+
   // determine authorization from stored user object
   const parseStoredUser = () => {
     try {
@@ -21,7 +33,7 @@ const Appointments = () => {
 
   const isAuthorized = (user) => {
     // if a token exists assume authenticated and allow; stored user may not be saved by login flow
-    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    const token = getAuthToken();
     if (!user && token) return true;
     if (!user) return false;
     if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) return true;
@@ -40,7 +52,7 @@ const Appointments = () => {
   const [customerInput, setCustomerInput] = useState("");
 
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
+    const token = getAuthToken();
     const headers = { Accept: "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -93,7 +105,7 @@ const Appointments = () => {
       }
     }
 
-    const token = sessionStorage.getItem("authToken");
+    const token = getAuthToken();
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -101,10 +113,10 @@ const Appointments = () => {
     const total = lineItems.reduce((s, l) => s + (parseFloat(l.cost) || 0), 0);
 
     const payload = {
-      vehicle: newAppointment.vehicle,
+      vehicle: Number(newAppointment.vehicle),
       service_type: serviceTypeSummary,
       cost: total.toFixed(2),
-      scheduled_at: newAppointment.datetime,
+      scheduled_at: toApiDateTime(newAppointment.datetime),
       lines: lineItems.map((l) => ({ name: l.name.trim(), cost: parseFloat(l.cost) || 0 })),
     };
 
@@ -128,17 +140,15 @@ const Appointments = () => {
           time: created.scheduled_at ? created.scheduled_at.split("T")[1]?.slice(0, 5) : "",
         };
         setAppointments((prev) => [...prev, normalized]);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Failed to create appointment");
-      })
-      .finally(() => {
         setShowModal(false);
         setNewAppointment({ name: "", description: "", vehicle: "", datetime: "", paymentStatus: "Pending" });
         setCustomerInput("");
         setLineItems([]);
         setCatalogPick("");
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Failed to create appointment");
       });
   };
 
@@ -148,7 +158,7 @@ const Appointments = () => {
 
   const handleDelete = (id) => {
     if (!window.confirm("Delete this appointment?")) return;
-    const token = sessionStorage.getItem("authToken");
+    const token = getAuthToken();
     const headers = { Accept: "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -303,13 +313,13 @@ const Appointments = () => {
                         alert("No appointment id available");
                         return;
                       }
-                      const token = sessionStorage.getItem("authToken");
+                      const token = getAuthToken();
                       const headers = { "Content-Type": "application/json" };
                       if (token) headers["Authorization"] = `Bearer ${token}`;
                       fetch(`${API_BASE_URL}/api/invoices/`, {
                         method: "POST",
                         headers,
-                        body: JSON.stringify({ appointment: apptId, status: "pending" }),
+                        body: JSON.stringify({ appointment: Number(apptId), status: "pending" }),
                       })
                         .then(async (res) => {
                           const body = await res.json().catch(() => null);
