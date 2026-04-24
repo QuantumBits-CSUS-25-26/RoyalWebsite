@@ -10,7 +10,14 @@ import '../App.css';
 
 const SideNavbar = () => {
   const { setServiceOpen, openServices } = useUi();
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
 
+    window.location.href = "/login";
+  };
 
   return (
     <div className ="Navbar d-none d-md-block">
@@ -60,6 +67,23 @@ const SideNavbar = () => {
                   </button>
                 </NavLink>
               </NavItem>
+              <NavItem>
+                <NavLink
+                    className="nav-link"
+                    to="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setServiceOpen(false);
+                      handleLogout();
+                    }}
+                >
+                  <button>
+                    <img src={Lo} alt="LogoutIcon" style={{ height: 30, width: 30 }} />
+                    Logout
+                  </button>
+                </NavLink>
+              </NavItem>
+
             </div>
           </Nav>
         </Container>
