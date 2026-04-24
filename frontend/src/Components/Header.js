@@ -17,7 +17,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { setServiceOpen } = useUi();
 
-  // ✅ use shared mobile nav state (so other components can open it)
+  //  use shared mobile nav state (so other components can open it)
   const { mobileNavOpen, toggleMobileNav, closeMobileNav } = useMobileNav();
 
   const closeAll = useCallback(() => {
