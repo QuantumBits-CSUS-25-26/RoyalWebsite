@@ -134,15 +134,6 @@ const CustomerReviews = () => {
                     );
                 })}
             </div>
-
-            <div className="appointment-section">
-                <button className="book-appointment-btn">
-                    Book Appointment
-                </button>
-                <a href="#services" className="view-services-link">
-                    View All Services
-                </a>
-            </div>
         </section>
     );
 };
