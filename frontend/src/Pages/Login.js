@@ -1,153 +1,205 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Login.css";
 import carImage from "../images/login-car.jpg";
 import logo from "../images/logo.png";
 
 function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [submitting, setSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-    const validateEmail = (value) => {
-        if (!value) return "Email is required.";
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) return "Please enter a valid email address.";
-        return "";
+  // -----------------------------
+  // AUTO‑REDIRECT IF ALREADY LOGGED IN
+  // -----------------------------
+  useEffect(() => {
+    const token =
+        localStorage.getItem("authToken") ||
+        sessionStorage.getItem("authToken");
+
+    if (token) {
+      window.location.href = "/customer-dashboard";
+    }
+  }, []);
+
+  // -----------------------------
+  // VALIDATORS
+  // -----------------------------
+  const validateEmail = (value) => {
+    if (!value) return "Email is required.";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) return "Enter a valid email.";
+    return "";
+  };
+
+  const validatePassword = (value) => {
+    if (!value) return "Password is required.";
+    if (value.length < 8) return "Password must be at least 8 characters.";
+    return "";
+  };
+
+  // -----------------------------
+  // HELPER FUNCTIONS
+  // -----------------------------
+
+  // SIMPLE, BABEL-FRIENDLY COOKIE READER
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(";").shift();
+    }
+    return null;
+  };
+
+  const clearOldAuthStorage = () => {
+    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+  };
+
+  // -----------------------------
+  // LOGIN SUBMIT
+  // -----------------------------
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    const emailErr = validateEmail(email);
+    const passErr = validatePassword(password);
+
+    if (emailErr || passErr) {
+      setError(emailErr || passErr);
+      return;
+    }
+
+    setSubmitting(true);
+
+    const payload = {
+      email: email.trim(),
+      password,
     };
 
-    const validatePassword = (value) => {
-        if (!value) return "Password is required.";
-        if (value.length < 8) return "Password must be at least 8 characters.";
-        return "";
-    };
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
 
-    const getCookie = (name) => {
-        const matches = document.cookie.match(new RegExp(
-            "(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + "=([^;]*)"
-        ));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
-    };
+      const csrftoken = getCookie("csrftoken");
+      if (csrftoken) headers["X-CSRFToken"] = csrftoken;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log("Email:", email, "Password:", password);
-        setError("");
+      const res = await fetch("/api/login/", {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
-        const emailError = validateEmail(email);
-        const passwordError = validatePassword(password);
+      if (res.ok) {
+        const data = await res.json();
 
-        if (emailError || passwordError) {
-            setError(emailError || passwordError);
-            setSubmitting(false);
-            return;
-        }
-        else {
-            setSubmitting(true);
-        }
+        const user =
+            data.employee || data.user || data.staff || data.admin || null;
 
+        const storage = rememberMe ? localStorage : sessionStorage;
 
-        const payload = {
-            email: email.trim(),
-            password: password,
-        };
+        clearOldAuthStorage();
 
-        console.log("Prepared payload for API:", payload); 
+        if (data.token) storage.setItem("authToken", data.token);
+        if (user) storage.setItem("user", JSON.stringify(user));
 
-        const endpoint = "/api/login/";
+        const goTo = data.redirect || "/customer-dashboard";
+        window.location.href = goTo;
+        return;
+      }
 
-        try {
-            const headers = {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-            };
-            const csrftoken = getCookie("csrftoken");
-            if (csrftoken) headers["X-CSRFToken"] = csrftoken;
+      if (res.status === 400 || res.status === 401) {
+        const errorData = await res.json();
+        setError(
+            errorData?.detail ||
+            errorData?.error ||
+            errorData?.message ||
+            "Invalid email or password."
+        );
+      } else {
+        setError("Server error. Please try again later.");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("Network error. Check connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-            const res = await fetch(endpoint, {
-                method: "POST",
-                headers,
-                body: JSON.stringify(payload),
-                credentials: "include", 
-            });
+  // -----------------------------
+  // RENDER
+  // -----------------------------
+  return (
+      <div className="login-page">
+        <div className="login-left">
+          <div className="login-header">
+            <img src={logo} alt="Royal Auto" className="login-logo" />
+            <h2>Royal Auto – Login</h2>
+          </div>
 
-            if (res.ok) {
-                const data = await res.json().catch(() => ({}));
+          <form className="login-form" onSubmit={handleSubmit}>
+            <h3>Login</h3>
 
-                if (data.token) {
-                    sessionStorage.setItem("authToken", data.token);
-                }
-
-                window.location.href = data.redirect || "/dashboard";
-                return;
-            }
-             if (res.status === 400 || res.status === 401) {
-                const errData = await res.json().catch(() => null);
-                const message = errData?.detail || errData?.error || errData?.message || "Invalid email or password.";
-                setError(message);
-            } else {
-                setError("Server error. Please try again later.");
-            }
-        } catch (err) {
-            console.error("Login request failed:", err);
-            setError("Network error. Please check your connection and try again.");
-        } finally {
-            setSubmitting(false);
-        }
-
-    };
-
-    return (
-        <div className="login-page">
-            <div className="login-left">
-                <div className="login-header">
-                    <img src={logo} alt="Royal Auto Logo" className="login-logo" />
-                    <h2>Royal Auto – Staff Login</h2>
+            {error && (
+                <div className="form-error" role="alert">
+                  {error}
                 </div>
+            )}
 
-                <form className="login-form" onSubmit={handleSubmit}>
-                    <h3>Login</h3>
+            <label>Email</label>
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError("");
+                }}
+            />
 
-                    {error && <div className="form-error" role="alert">{error}</div>}
+            <label>Password</label>
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError("");
+                }}
+            />
 
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        aria-invalid={!!validateEmail(email)}
-                    />
-
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        aria-invalid={!!validatePassword(password)}
-                    />
-
-                    <div className="remember">
-                        <label className="switch">
-                            <input type="checkbox" id="remember" />
-                            <span class="slider round"></span>
-                        </label>
-                        <label className="remember-label" htmlFor="remember">Remember me</label>
-                    </div>
-                    <button type="submit" disabled={!submitting}>{submitting ? "Signing in..." : "SIGN IN"}</button>
-                </form>
+            <div className="remember">
+              <label className="switch">
+                <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <span className="slider round"></span>
+              </label>
+              <label className="remember-label">Remember me</label>
             </div>
 
-
-            <div className="login-right">
-                <img src={carImage} alt="Car" />
-            </div>
+            <button type="submit" disabled={submitting}>
+              {submitting ? "Signing in..." : "SIGN IN"}
+            </button>
+          </form>
         </div>
-    );
+
+        <div className="login-right">
+          <img src={carImage} alt="Car" />
+        </div>
+      </div>
+  );
 }
 
 export default Login;

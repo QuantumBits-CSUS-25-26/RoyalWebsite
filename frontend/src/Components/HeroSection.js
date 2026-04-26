@@ -21,7 +21,7 @@ export default function HeroSection() {
             <div className="hero-overlay" aria-hidden="true" />
             <div className="hero-content">
                 <h1 className="hero-title">{businessInfo?.name || 'Royal Auto and Body Repair'}</h1>
-                <NavLink to="/admin">
+                <NavLink to="/appointments">
                     <button className="HeroBookingButton">Book an Appointment</button>
                 </NavLink>
             </div>

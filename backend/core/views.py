@@ -1,9 +1,14 @@
 import os
+from urllib import request
 import requests as http_requests  # renamed to avoid clash with DRF request
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.hashers import make_password, check_password
 from dotenv import load_dotenv
+from django.db.models import Q
+from datetime import datetime
+import calendar
+
 
 from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -12,7 +17,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -26,6 +31,9 @@ from .serializer import (
     BusinessInformationSerializer,
     ServiceRecommendationReadSerializer,
     AdminCustomerDetailSerializer,
+    InvoiceSerializer,
+    InvoiceReadSerializer,
+    MessageSerializer
 )
 from django.utils import timezone
 import datetime
@@ -346,6 +354,9 @@ class AppointmentListCreateView(APIView):
             qs = Appointment.objects.filter(vehicle_id__in=vehicle_ids)
         else:
             qs = Appointment.objects.all()
+        qs = qs.select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines')
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
 
@@ -475,10 +486,6 @@ class AppointmentListCreateView(APIView):
             status=status.HTTP_201_CREATED,
         )
 
-
-
-
-
 class AppointmentDetailView(APIView):
     """
     GET / PUT / DELETE  /api/appointments/<appointment_id>/
@@ -488,7 +495,9 @@ class AppointmentDetailView(APIView):
 
     def _get_appointment(self, request, appointment_id):
         try:
-            appt = Appointment.objects.get(appointment_id=appointment_id)
+            appt = Appointment.objects.select_related(
+                'vehicle', 'vehicle__customer', 'employee',
+            ).prefetch_related('lines').get(appointment_id=appointment_id)
         except Appointment.DoesNotExist:
             return None
 
@@ -519,7 +528,124 @@ class AppointmentDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         appt.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# ══════════════════════════════════════════════════════════════════
+#  Invoices
+# ══════════════════════════════════════════════════════════════════
+
+class InvoiceListCreateView(APIView):
+    """
+    GET  /api/invoices/   → list invoices
+    POST /api/invoices/   → create invoice
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [permissions.AllowAny]  # TODO: change to IsEmployee or IsAdmin in production
+
+    def get(self, request):
+        qs = Invoice.objects.select_related(
+            'appointment',
+            'appointment__vehicle',
+            'appointment__vehicle__customer',
+            'appointment__employee',
+        ).prefetch_related('lines', 'appointment__lines').all().order_by('-created_at')
+
+        status_filter = request.query_params.get('status')
+        month_filter = request.query_params.get('month')
+        year_filter = request.query_params.get('year')
+        search = request.query_params.get('search', '').strip()
+
+        if status_filter:
+            qs = qs.filter(status__iexact=status_filter)
+
+        if month_filter and month_filter.isdigit():
+            qs = qs.filter(appointment__scheduled_at__month=int(month_filter))
+
+        if year_filter and year_filter.isdigit():
+            qs = qs.filter(appointment__scheduled_at__year=int(year_filter))
+
+        if search:
+            text_q = (
+                Q(appointment__vehicle__customer__first_name__icontains=search) |
+                Q(appointment__vehicle__customer__last_name__icontains=search) |
+                Q(appointment__vehicle__make__icontains=search) |
+                Q(appointment__vehicle__model__icontains=search) |
+                Q(lines__name__icontains=search) |
+                Q(appointment__service_type__icontains=search) |
+                Q(status__icontains=search)
+            )
+            qs = qs.filter(text_q).distinct()
+
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 4))
+
+        start = (page - 1) * page_size
+        end = start + page_size
+
+        total_count = qs.count()
+        invoices = qs[start:end]
+
+        serializer = InvoiceReadSerializer(invoices, many=True)
+
+        return Response({
+            'count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'results': serializer.data,
+        })
+
+    def post(self, request):
+        serializer = InvoiceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            InvoiceReadSerializer(serializer.instance).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class InvoiceDetailView(APIView):
+    """
+    GET / PUT / DELETE  /api/invoices/<invoice_id>/
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [permissions.AllowAny]  # TODO: change to IsEmployee or IsAdmin in production
+
+    def _get_invoice(self, invoice_id):
+        try:
+            return Invoice.objects.select_related(
+                'appointment',
+                'appointment__vehicle',
+                'appointment__vehicle__customer',
+                'appointment__employee',
+            ).prefetch_related('lines', 'appointment__lines').get(invoice_id=invoice_id)
+        except Invoice.DoesNotExist:
+            return None
+
+    def get(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(InvoiceReadSerializer(invoice).data)
+
+    def put(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = InvoiceSerializer(invoice, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(InvoiceReadSerializer(serializer.instance).data)
+
+    def delete(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        invoice.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
+ 
 # ══════════════════════════════════════════════════════════════════
 #  Business Information
 # ══════════════════════════════════════════════════════════════════
@@ -586,22 +712,68 @@ class BusinessInformationDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
+
 # ══════════════════════════════════════════════════════════════════
 #  Admin-only list views
 # ══════════════════════════════════════════════════════════════════
 
 class AdminCustomerListView(APIView):
-    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments"""
-    authentication_classes = []  # [CustomJWTAuthentication]  # enable permission check at prod
-    # permission_classes = [IsEmployee]                       # enable permission check at prod
+    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments
+       POST /api/admin/customers/ — creates a new customer
+    """
+    authentication_classes = []  # [CustomJWTAuthentication]
+    # permission_classes = [IsEmployee]
 
     def get(self, request):
         qs = Customer.objects.prefetch_related(
-            'vehicles', 'vehicles__appointments', 'vehicles__appointments__employee',
+            'vehicles',
+            'vehicles__appointments',
+            'vehicles__appointments__employee',
         ).all().order_by('-created_at')
+
         serializer = AdminCustomerDetailSerializer(qs, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        first_name = request.data.get("first_name", "").strip()
+        last_name = request.data.get("last_name", "").strip()
+        email = request.data.get("email", "").strip()
+        phone = request.data.get("phone", "").strip()
+
+        if not first_name:
+            return Response(
+                {"detail": "First name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not last_name:
+            return Response(
+                {"detail": "Last name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not email:
+            return Response(
+                {"detail": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if Customer.objects.filter(email__iexact=email).exists():
+            return Response(
+                {"detail": "A customer with this email already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+        )
+
+        serializer = AdminCustomerDetailSerializer(customer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class AdminBookAppointmentView(APIView):
     """POST /api/admin/customers/<customer_id>/book-appointment/"""
@@ -768,7 +940,9 @@ class AdminAppointmentListView(APIView):
     permission_classes = [IsEmployee]
 
     def get(self, request):
-        qs = Appointment.objects.all()
+        qs = Appointment.objects.select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines').all()
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
 
@@ -861,15 +1035,96 @@ class ContactMessageView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        required = ['fname', 'lname', 'email', 'message']
-        missing = [f for f in required if not request.data.get(f)]
-        if missing:
-            return Response(
-                {'detail': f'Missing fields: {", ".join(missing)}'},
-                status=status.HTTP_400_BAD_REQUEST,
+        serializer = MessageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AdminMessageListView(APIView):
+    """GET /api/admin/messages/ — paginated, filterable list for admins.
+
+    Query params:
+      read        true|false - filter by read status
+      search      text - icontains across name, email, phone, message body
+      ordering    -created_at | last_name,first_name | email
+      page        1-based page number (default 1)
+      page_size   items per page, capped at 100 (default 20)
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    _DEFAULT_PAGE_SIZE = 20
+    _ALLOWED_ORDERINGS = {'-created_at', 'created_at', 'first_name,last_name', 'email'}
+
+    def get(self, request):
+        qs = Messsage.objects.all()
+
+        read_param = request.query_params.get('read')
+        if read_param is not None:
+            qs = qs.filter(read=(read_param.lower() == 'true'))
+
+        search = request.query_params.get('search', '').strip()
+        if search:
+            qs = qs.filter(
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone_number__icontains=search) |
+                Q(message__icontains=search)
             )
-        # TODO: store in a Message model or send email
-        return Response({'detail': 'Message received.'}, status=status.HTTP_201_CREATED)
+
+        ordering = request.query_params.get('ordering', '-created_at')
+        if ordering not in self._ALLOWED_ORDERINGS:
+            ordering = '-created_at'
+        qs = qs.order_by(*ordering.split(','))
+
+        try:
+            page = max(1, int(request.query_params.get('page', 1)))
+            page_size = min(100, max(1, int(
+                request.query_params.get('page_size', self._DEFAULT_PAGE_SIZE)
+            )))
+        except (ValueError, TypeError):
+            page, page_size = 1, self._DEFAULT_PAGE_SIZE
+
+        total = qs.count()
+        offset = (page - 1) * page_size
+        results = qs[offset:offset + page_size]
+
+        return Response({
+            'count': total,
+            'has_next': (page * page_size) < total,
+            'results': MessageSerializer(results, many=True).data,
+        })
+
+
+class AdminMessageDetailView(APIView):
+    """PATCH/DELETE /api/admin/messages/<message_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    def get_object(self, message_id):
+        try:
+            return Messsage.objects.get(pk=message_id)
+        except Messsage.DoesNotExist:
+            return None
+
+    def patch(self, request, message_id):
+        msg = self.get_object(message_id)
+        if not msg:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = MessageSerializer(msg, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, message_id):
+        msg = self.get_object(message_id)
+        if not msg:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        msg.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class AdminDashboardTotalsView(APIView):
     """GET /api/admin/dashboard-totals/"""
@@ -878,7 +1133,7 @@ class AdminDashboardTotalsView(APIView):
     def get(self, request):
         total_customers = Customer.objects.count()
         total_appointments = Appointment.objects.count()
-        total_messages = 0  # Placeholder since messages aren't stored yet
+        total_messages = Messsage.objects.count()
         total_services = SiteService.objects.count()
         return Response({
             'total_customers': total_customers,
@@ -970,7 +1225,9 @@ class VehicleServiceHistoryView(APIView):
         except Vehicle.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        appointments = Appointment.objects.filter(vehicle=vehicle).order_by('-scheduled_at')
+        appointments = Appointment.objects.filter(vehicle=vehicle).select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines').order_by('-scheduled_at')
         data = [
             {
                 'service_type': appt.service_type,

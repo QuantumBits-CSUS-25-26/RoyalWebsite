@@ -57,6 +57,69 @@ class Employee(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.role})'
 
+class Messsage(models.Model):
+    message_id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField()
+    message = models.TextField()
+    response = models.BooleanField(default=False)
+    current_customer = models.BooleanField(default=False)
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.email}: {self.message[:50]}"
+
+class Invoice(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+    ]
+
+    invoice_id = models.AutoField(primary_key=True)
+    appointment = models.OneToOneField(
+        'Appointment',
+        on_delete=models.CASCADE,
+        related_name='invoice',
+    )
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    due_date = models.DateField(null=True, blank=True)
+    notes = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'invoice'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Invoice #{self.invoice_id} – {self.appointment} – {self.status}'
+
+
+class InvoiceLineItem(models.Model):
+    """A single service/cost line on an invoice. Name is free-form so
+    custom (unique) services can be added without polluting SiteService.
+    """
+    line_id = models.AutoField(primary_key=True)
+    invoice = models.ForeignKey(
+        'Invoice',
+        on_delete=models.CASCADE,
+        related_name='lines',
+    )
+    name = models.CharField(max_length=200)
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        db_table = 'invoice_line_item'
+        ordering = ['line_id']
+
+    def __str__(self):
+        return f'{self.name} (${self.cost})'
 
 class Appointment(models.Model):
     """
@@ -94,6 +157,28 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f'{self.service_type} – {self.vehicle} @ {self.scheduled_at}'
+
+
+class AppointmentLineItem(models.Model):
+    """A single service/cost line on an appointment. Mirrors InvoiceLineItem
+    so appointments can be scheduled with multiple services at custom prices.
+    """
+    line_id = models.AutoField(primary_key=True)
+    appointment = models.ForeignKey(
+        'Appointment',
+        on_delete=models.CASCADE,
+        related_name='lines',
+    )
+    name = models.CharField(max_length=200)
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        db_table = 'appointment_line_item'
+        ordering = ['line_id']
+
+    def __str__(self):
+        return f'{self.name} (${self.cost})'
+
 
 class SiteService(models.Model):
     service_id = models.AutoField(primary_key=True)

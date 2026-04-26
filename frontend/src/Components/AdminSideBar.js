@@ -35,7 +35,7 @@ export default function AdminSideBar() {
             <div className='adminNav d-none d-md-flex'>
                 <Navbar className='navbar rounded'>
                     <NavbarBrand className='ms-5 ps-2' href='/'>
-                        <img src={Logo} alt='business logo' style={{ height: '85px', marginLeft: '30px' }} />
+                        <img src={Logo} alt='business logo' style={{ height: '85px'}} />
                     </NavbarBrand>
                     <Container>
                         <Nav vertical>

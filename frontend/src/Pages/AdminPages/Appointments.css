@@ -84,3 +84,29 @@
 
     background: #de1a1a !important;
 }
+
+/* Multi-service selection + tooltip services */
+.modal-services-group { display: flex; flex-direction: column; gap: 6px; }
+.modal-services-label { font-size: 13px; font-weight: 600; color: #e5e7eb; }
+.modal-services-list { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto; background: #1f2937; padding: 8px 10px; border-radius: 8px; border: 1px solid #374151; }
+.modal-services-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #e5e7eb; cursor: pointer; }
+.modal-services-item input[type="checkbox"] { cursor: pointer; }
+.modal-services-total { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+.tooltip-services { margin-top: 8px; }
+.tooltip-services-list { list-style: none; padding: 0; margin: 0 0 6px 0; display: flex; flex-direction: column; gap: 4px; }
+.tooltip-services-list li { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.tooltip-services-total { font-size: 13px; font-weight: 600; color: #22c55e; text-align: right; }
+
+/* Pointer cursor for clickable calendar events */
+.fc .fc-event, .fc .fc-event * { cursor: pointer; }
+
+/* Appointments page header (matches Invoices styling) */
+.admin-appointments-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; padding: 0 4px; }
+.admin-appointments-title { font-size: 28px; font-weight: 600; color: #2d358d; margin: 0; }
+.admin-appointments-btn-primary { background: #2f6dab; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(47,109,171,0.25); transition: background 0.15s, transform 0.1s; }
+.admin-appointments-btn-primary:hover { background: #2563a8; }
+
+/* Page layout (mirrors Messages page) */
+.admin-appointments-layout { display: flex; flex-direction: row; align-items: flex-start; gap: 20px; padding: 20px 24px 48px 16px; min-height: 100vh; box-sizing: border-box; background: #f8f9fa; }
+.admin-appointments-main { flex: 1; min-width: 0; position: relative; z-index: 1; }
+.admin-appointments-wrap { margin: 0; max-width: 100%; padding-bottom: 24px; text-align: left; }
