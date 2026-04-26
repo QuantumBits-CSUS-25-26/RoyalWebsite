@@ -78,9 +78,6 @@ const sampleService = [
 ]
 
 
-
-
-
 const CustomerDashboard = () => {
   
 
@@ -207,6 +204,9 @@ const CustomerDashboard = () => {
     navigate("/account-update");
   };
 
+  const handleBookAppointment = () => {
+    navigate("/appointments");
+  };
 
   // for testing: sample data overwrites API data
   /*
@@ -410,7 +410,11 @@ const CustomerDashboard = () => {
                     </Button>
                   </Row>
                   <Row className="mb-4">
-                    <Button type="button" className="btn btn-lg py-4">
+                    <Button
+                      type="button"
+                      className="btn btn-lg py-4"
+                      onClick={handleBookAppointment}
+                    >
                       Book an Appointment
                     </Button>
                   </Row>

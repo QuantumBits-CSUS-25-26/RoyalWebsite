@@ -2,9 +2,9 @@ import './Homepage.css';
 import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import AuthErrorPage from "../Components/AuthErrorPage/AuthErrorPage";
+import { API_BASE_URL } from "../config";
 
 const currentEntries = [
   {
@@ -18,28 +18,27 @@ const currentEntries = [
 ];
 
 const CustomerUpdate = () => {
-  //const navigate = useNavigate();
- const parseStoredUser = () => {
-        try {
-            const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
-            return raw ? JSON.parse(raw) : null;
-        } catch (e) {
-            return null;
-        }
-    };
+  const parseStoredUser = () => {
+    try {
+      const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  };
 
-    const storedUser = parseStoredUser();
+  const storedUser = parseStoredUser();
 
-    const isAuthorized = (user) => {
-        // if a token exists assume authenticated and allow; stored user may not be saved by login flow
-        const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-        if (!user && token) return true;
-        if (!user) return false;
-        if (user.is_customer || user.is_superuser) return true;
-        if (user.role && (user.role === "customer")) return true;
-        if (Array.isArray(user.roles) && (user.roles.includes("customer"))) return true;
-        return false;
-    };
+  const isAuthorized = (user) => {
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    if (!user && token) return true;
+    if (!user) return false;
+    if (user.is_customer || user.is_superuser) return true;
+    if (user.role === "customer") return true;
+    if (Array.isArray(user.roles) && user.roles.includes("customer")) return true;
+    return false;
+  };
+
   const [formValues, setFormValues] = useState({
     firstName: currentEntries[0].firstName,
     lastName: currentEntries[0].lastName,
@@ -53,7 +52,7 @@ const CustomerUpdate = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormValues(prev => ({ ...prev, [name]: value }));
+    setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleUpdate = async (e) => {
@@ -61,26 +60,31 @@ const CustomerUpdate = () => {
 
     const nextErrors = {};
 
-    if (!formValues.firstName) nextErrors.firstName = "First name required";
-    if (!formValues.lastName) nextErrors.lastName = "Last name required";
-    if (!formValues.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) nextErrors.email = "Invalid email";
-    if (!formValues.phoneNumber.match(/^\d{3}-\d{3}-\d{4}$/)) nextErrors.phoneNumber = "Invalid phone number";
+    if (!formValues.firstName.trim()) nextErrors.firstName = "First name required";
+    if (!formValues.lastName.trim()) nextErrors.lastName = "Last name required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) nextErrors.email = "Invalid email";
+    if (!/^\d{3}-\d{3}-\d{4}$/.test(formValues.phoneNumber)) nextErrors.phoneNumber = "Invalid phone number";
     if (formValues.password && formValues.password.length < 8) nextErrors.password = "Password must be 8+ chars";
     if (formValues.password !== formValues.confirmPassword) nextErrors.confirmPassword = "Passwords do not match";
 
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) return;
+    if (Object.keys(nextErrors).length > 0) return;
 
-    // Send API
     try {
+      const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+
       const response = await axios.put(
-          `http://127.0.0.1:8000/api/customers/update/${currentEntries[0].id}/`,
-          formValues
+        `${API_BASE_URL}/api/customers/update/${currentEntries[0].id}/`,
+        formValues,
+        {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          }
+        }
       );
+
       console.log("Customer updated:", response.data);
       alert("Update successful!");
-      // Optionally navigate
-      // navigate("/dashboard");
     } catch (err) {
       console.error("Update failed:", err);
       alert("Update failed");
@@ -88,109 +92,99 @@ const CustomerUpdate = () => {
   };
 
   if (!isAuthorized(storedUser)) return <AuthErrorPage />;
-  
-
 
   return (
-      <div className="customerUpdate">
-        <div className="title">
-          <Row className='justify-content-center'>
-            <Col md='10' sm='2'>
-              <Form className='updateForm fs-3 p-4 rounded-3 mt-4' onSubmit={handleUpdate}>
-                <div className=' my-4'>Update Account Information</div>
+    <div className="customerUpdate">
+      <Row className="justify-content-center">
+        <Col md="10" sm="12">
+          <Form className="updateForm fs-3 p-4 rounded-3 mt-4" onSubmit={handleUpdate}>
+            <div className="my-4">Update Account Information</div>
 
-                <FormGroup className='mx-5 px-5 my-3 text-start'>
-                  <Label for="firstName">First Name</Label>
-                  <Input
-                      id="firstName"
-                      name="firstName"
-                      placeholder="Enter First Name"
-                      type="text"
-                      value={formValues.firstName}
-                      onChange={handleChange}
-                      invalid={!!errors.firstName}
-                  />
-                  {errors.firstName && <div className="text-danger">{errors.firstName}</div>}
-                </FormGroup>
+            <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Label for="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                value={formValues.firstName}
+                onChange={handleChange}
+                invalid={!!errors.firstName}
+              />
+              {errors.firstName && <div className="text-danger">{errors.firstName}</div>}
+            </FormGroup>
 
-                <FormGroup className='mx-5 px-5 my-3 text-start'>
-                  <Label for="lastName">Last Name</Label>
-                  <Input
-                      id="lastName"
-                      name="lastName"
-                      placeholder="Enter Last Name"
-                      type="text"
-                      value={formValues.lastName}
-                      onChange={handleChange}
-                      invalid={!!errors.lastName}
-                  />
-                  {errors.lastName && <div className="text-danger">{errors.lastName}</div>}
-                </FormGroup>
+            <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Label for="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={formValues.lastName}
+                onChange={handleChange}
+                invalid={!!errors.lastName}
+              />
+              {errors.lastName && <div className="text-danger">{errors.lastName}</div>}
+            </FormGroup>
 
-                <FormGroup className='mx-5 px-5 my-3 text-start'>
-                  <Label for="email">Email</Label>
-                  <Input
-                      id="email"
-                      name="email"
-                      placeholder="Enter Email"
-                      type="email"
-                      value={formValues.email}
-                      onChange={handleChange}
-                      invalid={!!errors.email}
-                  />
-                  {errors.email && <div className="text-danger">{errors.email}</div>}
-                </FormGroup>
+            <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Label for="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formValues.email}
+                onChange={handleChange}
+                invalid={!!errors.email}
+              />
+              {errors.email && <div className="text-danger">{errors.email}</div>}
+            </FormGroup>
 
-                <FormGroup className='mx-5 px-5 my-3 text-start'>
-                  <Label for="phoneNumber">Phone Number</Label>
-                  <Input
-                      id="phoneNumber"
-                      name="phoneNumber"
-                      placeholder="123-456-7890"
-                      type="tel"
-                      value={formValues.phoneNumber}
-                      onChange={handleChange}
-                      invalid={!!errors.phoneNumber}
-                  />
-                  {errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
-                </FormGroup>
+            <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Label for="phoneNumber">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                value={formValues.phoneNumber}
+                onChange={handleChange}
+                invalid={!!errors.phoneNumber}
+              />
+              {errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
+            </FormGroup>
 
-                <FormGroup className='mx-5 px-5 my-3 text-start'>
-                  <Label for="password">New Password</Label>
-                  <Input
-                      id="password"
-                      name="password"
-                      placeholder="Enter New Password"
-                      type="password"
-                      value={formValues.password}
-                      onChange={handleChange}
-                      invalid={!!errors.password}
-                  />
-                  {errors.password && <div className="text-danger">{errors.password}</div>}
-                </FormGroup>
+            <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Label for="password">New Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formValues.password}
+                onChange={handleChange}
+                invalid={!!errors.password}
+              />
+              {errors.password && <div className="text-danger">{errors.password}</div>}
+            </FormGroup>
 
-                <FormGroup className='mx-5 px-5 my-3 text-start'>
-                  <Label for="confirmPassword">Confirm New Password</Label>
-                  <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      type="password"
-                      value={formValues.confirmPassword}
-                      onChange={handleChange}
-                      invalid={!!errors.confirmPassword}
-                  />
-                  {errors.confirmPassword && <div className="text-danger">{errors.confirmPassword}</div>}
-                </FormGroup>
+            <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Label for="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formValues.confirmPassword}
+                onChange={handleChange}
+                invalid={!!errors.confirmPassword}
+              />
+              {errors.confirmPassword && <div className="text-danger">{errors.confirmPassword}</div>}
+            </FormGroup>
 
-                <Button type='submit' className='btn btn-lg my-4 py-4'>
-                  Update
-                </Button>
-              </Form>
-            </Col>
-          </Row>
-        </div>
-      </div>
+            <Button type="submit" className="btn btn-lg my-4 py-4">
+              Update
+            </Button>
+          </Form>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

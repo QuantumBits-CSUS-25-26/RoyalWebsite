@@ -16,7 +16,15 @@ const NewVehiclePopUp = ({ isOpen, onClose, onVehicleAdded }) =>{
     e.preventDefault();
     setVehicleError('');
     setAddingVehicle(true);
-    const token = sessionStorage.getItem('authToken');
+
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+      setVehicleError('You are not logged in. Please log in again.');
+      setAddingVehicle(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/vehicles/`, {
         method: 'POST',
@@ -27,16 +35,19 @@ const NewVehiclePopUp = ({ isOpen, onClose, onVehicleAdded }) =>{
         body: JSON.stringify({
           make: newVehicle.make,
           model: newVehicle.model,
-          year: newVehicle.year,
+          year: Number(newVehicle.year),
           license_plate: newVehicle.license_plate,
         })
       });
+
+      const err = await response.json().catch(() => ({}));
+
       if (!response.ok){
-        const err = await response.json().catch(() => ({}));
         setVehicleError(err.detail || 'Failed to add vehicle.');
         setAddingVehicle(false);
         return;
       }
+
       setNewVehicle({ make: '', model: '', year: '', license_plate: '' });
       setAddingVehicle(false);
       if (onVehicleAdded) onVehicleAdded();
