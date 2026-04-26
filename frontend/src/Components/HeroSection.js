@@ -12,7 +12,8 @@ export default function HeroSection() {
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/business-info/`)
             .then(res => res.json())
-            .then(data => setBusinessInfo(data[0]));
+            .then(data => setBusinessInfo(data[0]))
+            .catch(() => setBusinessInfo(null));
     }, []);
     const style = { backgroundImage: `url(${heroImage})` };
 
@@ -21,7 +22,7 @@ export default function HeroSection() {
             <div className="hero-overlay" aria-hidden="true" />
             <div className="hero-content">
                 <h1 className="hero-title">{businessInfo?.name || 'Royal Auto and Body Repair'}</h1>
-                <NavLink to="/admin">
+                <NavLink to="/appointments">
                     <button className="HeroBookingButton">Book an Appointment</button>
                 </NavLink>
             </div>

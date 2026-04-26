@@ -51,18 +51,19 @@ const ServicesManagement = () => {
     }
   };
 
-  const storedUser = parseStoredUser();
+  // Handle user object possibly nested under 'employee' key
+  const storedUserRaw = parseStoredUser();
+  const storedUser = storedUserRaw && storedUserRaw.employee ? storedUserRaw.employee : storedUserRaw;
 
   const isAuthorized = (user) => {
-    // if a token exists assume authenticated and allow; stored user may not be saved by login flow
-    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-    if (!user && token) return true;
     if (!user) return false;
-    if (user.is_employee || user.is_staff || user.is_admin || user.is_superuser) return true;
-    if (user.role && (user.role === "employee" || user.role === "admin")) return true;
-    if (Array.isArray(user.roles) && (user.roles.includes("employee") || user.roles.includes("admin"))) return true;
+    if (user.is_admin || user.is_superuser) return true;
+    if (user.role && user.role === "admin") return true;
+    if (Array.isArray(user.roles) && user.roles.includes("admin")) return true;
     return false;
   };
+
+ 
   const [activeServices, setActiveServices] = useState([]);
   const [inactiveServices, setInactiveServices] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -87,6 +88,8 @@ const ServicesManagement = () => {
   useEffect(() => {
     fetchServices();
   }, [fetchServices]);
+
+  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
 
   const persistService = async (serviceId, updates) => {
     try {

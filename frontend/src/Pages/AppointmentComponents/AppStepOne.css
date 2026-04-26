@@ -3,6 +3,8 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center; 
+	color: #ffffff;
+	margin-top: 20px;
 }
 
 .app-step-one h1 {
@@ -18,7 +20,7 @@
 }
 
 .vehicle-card {
- 	background: #2F6DAB;
+ 	background-color: rgba(217, 217, 217, 0.8);
  	padding: 28px 28px; 
  	border-radius: 14px; 
  	box-shadow: 0 8px 24px rgba(16,24,40,0.06);
@@ -32,7 +34,7 @@
 	display: flex;
 	flex-direction: column;
 	font-size: 24px;
-	color: #ffffff;
+	color: black;
 }
 
 .vehicle-form input {

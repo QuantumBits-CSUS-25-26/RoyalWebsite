@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+import requests
 from urllib import request
 import requests as http_requests  # renamed to avoid clash with DRF request
 from django.http import JsonResponse
@@ -46,23 +48,21 @@ from .authentication import (
 )
 
 # Load environment variables
-load_dotenv()
-
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 #Facebook Posts View
 class FacebookPostsView(APIView):
     def get(self, request):
-        PAGE_ID = os.getenv('PAGE_ID', '1018524308015125')
-        ACCESS_TOKEN = os.getenv('FACEBOOK_ACCESS_TOKEN', 'EAAU2z6ZC17KgBQzZANCfG90AkhNCNZA36dC5p1OxZB2sY9Y5UAVii01F6mexQ3AhDSJRaSMjmI71oXB4X4RiPJ0nZCiEzClZCTt7HeoqKy9OLakFKKZCyEvZAZCpFFIbKr1wpLkzjnse1ZBqjVUqbavpdkIjykeskmXDWcugyFZCZB5Gc9AyPz0KRRN5hzUm1Qv9dQ07ACUq5OBupZCVBbTpGKFO40Btc7YYRhPLX5RPAv0cjOPjv')
-        if not PAGE_ID or not ACCESS_TOKEN:
-            return JsonResponse({'error': 'Missing Facebook credentials'}, status=500)
-        url = f'https://graph.facebook.com/v19.0/{PAGE_ID}/posts?fields=message,created_time,id,full_picture,attachments&access_token={ACCESS_TOKEN}'
-        try:
-            response = http_requests.get(url)
-            data = response.json()
-            return JsonResponse(data)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        page_id = os.getenv("PAGE_ID")
+        access_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+
+        url = f'https://graph.facebook.com/v19.0/{page_id}/posts?fields=message,created_time,id,full_picture,attachments&access_token={access_token}'
+
+        response = http_requests.get(url)
+        data = response.json()
+
+        return JsonResponse(data)
 
 # ══════════════════════════════════════════════════════════════════
 #  Helper permissions
@@ -330,160 +330,190 @@ class CustomerRecommendationsView(APIView):
 # ══════════════════════════════════════════════════════════════════
 
 class AppointmentListCreateView(APIView):
-    """
-    GET  /api/appointments/   → customer sees own, employee sees all
-    POST /api/appointments/   → create appointment
-
-    This view accepts two POST styles:
-    1) Authenticated clients: flat data using `vehicle` id (existing behavior).
-    2) Public nested payload: includes `contact`, `vehicle` (object with license_plate/manufacturer/model/year),
-       and `appointment` (date/time). The view will create/find customer and vehicle as needed and then
-       proceed to create the Appointment using the existing serializer.
-    """
-    # AllowAny so public clients can POST nested payloads; GET will enforce auth manually.
     authentication_classes = [CustomJWTAuthentication]
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        # enforce previous auth behavior for GET
         if not isinstance(request.user, (Customer, Employee)):
-            return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {'detail': 'Authentication required.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
         if isinstance(request.user, Customer):
             vehicle_ids = request.user.vehicles.values_list('vehicle_id', flat=True)
             qs = Appointment.objects.filter(vehicle_id__in=vehicle_ids)
         else:
             qs = Appointment.objects.all()
+
         qs = qs.select_related(
-            'vehicle', 'vehicle__customer', 'employee',
+            'vehicle', 'vehicle__customer', 'employee'
         ).prefetch_related('lines')
+
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        data = request.data.copy() if request.data else {}
+    def _parse_time_to_hour(self, time_value):
+        if time_value is None:
+            raise ValueError('Missing appointment.time')
 
-        # If this looks like a nested public payload (contains `contact` or vehicle is an object),
-        # handle creation of customer/vehicle first.
-        if 'contact' in data or isinstance(data.get('vehicle'), dict):
-            contact = data.get('contact', {})
-            vehicle = data.get('vehicle', {})
-            appt = data.get('appointment', {})
+        time_str = str(time_value).strip().upper().replace(' ', '')
 
-            # basic validation
-            required = []
-            if not contact.get('first_name'):
-                required.append('contact.first_name')
-            if not contact.get('last_name'):
-                required.append('contact.last_name')
-            if not contact.get('email'):
-                required.append('contact.email')
-            if not appt.get('date'):
-                required.append('appointment.date')
-            if not appt.get('time'):
-                required.append('appointment.time')
-            if required:
-                return Response({'detail': f'Missing fields: {", ".join(required)}'}, status=status.HTTP_400_BAD_REQUEST)
+        for fmt in ("%I%p", "%I:%M%p", "%H", "%H:%M"):
+            try:
+                parsed = datetime.datetime.strptime(time_str, fmt)
+                return parsed.hour
+            except ValueError:
+                continue
 
-            # find or create customer by email
-            email = contact.get('email').strip()
-            customer, created = Customer.objects.get_or_create(
-                email=email,
-                defaults={
-                    'first_name': contact.get('first_name', ''),
-                    'last_name': contact.get('last_name', ''),
-                    'phone': contact.get('phone', ''),
-                    'password_hash': make_password(''),
-                }
+        raise ValueError('Invalid appointment.time format')
+
+    def _normalize_nested_payload(self, data):
+        contact = data.get('contact', {}) or {}
+        vehicle = data.get('vehicle', {}) or {}
+        appt = data.get('appointment', {}) or {}
+
+        required = []
+        if not str(contact.get('first_name', '')).strip():
+            required.append('contact.first_name')
+        if not str(contact.get('last_name', '')).strip():
+            required.append('contact.last_name')
+        if not str(contact.get('email', '')).strip():
+            required.append('contact.email')
+        if not str(appt.get('date', '')).strip():
+            required.append('appointment.date')
+        if not str(appt.get('time', '')).strip():
+            required.append('appointment.time')
+
+        if required:
+            return None, Response(
+                {'detail': f'Missing fields: {", ".join(required)}'},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
-            # resolve vehicle: prefer provided license_plate, else match by make/model/year
-            try:
-                year_val = int(vehicle.get('year')) if vehicle.get('year') else None
-            except (TypeError, ValueError):
-                year_val = None
+        email = str(contact.get('email')).strip()
 
-            vehicle_obj = None
-            plate_provided = (vehicle.get('license_plate') or '').strip()
-            if plate_provided:
-                vehicle_obj = Vehicle.objects.filter(license_plate__iexact=plate_provided, customer=customer).first()
+        customer, _ = Customer.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': str(contact.get('first_name', '')).strip(),
+                'last_name': str(contact.get('last_name', '')).strip(),
+                'phone': str(contact.get('phone', '')).strip(),
+                'password_hash': make_password(''),
+            }
+        )
 
-            if not vehicle_obj:
-                vehicle_qs = Vehicle.objects.filter(customer=customer)
-                if vehicle.get('manufacturer'):
-                    vehicle_qs = vehicle_qs.filter(make=vehicle.get('manufacturer'))
-                if vehicle.get('model'):
-                    vehicle_qs = vehicle_qs.filter(model=vehicle.get('model'))
-                if year_val:
-                    vehicle_qs = vehicle_qs.filter(year=year_val)
-                vehicle_obj = vehicle_qs.first()
+        plate = str(vehicle.get('license_plate', '')).strip()
+        make = str(vehicle.get('manufacturer', '')).strip() or 'Unknown'
+        model = str(vehicle.get('model', '')).strip() or 'Unknown'
 
-            if not vehicle_obj:
-                plate = plate_provided if plate_provided else f"TMP{int(time.time())}{random.randint(100,999)}"
-                vehicle_obj = Vehicle.objects.create(
-                    customer=customer,
-                    make=vehicle.get('manufacturer') or 'Unknown',
-                    model=vehicle.get('model') or 'Unknown',
-                    year=year_val or 0,
-                    license_plate=plate,
-                )
+        try:
+            year_val = int(vehicle.get('year')) if vehicle.get('year') else 0
+        except (TypeError, ValueError):
+            year_val = 0
 
-            # parse scheduled_at from date + time
-            date_str = appt.get('date')
-            time_str = appt.get('time').strip().upper()
-            try:
-                y, m, d = [int(x) for x in date_str.split('-')]
-            except Exception:
-                return Response({'detail': 'Invalid appointment.date format, expected YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+        vehicle_obj = None
 
-            hour = None
-            try:
-                if time_str.endswith('AM') or time_str.endswith('PM'):
-                    val = time_str[:-2]
-                    hour = int(val) % 12
-                    if time_str.endswith('PM'):
-                        hour = hour + 12 if hour != 12 else 12
-                    if time_str.endswith('AM') and hour == 12:
-                        hour = 0
-                else:
-                    hour = int(time_str)
-            except Exception:
-                return Response({'detail': 'Invalid appointment.time format'}, status=status.HTTP_400_BAD_REQUEST)
+        if plate:
+            vehicle_obj = Vehicle.objects.filter(
+                customer=customer,
+                license_plate__iexact=plate
+            ).first()
 
-            dt = datetime.datetime(year=y, month=m, day=d, hour=hour, minute=0, second=0)
-            # use stdlib UTC tzinfo to avoid AttributeError on django.utils.timezone.utc
-            scheduled_at = timezone.make_aware(dt, timezone=datetime.timezone.utc)
+        if not vehicle_obj:
+            qs = Vehicle.objects.filter(customer=customer)
 
-            # populate flat data expected by serializer
-            # due to appointment step two not being fully implemented, 'General Service' will serve as a placeholder until merging can be resolved
-            data['vehicle'] = vehicle_obj.vehicle_id
-            data['scheduled_at'] = scheduled_at.isoformat()
-            data['service_type'] = data.get('service_type') or 'General Service'
+            if make and make != 'Unknown':
+                qs = qs.filter(make=make)
+            if model and model != 'Unknown':
+                qs = qs.filter(model=model)
+            if year_val:
+                qs = qs.filter(year=year_val)
 
-            # proceed to serializer below
+            vehicle_obj = qs.first()
 
+        if not vehicle_obj:
+            final_plate = plate or f"TMP{int(time.time())}{random.randint(100, 999)}"
+            vehicle_obj = Vehicle.objects.create(
+                customer=customer,
+                make=make,
+                model=model,
+                year=year_val,
+                license_plate=final_plate,
+            )
+
+        date_str = str(appt.get('date')).strip()
+        try:
+            parsed_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return None, Response(
+                {'detail': 'Invalid appointment.date format, expected YYYY-MM-DD'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            hour = self._parse_time_to_hour(appt.get('time'))
+        except ValueError as exc:
+            return None, Response(
+                {'detail': str(exc)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        naive_dt = datetime.datetime(
+            year=parsed_date.year,
+            month=parsed_date.month,
+            day=parsed_date.day,
+            hour=hour,
+            minute=0,
+            second=0
+        )
+
+        scheduled_at = timezone.make_aware(naive_dt, datetime.timezone.utc)
+
+        normalized = {
+            'vehicle': vehicle_obj.vehicle_id,
+            'scheduled_at': scheduled_at.isoformat(),
+            'service_type': str(data.get('service_type') or 'General Service').strip(),
+        }
+
+        if isinstance(self.request.user, Employee):
+            normalized['employee'] = self.request.user.employee_id
+
+        return normalized, None
+
+    def post(self, request):
+        self.request = request
+        data = request.data.copy() if request.data else {}
+
+        is_nested_payload = 'contact' in data or isinstance(data.get('vehicle'), dict)
+
+        if is_nested_payload:
+            normalized_data, error_response = self._normalize_nested_payload(data)
+            if error_response:
+                return error_response
+            data = normalized_data
         else:
-            # Non-nested path: maintain previous authentication/authorization behavior
-            # If customer is creating, verify they own the vehicle
             if isinstance(request.user, Customer):
                 vehicle_id = data.get('vehicle')
                 if not Vehicle.objects.filter(
-                    vehicle_id=vehicle_id, customer=request.user,
+                    vehicle_id=vehicle_id,
+                    customer=request.user
                 ).exists():
                     return Response(
                         {'detail': 'Vehicle not found or not yours.'},
-                        status=status.HTTP_400_BAD_REQUEST,
+                        status=status.HTTP_400_BAD_REQUEST
                     )
-            # If employee is creating, optionally assign themselves
+
             if isinstance(request.user, Employee) and not data.get('employee'):
                 data['employee'] = request.user.employee_id
 
         serializer = AppointmentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(
             AppointmentReadSerializer(serializer.instance).data,
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_201_CREATED
         )
 
 class AppointmentDetailView(APIView):
@@ -719,17 +749,61 @@ class BusinessInformationDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════
 
 class AdminCustomerListView(APIView):
-    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments"""
-    authentication_classes = []  # [CustomJWTAuthentication]  # enable permission check at prod
-    # permission_classes = [IsEmployee]                       # enable permission check at prod
+    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments
+       POST /api/admin/customers/ — creates a new customer
+    """
+    authentication_classes = []  # [CustomJWTAuthentication]
+    # permission_classes = [IsEmployee]
 
     def get(self, request):
         qs = Customer.objects.prefetch_related(
-            'vehicles', 'vehicles__appointments', 'vehicles__appointments__employee',
+            'vehicles',
+            'vehicles__appointments',
+            'vehicles__appointments__employee',
         ).all().order_by('-created_at')
+
         serializer = AdminCustomerDetailSerializer(qs, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        first_name = request.data.get("first_name", "").strip()
+        last_name = request.data.get("last_name", "").strip()
+        email = request.data.get("email", "").strip()
+        phone = request.data.get("phone", "").strip()
+
+        if not first_name:
+            return Response(
+                {"detail": "First name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not last_name:
+            return Response(
+                {"detail": "Last name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not email:
+            return Response(
+                {"detail": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if Customer.objects.filter(email__iexact=email).exists():
+            return Response(
+                {"detail": "A customer with this email already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+        )
+
+        serializer = AdminCustomerDetailSerializer(customer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class AdminBookAppointmentView(APIView):
     """POST /api/admin/customers/<customer_id>/book-appointment/"""

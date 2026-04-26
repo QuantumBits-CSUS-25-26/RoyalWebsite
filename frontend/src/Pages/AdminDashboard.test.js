@@ -16,11 +16,24 @@ jest.mock("../Components/AdminUpdateBusiness", () => ({ visible, onClose }) =>
 );
 
 beforeEach(() => {
+  localStorage.setItem(
+    "user",
+    JSON.stringify({
+      is_admin: true,
+      is_staff: true,
+      role: "admin",
+    })
+  );
+
+  localStorage.setItem("authToken", "fake-admin-token");
+
   global.fetch = jest.fn((url) => {
     if (url.includes("/api/business-info/")) {
       return Promise.resolve({
+        ok: true,
         json: async () => [
           {
+            info_id: 1,
             name: "Royal Auto",
             phone: "123-456-7890",
             address: "123 Main St",
@@ -33,6 +46,7 @@ beforeEach(() => {
 
     if (url.includes("/api/admin/dashboard-totals/")) {
       return Promise.resolve({
+        ok: true,
         json: async () => ({
           total_customers: 25,
           total_appointments: 10,
@@ -44,6 +58,7 @@ beforeEach(() => {
 
     if (url.includes("/api/admin/recent-customers/")) {
       return Promise.resolve({
+        ok: true,
         json: async () => [
           {
             id: 1,
@@ -62,12 +77,15 @@ beforeEach(() => {
     }
 
     return Promise.resolve({
+      ok: true,
       json: async () => ({}),
     });
   });
 });
 
 afterEach(() => {
+  localStorage.clear();
+  sessionStorage.clear();
   jest.clearAllMocks();
 });
 

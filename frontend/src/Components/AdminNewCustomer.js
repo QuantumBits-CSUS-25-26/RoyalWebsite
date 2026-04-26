@@ -1,242 +1,278 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
+const nameRegex = /^[\p{L}\s\-'.]+$/u;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const AdminNewCustomer = ({ isOpen, onClose }) => {
-  
-  //temp values for validation
-  const [ fName, setFName ] = useState("");
-  const [ lName, setLName ] = useState("");
-  const [ email, setEmail ] = useState("");
-  const [ phoneNumber, setPhoneNumber ] = useState("");
+const defaultPlaceholders = {
+  firstName: "e.g. John",
+  lastName: "e.g. Smith",
+  email: "e.g. john.smith@email.com",
+  phoneNumber: "e.g. (555) 123-4567",
+};
 
-  const [ fNamePlaceHolder, setFNamePlaceholder] = useState("e.g. John");
-  const [ lNamePlaceHolder, setLNamePlaceholder] = useState("e.g. Smith");
-  const [ emailPlaceHolder, setEmailPlaceholder] = useState("e.g. john.smith@email.com");
-  const [ phoneNumberPlaceHolder, setPhoneNumberPlaceholder] = useState("e.g. (555) 123-4567");
+const AdminNewCustomer = ({ isOpen, onClose, onAddCustomer }) => {
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+  });
 
-  const [ fNameError, setFNameError ] = useState(false);
-  const [ lNameError, setLNameError ] = useState(false);
-  const [ phoneError, setPhoneError] = useState(false);
-  const [ emailError, setEmailError] = useState(false);
-
-  // validated values to send to backend
-  const [ validatedFName, setValidatedFName ] = useState("");
-  const [ validatedLName, setValidatedLName ] = useState("");
-  const [ validatedEmail, setValidatedEmail ] = useState("");
-  const [ validatedPhone, setValidatedPhone ] = useState("");
-
-
-
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+  });
 
   const [mouseDownTarget, setMouseDownTarget] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
+  const resetForm = () => {
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+    });
+    setErrors({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+    });
+    setSubmitError("");
+    setSubmitting(false);
+  };
 
-  const ValidateFirstName = (value) => {
-    if (!fName) {
-      setFNameError(true);
-      return "Please enter a first name.";
+  const validateFirstName = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Please enter a first name.";
+    if (!nameRegex.test(trimmed)) {
+      return "Name can only contain letters, spaces, hyphens, and apostrophes";
+    }
+    return "";
+  };
 
-    } 
-    else if (!/^[\p{L}\s\-'.]+$/u.test(fName)) {
-        setFNameError(true);
-        return "Name can only contain letters, spaces, hyphens, and apostrophes";
+  const validateLastName = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Please enter a last name.";
+    if (!nameRegex.test(trimmed)) {
+      return "Name can only contain letters, spaces, hyphens, and apostrophes";
     }
-    else {
-      return "";
-    }
-  }
-  const ValidateLastName = (value) => {
-    if (!lName) {
-      setLNameError(true);
-      return "Please enter a last name.";
-    } 
-    else if (!/^[\p{L}\s\-'.]+$/u.test(lName)) {
-        setLNameError(true);
-        return "Name can only contain letters, spaces, hyphens, and apostrophes";
-    }
-    else {
-      return "";
-    }
-  }
-  const validatePhoneNumber = (value) => {
-    if (!phoneNumber) {
-      setPhoneError(true);
-      return "Please enter a phone number.";
-    }
-    else {
-      // Remove all chars except plus signs and digits, and then check for misplaced or duplicate plus signs
-      const cleanPhone = phoneNumber.replace(/[^\d+]/g, '');
-      
-      if (cleanPhone.includes('+')) {
-          const plusCount = (cleanPhone.match(/\+/g) || []).length;
-          if (plusCount > 1 || !cleanPhone.startsWith('+')) {
-              setPhoneError(true);
-              return "Please enter a valid phone number."; 
-          }
-      }
-      if (cleanPhone.startsWith('+1') && cleanPhone.length === 12) {
-          // +1 followed by exactly 10 digits: valid US number
+    return "";
+  };
 
-      } 
-      else if (cleanPhone.startsWith('1') && cleanPhone.length === 11) {
-        // 1 followed by exactly 10 digits: valid US number
-      } 
-      else if (cleanPhone.startsWith('+')) {
-        // International numbers
-        const digitsAfterPlus = cleanPhone.slice(1);
-        if (digitsAfterPlus.length < 7 || digitsAfterPlus.length > 15) {
-          setPhoneError(true);
-          return "Please enter a valid phone number."; 
-        }
-        //fine otherwise
-      } 
-      else if (cleanPhone.length === 7) {
-        setPhoneError(true);
-        return "Please include area code";
-      } 
-      else if (cleanPhone.length === 10) {
-        // 10 digits: valid US number
-        return "";
-      } 
-      else {
-        setPhoneError(true);
-        return "Please enter a valid phone number";
-      }
-    }
-  }
   const validateEmail = (value) => {
-    if (!value) {
-    setEmailError(true);
-    return "Please enter an email address.";
+    const trimmed = value.trim();
+    if (!trimmed) return "Please enter an email address.";
+    if (!emailRegex.test(trimmed)) {
+      return "Please enter a valid email address.";
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-    setEmailError(true);
-    return "Please enter a valid email address.";
+    return "";
+  };
+
+  const validatePhoneNumber = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Please enter a phone number.";
+
+    const cleanPhone = trimmed.replace(/[^\d+]/g, "");
+
+    if (cleanPhone.includes("+")) {
+      const plusCount = (cleanPhone.match(/\+/g) || []).length;
+      if (plusCount > 1 || !cleanPhone.startsWith("+")) {
+        return "Please enter a valid phone number.";
+      }
     }
-    else {
+
+    if (cleanPhone.startsWith("+1") && cleanPhone.length === 12) {
       return "";
     }
-  }
 
+    if (cleanPhone.startsWith("1") && cleanPhone.length === 11) {
+      return "";
+    }
 
-  const handleSubmit = async(e) => {
+    if (cleanPhone.startsWith("+")) {
+      const digitsAfterPlus = cleanPhone.slice(1);
+      if (digitsAfterPlus.length < 7 || digitsAfterPlus.length > 15) {
+        return "Please enter a valid phone number.";
+      }
+      return "";
+    }
+
+    if (cleanPhone.length === 7) {
+      return "Please include area code";
+    }
+
+    if (cleanPhone.length === 10) {
+      return "";
+    }
+
+    return "Please enter a valid phone number.";
+  };
+
+  const validateForm = () => {
+    const nextErrors = {
+      firstName: validateFirstName(form.firstName),
+      lastName: validateLastName(form.lastName),
+      email: validateEmail(form.email),
+      phoneNumber: validatePhoneNumber(form.phoneNumber),
+    };
+
+    setErrors(nextErrors);
+    return !Object.values(nextErrors).some(Boolean);
+  };
+
+  const handleChange = (field) => (e) => {
+    const value = e.target.value;
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+    }
+
+    if (submitError) {
+      setSubmitError("");
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const fNameErrorMsg = ValidateFirstName(fName);
-    const lNameErrorMsg = ValidateLastName(lName);
-    const phoneErrorMsg = validatePhoneNumber(phoneNumber);
-    const emailErrorMsg = validateEmail(email);
-    
-    if (fNameError){
-      setFNamePlaceholder(fNameErrorMsg);
-      setFName('');
-    }
-    if (lNameError){
-      setLNamePlaceholder(lNameErrorMsg);
-      setLName('');
-    }
-    if (emailError){
-      setEmailPlaceholder(emailErrorMsg);
-      setEmail('');
-    }
-    if (phoneError){
-      setPhoneNumberPlaceholder(phoneErrorMsg);
-      setPhoneNumber('');
-    }
 
-    if (!fNameError && !lNameError && !emailError && !phoneError){
-      // make api call to update information in database
-      setValidatedFName(fName);
-      setValidatedLName(lName);
-      setValidatedEmail(email);
-      setValidatedPhone(phoneNumber);
+    if (submitting) return;
 
+    setSubmitError("");
+
+    const isValid = validateForm();
+    if (!isValid) return;
+
+    const payload = {
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim(),
+      phoneNumber: form.phoneNumber.trim(),
+    };
+
+    try {
+      setSubmitting(true);
+
+      if (onAddCustomer) {
+        await onAddCustomer(payload);
+      }
+
+      resetForm();
+      onClose?.();
+    } catch (error) {
+      setSubmitting(false);
+      setSubmitError(error?.message || "Failed to add customer.");
     }
-
-  }
-
-  
-  if (!isOpen) return null;
+  };
 
   const handleMouseDown = (e) => {
     setMouseDownTarget(e.target);
   };
 
-  // Only close if both mousedown and mouseup happen outside box thing
   const handleMouseUp = (e) => {
-    if (e.target.className === 'services-management-add-overlay' && 
-        mouseDownTarget?.className === 'services-management-add-overlay') {
-      onClose();
+    if (
+      e.target.className === "services-management-add-overlay" &&
+      mouseDownTarget?.className === "services-management-add-overlay"
+    ) {
+      resetForm();
+      onClose?.();
     }
     setMouseDownTarget(null);
   };
 
+  const getPlaceholder = (field) => errors[field] || defaultPlaceholders[field];
+
+  if (!isOpen) return null;
+
   return (
-    <div 
-      className="services-management-add-overlay" 
+    <div
+      className="services-management-add-overlay"
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
       <div className="services-management-add">
-        <div className="title">
-          Add New Customer
-        </div>
+        <div className="title">Add New Customer</div>
+
+        {submitError && (
+          <div className="error" role="alert">
+            {submitError}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="add-service-content">
             <div className="add-service-field">
               <label htmlFor="fname">First Name *</label>
-              <input 
+              <input
                 id="fname"
-                type="text" 
+                type="text"
                 name="fname"
-                placeholder={fNamePlaceHolder}
-                value={fName}
-                onChange={(e) => setFName(e.target.value)}
+                placeholder={getPlaceholder("firstName")}
+                value={form.firstName}
+                onChange={handleChange("firstName")}
+                aria-invalid={!!errors.firstName}
               />
             </div>
 
             <div className="add-service-field">
               <label htmlFor="lname">Last Name *</label>
-              <input 
+              <input
                 id="lname"
-                type="text" 
+                type="text"
                 name="lname"
-                placeholder={lNamePlaceHolder}
-                value={lName}
-                onChange={(e) => setLName(e.target.value)}
+                placeholder={getPlaceholder("lastName")}
+                value={form.lastName}
+                onChange={handleChange("lastName")}
+                aria-invalid={!!errors.lastName}
               />
             </div>
 
             <div className="add-service-field">
               <label htmlFor="phone">Phone Number *</label>
-              <input 
+              <input
                 id="phone"
-                type="text" 
+                type="text"
                 name="phone"
-                placeholder={phoneNumberPlaceHolder}
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder={getPlaceholder("phoneNumber")}
+                value={form.phoneNumber}
+                onChange={handleChange("phoneNumber")}
+                aria-invalid={!!errors.phoneNumber}
               />
             </div>
 
             <div className="add-service-field">
               <label htmlFor="email">Email *</label>
-              <input 
+              <input
                 id="email"
-                type="text" 
+                type="text"
                 name="email"
-                placeholder={emailPlaceHolder}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder={getPlaceholder("email")}
+                value={form.email}
+                onChange={handleChange("email")}
+                aria-invalid={!!errors.email}
               />
             </div>
 
-            <button type="submit">Add Customer</button>
+            <button type="submit" disabled={submitting}>
+              {submitting ? "Adding..." : "Add Customer"}
+            </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default AdminNewCustomer;
