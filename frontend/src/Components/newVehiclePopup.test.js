@@ -1,4 +1,5 @@
 import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import NewVehiclePopUp from "./NewVehiclePopUp";
 
@@ -13,15 +14,17 @@ describe("NewVehiclePopUp", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn();
+    localStorage.clear();
     sessionStorage.clear();
-    sessionStorage.setItem("authToken", "test-token");
+    localStorage.setItem("authToken", "test-token");
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    delete global.fetch;
   });
 
-  test("renders modal fields and buttons when open", () => {
+  function renderModal() {
     render(
       <NewVehiclePopUp
         isOpen={true}
@@ -29,55 +32,61 @@ describe("NewVehiclePopUp", () => {
         onVehicleAdded={mockOnVehicleAdded}
       />
     );
+  }
+
+  function fillVehicleForm({
+    make = "Toyota",
+    model = "Camry",
+    year = "2020",
+    licensePlate = "ABC123",
+  } = {}) {
+    fireEvent.change(screen.getByLabelText(/^make$/i), {
+      target: { value: make },
+    });
+
+    fireEvent.change(screen.getByLabelText(/^model$/i), {
+      target: { value: model },
+    });
+
+    fireEvent.change(screen.getByLabelText(/^year$/i), {
+      target: { value: year },
+    });
+
+    fireEvent.change(screen.getByLabelText(/license plate/i), {
+      target: { value: licensePlate },
+    });
+  }
+
+  test("renders modal fields and buttons when open", () => {
+    renderModal();
 
     expect(screen.getByText("Add New Vehicle")).toBeInTheDocument();
-    expect(screen.getByLabelText(/make/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/model/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/year/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^make$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^model$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^year$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/license plate/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /add vehicle/i })).toBeInTheDocument();
   });
 
   test("updates input values when user types", () => {
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Toyota" },
+    fillVehicleForm({
+      make: "Toyota",
+      model: "Camry",
+      year: "2020",
+      licensePlate: "ABC123",
     });
 
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "Camry" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2020" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "ABC123" },
-    });
-
-    expect(screen.getByLabelText(/make/i)).toHaveValue("Toyota");
-    expect(screen.getByLabelText(/model/i)).toHaveValue("Camry");
-    expect(screen.getByLabelText(/year/i)).toHaveValue(2020);
+    expect(screen.getByLabelText(/^make$/i)).toHaveValue("Toyota");
+    expect(screen.getByLabelText(/^model$/i)).toHaveValue("Camry");
+    expect(screen.getByLabelText(/^year$/i)).toHaveValue(2020);
     expect(screen.getByLabelText(/license plate/i)).toHaveValue("ABC123");
   });
 
   test("calls onClose when Cancel button is clicked", () => {
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
     fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
 
@@ -90,28 +99,13 @@ describe("NewVehiclePopUp", () => {
       json: jest.fn().mockResolvedValue({}),
     });
 
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Honda" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "Civic" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2021" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "XYZ789" },
+    fillVehicleForm({
+      make: "Honda",
+      model: "Civic",
+      year: "2021",
+      licensePlate: "XYZ789",
     });
 
     fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
@@ -131,7 +125,7 @@ describe("NewVehiclePopUp", () => {
         body: JSON.stringify({
           make: "Honda",
           model: "Civic",
-          year: "2021",
+          year: 2021,
           license_plate: "XYZ789",
         }),
       }
@@ -154,28 +148,13 @@ describe("NewVehiclePopUp", () => {
         })
     );
 
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Ford" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "Focus" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2018" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "FOR123" },
+    fillVehicleForm({
+      make: "Ford",
+      model: "Focus",
+      year: "2018",
+      licensePlate: "FOR123",
     });
 
     fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
@@ -200,28 +179,13 @@ describe("NewVehiclePopUp", () => {
       }),
     });
 
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Toyota" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "RAV4" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2022" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "BAD123" },
+    fillVehicleForm({
+      make: "Toyota",
+      model: "RAV4",
+      year: "2022",
+      licensePlate: "BAD123",
     });
 
     fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
@@ -238,28 +202,13 @@ describe("NewVehiclePopUp", () => {
       json: jest.fn().mockResolvedValue({}),
     });
 
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Nissan" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "Altima" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2019" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "ALT123" },
+    fillVehicleForm({
+      make: "Nissan",
+      model: "Altima",
+      year: "2019",
+      licensePlate: "ALT123",
     });
 
     fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
@@ -276,28 +225,13 @@ describe("NewVehiclePopUp", () => {
       json: jest.fn().mockRejectedValue(new Error("Invalid JSON")),
     });
 
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Mazda" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "CX-5" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2023" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "MAZ123" },
+    fillVehicleForm({
+      make: "Mazda",
+      model: "CX-5",
+      year: "2023",
+      licensePlate: "MAZ123",
     });
 
     fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
@@ -311,34 +245,42 @@ describe("NewVehiclePopUp", () => {
   test("shows network error when fetch throws", async () => {
     global.fetch.mockRejectedValueOnce(new Error("Network failed"));
 
-    render(
-      <NewVehiclePopUp
-        isOpen={true}
-        onClose={mockOnClose}
-        onVehicleAdded={mockOnVehicleAdded}
-      />
-    );
+    renderModal();
 
-    fireEvent.change(screen.getByLabelText(/make/i), {
-      target: { value: "Kia" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/model/i), {
-      target: { value: "Soul" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/year/i), {
-      target: { value: "2020" },
-    });
-
-    fireEvent.change(screen.getByLabelText(/license plate/i), {
-      target: { value: "KIA123" },
+    fillVehicleForm({
+      make: "Kia",
+      model: "Soul",
+      year: "2020",
+      licensePlate: "KIA123",
     });
 
     fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
 
     expect(await screen.findByText("Network error.")).toBeInTheDocument();
 
+    expect(mockOnVehicleAdded).not.toHaveBeenCalled();
+    expect(mockOnClose).not.toHaveBeenCalled();
+  });
+
+  test("shows not logged in error and does not call fetch when auth token is missing", async () => {
+    localStorage.clear();
+
+    renderModal();
+
+    fillVehicleForm({
+      make: "Honda",
+      model: "Accord",
+      year: "2022",
+      licensePlate: "NOAUTH1",
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /add vehicle/i }));
+
+    expect(
+      await screen.findByText("You are not logged in. Please log in again.")
+    ).toBeInTheDocument();
+
+    expect(global.fetch).not.toHaveBeenCalled();
     expect(mockOnVehicleAdded).not.toHaveBeenCalled();
     expect(mockOnClose).not.toHaveBeenCalled();
   });

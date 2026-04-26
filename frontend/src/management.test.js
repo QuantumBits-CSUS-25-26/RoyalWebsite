@@ -1,7 +1,14 @@
 import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Management from "./Pages/AdminPages/Management";
+
+const API = "http://test-api.com";
+
+jest.mock("./config", () => ({
+  API_BASE_URL: "http://test-api.com",
+}));
 
 jest.mock("./Components/AdminSideBar", () => () => <div data-testid="sidebar" />);
 
@@ -13,7 +20,7 @@ jest.mock("./Pages/EmployeeManagmentPopups/AddEmployee", () => {
   return function AddEmployeeMock(props) {
     if (!props.visible) return null;
     return (
-      <div>
+      <div data-testid="add-form">
         <button
           onClick={() =>
             props.onAdd({
@@ -37,7 +44,7 @@ jest.mock("./Pages/EmployeeManagmentPopups/RemoveEmployee", () => {
   return function RemoveEmployeeMock(props) {
     if (!props.visible) return null;
     return (
-      <div>
+      <div data-testid="remove-form">
         <button onClick={() => props.onRemove(1).catch(() => {})}>
           Confirm Remove
         </button>
@@ -50,7 +57,7 @@ jest.mock("./Pages/EmployeeManagmentPopups/EditEmployee", () => {
   return function EditEmployeeMock(props) {
     if (!props.visible) return null;
     return (
-      <div>
+      <div data-testid="edit-form">
         <button
           onClick={() =>
             props
@@ -97,8 +104,8 @@ const mockFetchRouter = ({
   deleteBody,
   editBody,
 } = {}) => {
-  global.fetch = jest.fn((url, options) => {
-    if (url === "/api/admin/employees/" && (!options || !options.method)) {
+  global.fetch = jest.fn((url, options = {}) => {
+    if (url === `${API}/api/admin/employees/` && (!options.method || options.method === "GET")) {
       return Promise.resolve({
         ok: initialFetchOk,
         json: () =>
@@ -109,7 +116,7 @@ const mockFetchRouter = ({
       });
     }
 
-    if (url === "/api/admin/employees/create/" && options?.method === "POST") {
+    if (url === `${API}/api/admin/employees/create/` && options.method === "POST") {
       return Promise.resolve({
         ok: createOk,
         json: () =>
@@ -119,7 +126,7 @@ const mockFetchRouter = ({
       });
     }
 
-    if (url === "/api/admin/employees/1/delete/" && options?.method === "DELETE") {
+    if (url === `${API}/api/admin/employees/1/delete/` && options.method === "DELETE") {
       return Promise.resolve({
         ok: deleteOk,
         json: () =>
@@ -129,7 +136,7 @@ const mockFetchRouter = ({
       });
     }
 
-    if (url === "/api/admin/employees/1/edit/" && options?.method === "PUT") {
+    if (url === `${API}/api/admin/employees/1/edit/` && options.method === "PUT") {
       return Promise.resolve({
         ok: editOk,
         json: () =>
@@ -146,7 +153,7 @@ const mockFetchRouter = ({
 const waitForInitialEmployeesFetch = async () => {
   await waitFor(() => {
     expect(global.fetch).toHaveBeenCalledWith(
-      "/api/admin/employees/",
+      `${API}/api/admin/employees/`,
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer test-token",
@@ -329,7 +336,7 @@ describe("Management Component", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/admin/employees/create/",
+        `${API}/api/admin/employees/create/`,
         expect.objectContaining({
           method: "POST",
           headers: expect.objectContaining({
@@ -378,7 +385,7 @@ describe("Management Component", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/admin/employees/1/delete/",
+        `${API}/api/admin/employees/1/delete/`,
         expect.objectContaining({
           method: "DELETE",
           headers: expect.objectContaining({
@@ -408,7 +415,7 @@ describe("Management Component", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/admin/employees/1/delete/",
+        `${API}/api/admin/employees/1/delete/`,
         expect.objectContaining({ method: "DELETE" })
       );
     });
@@ -429,7 +436,7 @@ describe("Management Component", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/admin/employees/1/edit/",
+        `${API}/api/admin/employees/1/edit/`,
         expect.objectContaining({
           method: "PUT",
           headers: expect.objectContaining({
@@ -465,7 +472,7 @@ describe("Management Component", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/admin/employees/1/edit/",
+        `${API}/api/admin/employees/1/edit/`,
         expect.objectContaining({ method: "PUT" })
       );
     });
