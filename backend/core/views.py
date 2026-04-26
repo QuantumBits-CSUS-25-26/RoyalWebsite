@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+import requests
 from urllib import request
 import requests as http_requests  # renamed to avoid clash with DRF request
 from django.http import JsonResponse
@@ -46,23 +48,21 @@ from .authentication import (
 )
 
 # Load environment variables
-load_dotenv()
-
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 #Facebook Posts View
 class FacebookPostsView(APIView):
     def get(self, request):
-        PAGE_ID = os.getenv('PAGE_ID', '1018524308015125')
-        ACCESS_TOKEN = os.getenv('FACEBOOK_ACCESS_TOKEN', 'EAAU2z6ZC17KgBQzZANCfG90AkhNCNZA36dC5p1OxZB2sY9Y5UAVii01F6mexQ3AhDSJRaSMjmI71oXB4X4RiPJ0nZCiEzClZCTt7HeoqKy9OLakFKKZCyEvZAZCpFFIbKr1wpLkzjnse1ZBqjVUqbavpdkIjykeskmXDWcugyFZCZB5Gc9AyPz0KRRN5hzUm1Qv9dQ07ACUq5OBupZCVBbTpGKFO40Btc7YYRhPLX5RPAv0cjOPjv')
-        if not PAGE_ID or not ACCESS_TOKEN:
-            return JsonResponse({'error': 'Missing Facebook credentials'}, status=500)
-        url = f'https://graph.facebook.com/v19.0/{PAGE_ID}/posts?fields=message,created_time,id,full_picture,attachments&access_token={ACCESS_TOKEN}'
-        try:
-            response = http_requests.get(url)
-            data = response.json()
-            return JsonResponse(data)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        page_id = os.getenv("PAGE_ID")
+        access_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+
+        url = f'https://graph.facebook.com/v19.0/{page_id}/posts?fields=message,created_time,id,full_picture,attachments&access_token={access_token}'
+
+        response = http_requests.get(url)
+        data = response.json()
+
+        return JsonResponse(data)
 
 # ══════════════════════════════════════════════════════════════════
 #  Helper permissions
