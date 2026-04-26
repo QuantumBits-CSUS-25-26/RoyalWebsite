@@ -7,7 +7,7 @@ const ContactInfoS4 = ({ contactInfo = {}, onFieldChange = () => {}, onNotifChan
 
   return (
     <div className="contact-info-s4">
-        <div className="contact-info-header">
+        <div className="contact-info-header" style={{color: '#ffffff'}}>
             <h1>Contact Information</h1>
         </div>
         
