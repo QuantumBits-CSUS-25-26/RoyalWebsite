@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import ContactInfoS4 from "../Components/ContactInfoS4";
-import AppStepOne from './AppointmentComponents/AppStepOne';
-import AppStepThree from './AppointmentComponents/AppStepThree';
+import AppStepOne from './AppointmentComponents/AppStepOne'
+import AppStepTwo from "./AppointmentComponents/AppStepTwo";
+import AppStepThree from './AppointmentComponents/AppStepThree'
 import '../App.css';
 import { API_BASE_URL } from "../config";
 
@@ -16,6 +17,9 @@ const Appointments = () => {
       text: false
     }
   });
+
+  const [step, setStep] = useState(1);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
 
   const [vehicleInfo, setVehicleInfo] = useState({
     year: '',
@@ -201,7 +205,11 @@ const Appointments = () => {
         onVehicleChange={handleVehicleChange}
         errors={vehicleErrors}
       />
-
+      <AppStepTwo 
+          contactInfo={contactInfo}
+          onFieldChange={handleFieldChange}
+          onNotifChange={handleNotifChange}
+      />
       <AppStepThree
         selectedDate={appointment.selectedDate}
         selectedTime={appointment.selectedTime}
