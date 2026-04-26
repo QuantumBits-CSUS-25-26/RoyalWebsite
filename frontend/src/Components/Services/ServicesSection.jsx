@@ -20,7 +20,6 @@ const ServicesSection = () => {
                     <div className={styles.textContent}>
                         <div className={styles.grayBar}>
                             <div className={styles.title}>Our Services</div>
-                        </div>
 
                         <p className={styles.description}>
                             We provide a wide range of auto repair and maintenance services
@@ -28,6 +27,7 @@ const ServicesSection = () => {
                             major repair, Royal Auto and Body Repair ensures top-quality
                             service at an affordable price.
                         </p>
+                        </div>
 
 
                         <div className={styles.serviceList}>

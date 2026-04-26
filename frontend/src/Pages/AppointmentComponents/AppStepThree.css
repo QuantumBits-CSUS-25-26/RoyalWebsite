@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: #ffffff;
 }
 
 .app-step-three h1 {
@@ -9,7 +10,7 @@
 }
 
 .calendar-card {
-  background: #2F6DAB;
+  background-color: rgba(217, 217, 217, 0.8);
   padding: 28px 28px;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
@@ -17,7 +18,7 @@
   width: 100%;
   max-width: 1000px;
   box-sizing: border-box;
-  color: #ffffff;
+  color: black;
 }
 
 .calendar-header {
