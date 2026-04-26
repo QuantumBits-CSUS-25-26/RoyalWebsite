@@ -23,6 +23,7 @@ const ContactInfoS4 = ({
             <input
               className="contact-info-input"
               type="text"
+              id="contact-fname"
               name="fname"
               value={contactInfo.fname || ''}
               onChange={onFieldChange}
@@ -35,6 +36,7 @@ const ContactInfoS4 = ({
             <input
               className="contact-info-input"
               type="text"
+              id="contact-lname"
               name="lname"
               value={contactInfo.lname || ''}
               onChange={onFieldChange}
@@ -49,6 +51,7 @@ const ContactInfoS4 = ({
             <input
               className="contact-info-input"
               type="email"
+               id="contact-email"
               name="email"
               value={contactInfo.email || ''}
               onChange={onFieldChange}
@@ -61,6 +64,7 @@ const ContactInfoS4 = ({
             <input
               className="contact-info-input"
               type="tel"
+              id="contact-phone"
               name="phone"
               value={contactInfo.phone || ''}
               onChange={onFieldChange}
