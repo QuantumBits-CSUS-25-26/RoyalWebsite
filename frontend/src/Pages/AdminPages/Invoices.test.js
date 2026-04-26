@@ -1,214 +1,156 @@
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { render, screen, within, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import Invoices from "./Invoices";
 
-jest.mock("../../Components/AdminSideBar", () => () => <div>Admin Sidebar</div>);
+jest.mock("../../Components/AdminSideBar", () => () => (
+  <div data-testid="mock-admin-sidebar">Sidebar</div>
+));
 
-const mockInvoicesResponse = {
-  count: 2,
-  page: 1,
-  page_size: 4,
-  results: [
-    {
-      invoice_id: 1,
-      customer: "John Doe",
-      vehicle: "Toyota Camry",
-      date: "2026-03-21T00:00:00Z",
-      services: "Oil Change",
-      cost: "89.99",
-      status: "pending",
-      created_at: "2026-03-21T00:00:00Z",
-    },
-    {
-      invoice_id: 2,
-      customer: "Jane Smith",
-      vehicle: "Honda Civic",
-      date: "2026-03-22T00:00:00Z",
-      services: "Brake Inspection",
-      cost: "120.00",
-      status: "paid",
-      created_at: "2026-03-22T00:00:00Z",
-    },
-  ],
-};
+describe("Admin Invoices page", () => {
+  let invoicesState;
+  let appointmentsState;
 
-describe("Invoices page", () => {
   beforeEach(() => {
-    sessionStorage.setItem("authToken", "fake-token");
-    window.alert = jest.fn();
+    sessionStorage.setItem("authToken", "test-token");
+    invoicesState = [
+      {
+        invoice_id: 101,
+        appointment: { appointment_id: 1 },
+        customer: "Jordan Lee",
+        amount: "428.50",
+        status: "pending",
+        due_date: null,
+        notes: "",
+        lines: [],
+      },
+      {
+        invoice_id: 102,
+        appointment: { appointment_id: 2 },
+        customer: "Maria Santos",
+        amount: "89.99",
+        status: "paid",
+        due_date: null,
+        notes: "",
+        lines: [],
+      },
+    ];
+    appointmentsState = [
+      {
+        appointment_id: 1,
+        service_type: "Brake Pads",
+        scheduled_at: "2026-04-14T09:30:00Z",
+        cost: "428.50",
+        vehicle: { customer: { first_name: "Jordan", last_name: "Lee" } },
+      },
+      {
+        appointment_id: 2,
+        service_type: "Oil Change",
+        scheduled_at: "2026-04-10T11:00:00Z",
+        cost: "89.99",
+        vehicle: { customer: { first_name: "Maria", last_name: "Santos" } },
+      },
+      {
+        appointment_id: 3,
+        service_type: "Tire Rotation",
+        scheduled_at: "2026-04-20T10:00:00Z",
+        cost: "65.00",
+        vehicle: { customer: { first_name: "Pat", last_name: "Rivera" } },
+      },
+    ];
 
-    global.fetch = jest.fn((url, options) => {
-      if (options?.method === "PUT") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({}),
-        });
+    jest.spyOn(global, "fetch").mockImplementation(async (url, opts = {}) => {
+      const method = (opts.method || "GET").toUpperCase();
+      const u = String(url);
+
+      if (u.includes("/api/invoices/") && method === "GET") {
+        return { ok: true, json: async () => ({ results: invoicesState, count: invoicesState.length }) };
       }
-
-      if (url.includes("status=pending")) {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              count: 1,
-              page: 1,
-              page_size: 4,
-              results: [mockInvoicesResponse.results[0]],
-            }),
-        });
+      if (u.includes("/api/admin/appointments/") && method === "GET") {
+        return { ok: true, json: async () => appointmentsState };
       }
-
-      if (url.includes("status=paid")) {
-        return Promise.resolve({
+      if (u.includes("/api/services/") && method === "GET") {
+        return {
           ok: true,
-          json: () =>
-            Promise.resolve({
-              count: 1,
-              page: 1,
-              page_size: 4,
-              results: [mockInvoicesResponse.results[1]],
-            }),
-        });
+          json: async () => [{ service_id: 21, name: "Oil Change", cost: 29.99 }],
+        };
       }
-
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(mockInvoicesResponse),
-      });
+      if (u.includes("/api/invoices/") && method === "POST") {
+        const body = JSON.parse(opts.body || "{}");
+        const appt = appointmentsState.find((a) => a.appointment_id === body.appointment);
+        const row = {
+          invoice_id: 103,
+          appointment: appt,
+          customer: appt?.vehicle?.customer
+            ? `${appt.vehicle.customer.first_name} ${appt.vehicle.customer.last_name}`
+            : "Customer",
+          amount: "65.00",
+          status: body.status || "pending",
+          due_date: body.due_date || null,
+          notes: body.notes || "",
+          lines: body.lines || [],
+        };
+        invoicesState = [row, ...invoicesState];
+        return { ok: true, json: async () => row };
+      }
+      if (u.includes("/api/invoices/101/") && method === "PUT") {
+        const body = JSON.parse(opts.body || "{}");
+        invoicesState = invoicesState.map((i) =>
+          i.invoice_id === 101 ? { ...i, status: body.status, amount: body.lines?.length ? "500.00" : i.amount } : i
+        );
+        return { ok: true, json: async () => invoicesState.find((i) => i.invoice_id === 101) };
+      }
+      if (u.includes("/api/invoices/102/") && method === "DELETE") {
+        invoicesState = invoicesState.filter((i) => i.invoice_id !== 102);
+        return { ok: true, status: 204 };
+      }
+      return { ok: true, json: async () => ({}) };
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
     sessionStorage.clear();
   });
 
-  test("renders invoices page headings and search inputs", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
-
-    expect(screen.getByText("Admin Sidebar")).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.getByText("Invoices")).toBeInTheDocument();
-    });
-
-    expect(screen.getByPlaceholderText(/search pending invoices/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/search paid invoices/i)).toBeInTheDocument();
+  test("loads invoices from API", async () => {
+    render(<Invoices />);
+    expect(screen.getByTestId("mock-admin-sidebar")).toBeInTheDocument();
+    expect(await screen.findByText("Jordan Lee")).toBeInTheDocument();
+    expect(screen.getByText("INV-101")).toBeInTheDocument();
   });
 
-  test("renders pending and paid invoice data from API", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("creates invoice after selecting appointment", async () => {
+    const user = userEvent.setup();
+    render(<Invoices />);
+    await screen.findByText("Jordan Lee");
+
+    await user.click(screen.getByRole("button", { name: /add an invoice/i }));
+    await screen.findByText("New invoice");
+    const dialog = screen.getByText("New invoice").closest('[role="dialog"]');
+    expect(dialog).toBeTruthy();
+    const combos = within(dialog).getAllByRole("combobox");
+    await user.selectOptions(combos[0], "3");
+    await user.click(within(dialog).getByRole("button", { name: /create invoice/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("Pat Rivera")).toBeInTheDocument();
     });
-
-    await waitFor(() => {
-      expect(screen.getByText("Jane Smith")).toBeInTheDocument();
-    });
-
-    await screen.findByText((text) => text.includes("Toyota Camry"));
-    await screen.findByText((text) => text.includes("Honda Civic"));
-    await screen.findByText((text) => text.includes("Oil Change"));
-    await screen.findByText((text) => text.includes("Brake Inspection"));
-    await screen.findByText((text) => text.includes("89.99"));
-    await screen.findByText((text) => text.includes("120.00"));
-
-    expect(screen.getByText((text) => text.includes("Toyota Camry"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("Honda Civic"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("Oil Change"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("Brake Inspection"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("89.99"))).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes("120.00"))).toBeInTheDocument();
+    expect(screen.getByText("INV-103")).toBeInTheDocument();
   });
 
-  test("renders invoice costs from API", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
+  test("delete confirm removes row", async () => {
+    const user = userEvent.setup();
+    render(<Invoices />);
+    await screen.findByText("Maria Santos");
+    const row = screen.getByText("Maria Santos").closest("tr");
+    await user.click(within(row).getByRole("button", { name: /^delete$/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText((text) => text.includes("89.99"))).toBeInTheDocument();
-    });
+    const dialogs = screen.getAllByRole("dialog");
+    const delDlg = dialogs.find((d) => within(d).queryByText(/delete invoice/i));
+    expect(delDlg).toBeTruthy();
+    await user.click(within(delDlg).getByRole("button", { name: /^delete$/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText((text) => text.includes("120.00"))).toBeInTheDocument();
-    });
-  });
-
-  test("renders correct status action buttons", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
-
-    expect(await screen.findByRole("button", { name: /mark as paid/i })).toBeInTheDocument();
-    expect(await screen.findByRole("button", { name: /mark as pending/i })).toBeInTheDocument();
-  });
-
-  test("clicking status button sends PUT request with updated status", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
-
-    await screen.findByText("John Doe");
-    const button = await screen.findByRole("button", { name: /mark as paid/i });
-    fireEvent.click(button);
-
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/invoices/1/"),
-        expect.objectContaining({
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: "paid" }),
-        })
-      );
-    });
-
-    expect(window.alert).toHaveBeenCalledWith("Invoice status updated.");
-  });
-
-  test("clicking status button refetches pending and paid invoices", async () => {
-    render(
-      <MemoryRouter>
-        <Invoices />
-      </MemoryRouter>
-    );
-
-    await screen.findByText("John Doe");
-    const button = await screen.findByRole("button", { name: /mark as paid/i });
-    fireEvent.click(button);
-
-    await waitFor(() => {
-      const calledUrls = global.fetch.mock.calls.map((call) => call[0]);
-      expect(calledUrls.some((url) => url.includes("/api/invoices/1/"))).toBe(true);
-    });
-
-    await waitFor(() => {
-      const calledUrls = global.fetch.mock.calls.map((call) => call[0]);
-      expect(calledUrls.some((url) => url.includes("status=pending"))).toBe(true);
-    });
-
-    await waitFor(() => {
-      const calledUrls = global.fetch.mock.calls.map((call) => call[0]);
-      expect(calledUrls.some((url) => url.includes("status=paid"))).toBe(true);
-    });
+    await waitFor(() => expect(screen.queryByText("Maria Santos")).not.toBeInTheDocument());
   });
 });

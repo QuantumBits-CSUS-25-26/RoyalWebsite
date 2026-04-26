@@ -27,6 +27,8 @@ urlpatterns = [
 
     # ── Contact form ───────────────────────────────────────────
     path('contact/', views.ContactMessageView.as_view(), name='contact_message'),
+    path('admin/messages/', views.AdminMessageListView.as_view(), name='admin_message_list'),
+    path('admin/messages/<int:message_id>/', views.AdminMessageDetailView.as_view(), name='admin_message_detail'),
 
     path('services/', views.SiteServiceListCreateView.as_view(), name='site_service_list_create'),
     path('services/<int:service_id>/', views.SiteServiceDetailView.as_view(), name='site_service_detail'),

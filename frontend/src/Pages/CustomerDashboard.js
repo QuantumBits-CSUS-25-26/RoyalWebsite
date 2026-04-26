@@ -78,13 +78,6 @@ const sampleService = [
 ]
 
 
-
-
-
-
-
-
-
 const CustomerDashboard = () => {
   
 
@@ -125,7 +118,7 @@ const CustomerDashboard = () => {
   const [showNewVehicleModal, setShowNewVehicleModal] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
     const headers = { "Accept": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -180,10 +173,40 @@ const CustomerDashboard = () => {
 
 
   const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      const token =
+          sessionStorage.getItem("authToken") ||
+          localStorage.getItem("authToken");
+
+      if (token) {
+        await fetch(`${API_BASE_URL}/api/logout/`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json"
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Logout request failed:", err);
+    }
+
+    // Clear storage
+    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+
+    navigate("/login");
+  };
   const handleClickUpdateInfo = () => {
     navigate("/account-update");
   };
 
+  const handleBookAppointment = () => {
+    navigate("/appointments");
+  };
 
   // for testing: sample data overwrites API data
   /*
@@ -197,7 +220,7 @@ const CustomerDashboard = () => {
   ///*
   // Helper to refresh vehicles after adding
   const fetchVehicles = () => {
-    const token = sessionStorage.getItem("authToken");
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
     const headers = { "Accept": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
     fetch(`${API_BASE_URL}/api/vehicles/`, { headers })
@@ -387,7 +410,11 @@ const CustomerDashboard = () => {
                     </Button>
                   </Row>
                   <Row className="mb-4">
-                    <Button type="button" className="btn btn-lg py-4">
+                    <Button
+                      type="button"
+                      className="btn btn-lg py-4"
+                      onClick={handleBookAppointment}
+                    >
                       Book an Appointment
                     </Button>
                   </Row>

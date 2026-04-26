@@ -69,7 +69,7 @@ describe('CustomerLogin page', () => {
   });
 
   test('stores token and navigates to dashboard on successful login', async () => {
-    axios.post.mockResolvedValueOnce({ data: { token: 'test-token' } });
+    axios.post.mockResolvedValueOnce({ data: { access: 'test-token' } });
 
     renderPage();
 
@@ -78,7 +78,8 @@ describe('CustomerLogin page', () => {
     fireEvent.click(screen.getByRole('button', { name: /Log In/i }));
 
     await waitFor(() => {
-      expect(localStorage.getItem('token')).toBe('test-token');
+
+      expect(localStorage.getItem('authToken')).toBe('test-token');
       expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
     });
   });
