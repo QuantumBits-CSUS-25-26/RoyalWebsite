@@ -1,50 +1,46 @@
 import React from "react";
-import "./AppointmentSteps.css";
+import "./AppStepTwo.css";
 
-const SERVICES = [
-  { id: "brakes", label: "Brake Work" },
-  { id: "body", label: "Body Work" },
-  { id: "engine-transmission", label: "Engine / Transmission" },
-  { id: "hybrid", label: "Hybrid Services" },
-  { id: "oil-change", label: "Oil Change" },
-  { id: "suspension-tune-up", label: "Suspension Work / Tune Up" },
-];
-
-const AppStepTwo = ({ selectedServiceId, setSelectedServiceId, onBack, onNext }) => {
+const AppStepTwo = ({
+  services = [],
+  selectedServiceId,
+  setSelectedServiceId = () => {},
+  loading = false,
+  error = ""
+}) => {
   return (
-    <div className="appStep">
-      <h1 className="appStepTitle">Service Selection</h1>
-      <p className="appStepSubtitle">Step 2 — choose one service for your appointment.</p>
+    <div className="app-step-two">
+      <h1>Service Selection</h1>
 
-      <div className="serviceGrid">
-        {SERVICES.map((s) => {
-          const selected = selectedServiceId === s.id;
-          return (
-            <button
-              key={s.id}
-              type="button"
-              className={`serviceCard ${selected ? "selected" : ""}`}
-              onClick={() => setSelectedServiceId(s.id)}
-            >
-              {s.label}
-            </button>
-          );
-        })}
-      </div>
+      <div className="service-card">
+        {loading && <div className="service-message">Loading services...</div>}
+        {error && <div className="service-message text-danger">{error}</div>}
 
-      <div className="stepActions">
-        <button type="button" className="stepBtn secondary" onClick={onBack}>
-          Back
-        </button>
+        {!loading && !error && (
+          <div className="service-grid">
+            {services.length === 0 ? (
+              <div className="service-message">No active services available.</div>
+            ) : (
+              services.map((service) => {
+                const selected = selectedServiceId === service.service_id;
 
-        <button
-          type="button"
-          className="stepBtn primary"
-          onClick={onNext}
-          disabled={!selectedServiceId}
-        >
-          Next
-        </button>
+                return (
+                  <button
+                    key={service.service_id}
+                    type="button"
+                    className={`service-option ${selected ? "selected" : ""}`}
+                    onClick={() => setSelectedServiceId(service.service_id)}
+                  >
+                    <div className="service-name">{service.name}</div>
+                    <div className="service-cost">
+                      ${Number(service.cost).toFixed(2)}
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

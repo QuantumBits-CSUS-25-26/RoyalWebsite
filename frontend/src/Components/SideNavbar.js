@@ -10,6 +10,12 @@ import '../App.css';
 
 const SideNavbar = () => {
   const { setServiceOpen, openServices } = useUi();
+
+  const isLoggedIn = !!(
+    localStorage.getItem("authToken") ||
+    sessionStorage.getItem("authToken")
+  );
+
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     sessionStorage.removeItem("authToken");
@@ -26,7 +32,10 @@ const SideNavbar = () => {
           <Nav vertical>
             <div className ="btn-group">
               <NavItem>
-                <NavLink className='nav-link' to='/login' onClick={() => setServiceOpen(false)}>
+                <NavLink 
+                  className='nav-link' 
+                  to={isLoggedIn ? '/dashboard' : '/login'} 
+                  onClick={() => setServiceOpen(false)}>
                   <button>
                     <img src={AccountSvg} alt="AccountImage" style={{ height:30, width:30}}/>
                     Account
@@ -68,8 +77,9 @@ const SideNavbar = () => {
                 </NavLink>
               </NavItem>
 
-              <NavItem>
-                <NavLink
+              {isLoggedIn && (
+                <NavItem>
+                  <NavLink
                     className="nav-link"
                     to="#"
                     onClick={(e) => {
@@ -79,12 +89,12 @@ const SideNavbar = () => {
                     }}
                 >
                   <button>
-                    <img src={NewsSvg} alt="LogoutIcon" style={{ height: 30, width: 30 }} />
+                    <img src={AccountSvg} alt="LogoutIcon" style={{ height: 30, width: 30 }} />
                     Logout
                   </button>
                 </NavLink>
               </NavItem>
-
+              )}
             </div>
           </Nav>
         </Container>

@@ -1,69 +1,121 @@
 import './Homepage.css';
 import '../App.css';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import AuthErrorPage from "../Components/AuthErrorPage/AuthErrorPage";
 import { API_BASE_URL } from "../config";
 
-const currentEntries = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "123-456-7890",
-    password: "examplePassword"
-  }
-];
-
 const CustomerUpdate = () => {
-  const parseStoredUser = () => {
-    try {
-      const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const storedUser = parseStoredUser();
-
-  const isAuthorized = (user) => {
-    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-    if (!user && token) return true;
-    if (!user) return false;
-    if (user.is_customer || user.is_superuser) return true;
-    if (user.role === "customer") return true;
-    if (Array.isArray(user.roles) && user.roles.includes("customer")) return true;
-    return false;
-  };
+  const navigate = useNavigate();
 
   const [formValues, setFormValues] = useState({
-    firstName: currentEntries[0].firstName,
-    lastName: currentEntries[0].lastName,
-    email: currentEntries[0].email,
-    phoneNumber: currentEntries[0].phoneNumber,
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+
+  const isAuthorized = () => {
+    return !!token;
+  };
+
+  const formatPhoneNumber = (value) => {
+    const digits = String(value || '').replace(/\D/g, '').slice(0, 10);
+
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  };
+
+  const mergeUpdatedUserIntoStorage = (updatedProfile) => {
+    const mergeOne = (storage) => {
+      const raw = storage.getItem("user");
+      if (!raw) return;
+
+      try {
+        const existingUser = JSON.parse(raw);
+        const mergedUser = {
+          ...existingUser,
+          first_name: updatedProfile.first_name,
+          last_name: updatedProfile.last_name,
+          email: updatedProfile.email,
+          phone: updatedProfile.phone,
+          customer_id: updatedProfile.customer_id ?? existingUser.customer_id,
+          created_at: updatedProfile.created_at ?? existingUser.created_at
+        };
+        storage.setItem("user", JSON.stringify(mergedUser));
+      } catch (e) {
+        console.error("Failed to merge updated user into storage:", e);
+      }
+    };
+
+    mergeOne(localStorage);
+    mergeOne(sessionStorage);
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/api/customers/me/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const user = response.data;
+
+        setFormValues((prev) => ({
+          ...prev,
+          firstName: user.first_name || '',
+          lastName: user.last_name || '',
+          email: user.email || '',
+          phoneNumber: formatPhoneNumber(user.phone || '')
+        }));
+      } catch (err) {
+        console.error("Failed to load user:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: name === "phoneNumber" ? formatPhoneNumber(value) : value
+    }));
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
 
     const nextErrors = {};
+    const phoneDigits = formValues.phoneNumber.replace(/\D/g, '');
 
     if (!formValues.firstName.trim()) nextErrors.firstName = "First name required";
     if (!formValues.lastName.trim()) nextErrors.lastName = "Last name required";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) nextErrors.email = "Invalid email";
-    if (!/^\d{3}-\d{3}-\d{4}$/.test(formValues.phoneNumber)) nextErrors.phoneNumber = "Invalid phone number";
+    if (phoneDigits.length !== 10) nextErrors.phoneNumber = "Invalid phone number";
     if (formValues.password && formValues.password.length < 8) nextErrors.password = "Password must be 8+ chars";
     if (formValues.password !== formValues.confirmPassword) nextErrors.confirmPassword = "Passwords do not match";
 
@@ -71,27 +123,45 @@ const CustomerUpdate = () => {
     if (Object.keys(nextErrors).length > 0) return;
 
     try {
-      const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+      const payload = {
+        first_name: formValues.firstName,
+        last_name: formValues.lastName,
+        email: formValues.email,
+        phone: phoneDigits,
+        ...(formValues.password ? { password: formValues.password } : {})
+      };
 
       const response = await axios.put(
-        `${API_BASE_URL}/api/customers/update/${currentEntries[0].id}/`,
-        formValues,
+        `${API_BASE_URL}/api/customers/me/`,
+        payload,
         {
           headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
+            Authorization: `Bearer ${token}`
           }
         }
       );
 
       console.log("Customer updated:", response.data);
-      alert("Update successful!");
+
+      mergeUpdatedUserIntoStorage(response.data);
+
+      setFormValues((prev) => ({
+        ...prev,
+        phoneNumber: formatPhoneNumber(response.data.phone || phoneDigits),
+        password: '',
+        confirmPassword: ''
+      }));
+
+      navigate("/dashboard");
     } catch (err) {
       console.error("Update failed:", err);
       alert("Update failed");
     }
   };
 
-  if (!isAuthorized(storedUser)) return <AuthErrorPage />;
+  if (!isAuthorized()) return <AuthErrorPage />;
+
+  if (loading) return <div className="text-center mt-5">Loading...</div>;
 
   return (
     <div className="customerUpdate">
@@ -101,11 +171,9 @@ const CustomerUpdate = () => {
             <div className="my-4">Update Account Information</div>
 
             <FormGroup className="mx-5 px-5 my-3 text-start">
-              <Label for="firstName">First Name</Label>
+              <Label>First Name</Label>
               <Input
-                id="firstName"
                 name="firstName"
-                type="text"
                 value={formValues.firstName}
                 onChange={handleChange}
                 invalid={!!errors.firstName}
@@ -114,11 +182,9 @@ const CustomerUpdate = () => {
             </FormGroup>
 
             <FormGroup className="mx-5 px-5 my-3 text-start">
-              <Label for="lastName">Last Name</Label>
+              <Label>Last Name</Label>
               <Input
-                id="lastName"
                 name="lastName"
-                type="text"
                 value={formValues.lastName}
                 onChange={handleChange}
                 invalid={!!errors.lastName}
@@ -127,11 +193,9 @@ const CustomerUpdate = () => {
             </FormGroup>
 
             <FormGroup className="mx-5 px-5 my-3 text-start">
-              <Label for="email">Email</Label>
+              <Label>Email</Label>
               <Input
-                id="email"
                 name="email"
-                type="email"
                 value={formValues.email}
                 onChange={handleChange}
                 invalid={!!errors.email}
@@ -140,24 +204,22 @@ const CustomerUpdate = () => {
             </FormGroup>
 
             <FormGroup className="mx-5 px-5 my-3 text-start">
-              <Label for="phoneNumber">Phone Number</Label>
+              <Label>Phone</Label>
               <Input
-                id="phoneNumber"
                 name="phoneNumber"
-                type="tel"
                 value={formValues.phoneNumber}
                 onChange={handleChange}
                 invalid={!!errors.phoneNumber}
+                placeholder="123-456-7890"
               />
               {errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
             </FormGroup>
 
             <FormGroup className="mx-5 px-5 my-3 text-start">
-              <Label for="password">New Password</Label>
+              <Label>New Password</Label>
               <Input
-                id="password"
-                name="password"
                 type="password"
+                name="password"
                 value={formValues.password}
                 onChange={handleChange}
                 invalid={!!errors.password}
@@ -166,11 +228,10 @@ const CustomerUpdate = () => {
             </FormGroup>
 
             <FormGroup className="mx-5 px-5 my-3 text-start">
-              <Label for="confirmPassword">Confirm New Password</Label>
+              <Label>Confirm Password</Label>
               <Input
-                id="confirmPassword"
-                name="confirmPassword"
                 type="password"
+                name="confirmPassword"
                 value={formValues.confirmPassword}
                 onChange={handleChange}
                 invalid={!!errors.confirmPassword}

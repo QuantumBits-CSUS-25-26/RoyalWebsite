@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ContactInfoS4 from "../Components/ContactInfoS4";
-import AppStepOne from './AppointmentComponents/AppStepOne'
+import AppStepOne from './AppointmentComponents/AppStepOne';
 import AppStepTwo from "./AppointmentComponents/AppStepTwo";
-import AppStepThree from './AppointmentComponents/AppStepThree'
+import AppStepThree from './AppointmentComponents/AppStepThree';
 import '../App.css';
 import { API_BASE_URL } from "../config";
 
@@ -18,8 +18,11 @@ const Appointments = () => {
     }
   });
 
-  const [step, setStep] = useState(1);
   const [selectedServiceId, setSelectedServiceId] = useState("");
+
+  const [services, setServices] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [servicesError, setServicesError] = useState('');
 
   const [vehicleInfo, setVehicleInfo] = useState({
     year: '',
@@ -37,6 +40,51 @@ const Appointments = () => {
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchServices() {
+      setServicesLoading(true);
+      setServicesError('');
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/services/`);
+        const data = await response.json().catch(() => []);
+
+        if (!response.ok) {
+          throw new Error(data.detail || 'Failed to load services.');
+        }
+
+        if (!isMounted) return;
+
+        const activeServices = Array.isArray(data)
+          ? data.filter((service) => service.is_active)
+          : [];
+
+        activeServices.sort((a, b) => {
+          const aOrder = a.display_order ?? 9999;
+          const bOrder = b.display_order ?? 9999;
+          return aOrder - bOrder;
+        });
+
+        setServices(activeServices);
+      } catch (err) {
+        console.error('Services fetch error:', err);
+        if (!isMounted) return;
+        setServicesError(err.message || 'Failed to load services.');
+        setServices([]);
+      } finally {
+        if (isMounted) setServicesLoading(false);
+      }
+    }
+
+    fetchServices();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function handleFieldChange(e) {
     const { name, value } = e.target;
@@ -93,6 +141,10 @@ const Appointments = () => {
   }
 
   function createAppointmentPayload() {
+    const selectedService = services.find(
+      (service) => service.service_id === selectedServiceId
+    );
+
     return {
       contact: {
         first_name: contactInfo.fname.trim(),
@@ -112,7 +164,7 @@ const Appointments = () => {
         date: formatLocalDate(appointment.selectedDate),
         time: appointment.selectedTime
       },
-      service_type: 'General Service'
+      service_type: selectedService?.name || 'General Service'
     };
   }
 
@@ -121,6 +173,11 @@ const Appointments = () => {
 
     setSubmitError('');
     setSubmitSuccess('');
+
+    if (!selectedServiceId) {
+      setSubmitError('Please select a service.');
+      return;
+    }
 
     if (!contactInfo.fname.trim() || !contactInfo.lname.trim() || !contactInfo.email.trim()) {
       setSubmitError('First name, last name, and email are required.');
@@ -177,6 +234,8 @@ const Appointments = () => {
         }
       });
 
+      setSelectedServiceId("");
+
       setVehicleInfo({
         year: '',
         manufacturer: '',
@@ -205,11 +264,15 @@ const Appointments = () => {
         onVehicleChange={handleVehicleChange}
         errors={vehicleErrors}
       />
-      <AppStepTwo 
-          contactInfo={contactInfo}
-          onFieldChange={handleFieldChange}
-          onNotifChange={handleNotifChange}
+
+      <AppStepTwo
+        services={services}
+        selectedServiceId={selectedServiceId}
+        setSelectedServiceId={setSelectedServiceId}
+        loading={servicesLoading}
+        error={servicesError}
       />
+
       <AppStepThree
         selectedDate={appointment.selectedDate}
         selectedTime={appointment.selectedTime}
