@@ -27,9 +27,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
+}
+
+.admin-invoices-top-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-invoices-top-controls .dropdown {
+  display: flex;
+  gap: 8px;
 }
 
 .admin-invoices-title {
