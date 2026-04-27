@@ -336,7 +336,7 @@ const Invoices = () => {
           {availableAppointments.map((a) => {
             const c = a.vehicle?.customer;
             const label = c
-              ? `${c.first_name} ${c.last_name} — ${a.service_type || ""} @ ${formatDate(a.scheduled_at)}`
+              ? `${a.customer_name} — ${a.service_type || ""} @ ${formatDate(a.scheduled_at)}`
               : `Appointment #${a.appointment_id}`;
             return (
               <option key={a.appointment_id} value={a.appointment_id}>
