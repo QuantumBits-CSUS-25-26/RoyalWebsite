@@ -15,57 +15,81 @@ describe("Admin Invoices page", () => {
   let alertSpy;
 
   const setupDefaultState = () => {
-    invoicesState = [
-      {
-        invoice_id: 101,
-        appointment: { appointment_id: 1 },
-        customer: "Jordan Lee",
-        amount: "428.50",
-        status: "pending",
-        due_date: null,
-        notes: "",
-        lines: [],
-      },
-      {
-        invoice_id: 102,
-        appointment: { appointment_id: 2 },
-        customer: "Maria Santos",
-        amount: "89.99",
-        status: "paid",
-        due_date: null,
-        notes: "",
-        lines: [],
-      },
-    ];
-
     appointmentsState = [
       {
         appointment_id: 1,
         service_type: "Brake Pads",
         scheduled_at: "2026-04-14T09:30:00Z",
         cost: "428.50",
-        vehicle: { customer: { first_name: "Jordan", last_name: "Lee" } },
+        vehicle: {
+          year: 2020,
+          make: "Toyota",
+          model: "Camry",
+          customer: { first_name: "Jordan", last_name: "Lee" },
+        },
       },
       {
         appointment_id: 2,
         service_type: "Oil Change",
         scheduled_at: "2026-04-10T11:00:00Z",
         cost: "89.99",
-        vehicle: { customer: { first_name: "Maria", last_name: "Santos" } },
+        vehicle: {
+          year: 2018,
+          make: "Honda",
+          model: "Civic",
+          customer: { first_name: "Maria", last_name: "Santos" },
+        },
       },
       {
         appointment_id: 3,
         service_type: "Tire Rotation",
         scheduled_at: "2026-04-20T10:00:00Z",
         cost: "65.00",
-        vehicle: { customer: { first_name: "Pat", last_name: "Rivera" } },
+        vehicle: {
+          year: 2021,
+          make: "Ford",
+          model: "Escape",
+          customer: { first_name: "Pat", last_name: "Rivera" },
+        },
       },
       {
         appointment_id: 4,
         service_type: "Oil Change, Tire Rotation",
         scheduled_at: "2026-04-25T10:00:00Z",
         cost: "94.99",
-        vehicle: { customer: { first_name: "Chris", last_name: "Nolan" } },
+        vehicle: {
+          year: 2022,
+          make: "Nissan",
+          model: "Altima",
+          customer: { first_name: "Chris", last_name: "Nolan" },
+        },
+      },
+    ];
+
+    invoicesState = [
+      {
+        invoice_id: 101,
+        appointment: appointmentsState[0],
+        customer: "Jordan Lee",
+        vehicle: "Toyota Camry",
+        date: "2026-04-14T09:30:00Z",
+        amount: "428.50",
+        status: "pending",
+        due_date: null,
+        notes: "",
+        lines: [{ line_id: 1, name: "Brake Pads", cost: "428.50" }],
+      },
+      {
+        invoice_id: 102,
+        appointment: appointmentsState[1],
+        customer: "Maria Santos",
+        vehicle: "Honda Civic",
+        date: "2026-04-10T11:00:00Z",
+        amount: "89.99",
+        status: "paid",
+        due_date: null,
+        notes: "",
+        lines: [],
       },
     ];
 
@@ -85,101 +109,151 @@ describe("Admin Invoices page", () => {
     deleteOk = true,
     invoicesResponseShape = "results",
   } = {}) => {
-    fetchSpy = jest.spyOn(global, "fetch").mockImplementation(async (url, opts = {}) => {
-      const method = (opts.method || "GET").toUpperCase();
-      const u = String(url);
+    fetchSpy = jest
+      .spyOn(global, "fetch")
+      .mockImplementation(async (url, opts = {}) => {
+        const method = (opts.method || "GET").toUpperCase();
+        const u = String(url);
 
-      if (u.includes("/api/invoices/") && method === "GET") {
-        if (!invoicesGetOk) throw new Error("Failed to load");
-        if (invoicesResponseShape === "array") {
-          return { ok: true, json: async () => invoicesState };
-        }
-        return {
-          ok: true,
-          json: async () => ({ results: invoicesState, count: invoicesState.length }),
-        };
-      }
+        if (u.includes("/api/invoices/") && method === "GET") {
+          if (!invoicesGetOk) {
+            return {
+              ok: false,
+              status: 500,
+              statusText: "Server Error",
+              json: async () => ({ detail: "Failed to load" }),
+            };
+          }
 
-      if (u.includes("/api/admin/appointments/") && method === "GET") {
-        if (!appointmentsGetOk) throw new Error("Failed to load appointments");
-        return { ok: true, json: async () => appointmentsState };
-      }
+          if (invoicesResponseShape === "array") {
+            return { ok: true, json: async () => invoicesState };
+          }
 
-      if (u.includes("/api/services/") && method === "GET") {
-        if (!servicesGetOk) throw new Error("Failed to load services");
-        return { ok: true, json: async () => servicesState };
-      }
-
-      if (u.includes("/api/invoices/") && method === "POST") {
-        if (!createOk) {
           return {
-            ok: false,
-            json: async () => ({ detail: "Create failed" }),
+            ok: true,
+            json: async () => ({
+              results: invoicesState,
+              count: invoicesState.length,
+            }),
           };
         }
 
-        const body = JSON.parse(opts.body || "{}");
-        const appt = appointmentsState.find((a) => a.appointment_id === body.appointment);
-        const row = {
-          invoice_id: 103,
-          appointment: appt,
-          customer: appt?.vehicle?.customer
-            ? `${appt.vehicle.customer.first_name} ${appt.vehicle.customer.last_name}`
-            : "Customer",
-          amount:
+        if (u.includes("/api/admin/appointments/") && method === "GET") {
+          if (!appointmentsGetOk) {
+            return {
+              ok: false,
+              status: 500,
+              statusText: "Server Error",
+              json: async () => ({ detail: "Failed to load appointments" }),
+            };
+          }
+
+          return { ok: true, json: async () => appointmentsState };
+        }
+
+        if (u.includes("/api/services/") && method === "GET") {
+          if (!servicesGetOk) {
+            return {
+              ok: false,
+              status: 500,
+              statusText: "Server Error",
+              json: async () => ({ detail: "Failed to load services" }),
+            };
+          }
+
+          return { ok: true, json: async () => servicesState };
+        }
+
+        if (u.includes("/api/invoices/") && method === "POST") {
+          if (!createOk) {
+            return {
+              ok: false,
+              json: async () => ({ detail: "Create failed" }),
+            };
+          }
+
+          const body = JSON.parse(opts.body || "{}");
+          const appt = appointmentsState.find(
+            (a) => a.appointment_id === body.appointment
+          );
+
+          const amount =
             body.lines && body.lines.length > 0
-              ? body.lines.reduce((sum, l) => sum + (parseFloat(l.cost) || 0), 0).toFixed(2)
-              : "65.00",
-          status: body.status || "pending",
-          due_date: body.due_date || null,
-          notes: body.notes || "",
-          lines: body.lines || [],
-        };
-        invoicesState = [row, ...invoicesState];
-        return { ok: true, json: async () => row };
-      }
+              ? body.lines
+                .reduce((sum, l) => sum + (parseFloat(l.cost) || 0), 0)
+                .toFixed(2)
+              : String(appt?.cost || "0.00");
 
-      if (u.includes("/api/invoices/101/") && method === "PUT") {
-        if (!updateOk) {
-          return {
-            ok: false,
-            json: async () => ({ detail: "Update failed" }),
+          const row = {
+            invoice_id: 103,
+            appointment: appt,
+            customer: appt?.vehicle?.customer
+              ? `${appt.vehicle.customer.first_name} ${appt.vehicle.customer.last_name}`
+              : "Customer",
+            vehicle: appt?.vehicle
+              ? `${appt.vehicle.make} ${appt.vehicle.model}`
+              : "",
+            date: appt?.scheduled_at,
+            amount,
+            status: body.status || "pending",
+            due_date: body.due_date || null,
+            notes: body.notes || "",
+            lines: body.lines || [],
           };
+
+          invoicesState = [row, ...invoicesState];
+          return { ok: true, json: async () => row };
         }
 
-        const body = JSON.parse(opts.body || "{}");
-        const updated = {
-          ...invoicesState.find((i) => i.invoice_id === 101),
-          status: body.status,
-          due_date: body.due_date,
-          notes: body.notes,
-          lines: body.lines || [],
-          amount: body.lines?.length
-            ? body.lines.reduce((sum, l) => sum + (parseFloat(l.cost) || 0), 0).toFixed(2)
-            : invoicesState.find((i) => i.invoice_id === 101).amount,
-        };
+        if (u.includes("/api/invoices/101/") && method === "PUT") {
+          if (!updateOk) {
+            return {
+              ok: false,
+              json: async () => ({ detail: "Update failed" }),
+            };
+          }
 
-        invoicesState = invoicesState.map((i) => (i.invoice_id === 101 ? updated : i));
-        return { ok: true, json: async () => updated };
-      }
+          const body = JSON.parse(opts.body || "{}");
+          const oldInvoice = invoicesState.find((i) => i.invoice_id === 101);
 
-      if (u.includes("/api/invoices/102/") && method === "DELETE") {
-        if (!deleteOk) {
-          return { ok: false, status: 500 };
+          const updated = {
+            ...oldInvoice,
+            status: body.status,
+            due_date: body.due_date,
+            notes: body.notes,
+            lines: body.lines || [],
+            amount: body.lines?.length
+              ? body.lines
+                .reduce((sum, l) => sum + (parseFloat(l.cost) || 0), 0)
+                .toFixed(2)
+              : oldInvoice.amount,
+          };
+
+          invoicesState = invoicesState.map((i) =>
+            i.invoice_id === 101 ? updated : i
+          );
+
+          return { ok: true, json: async () => updated };
         }
-        invoicesState = invoicesState.filter((i) => i.invoice_id !== 102);
-        return { ok: true, status: 204 };
-      }
 
-      return { ok: true, json: async () => ({}) };
-    });
+        if (u.includes("/api/invoices/102/") && method === "DELETE") {
+          if (!deleteOk) {
+            return { ok: false, status: 500 };
+          }
+
+          invoicesState = invoicesState.filter((i) => i.invoice_id !== 102);
+          return { ok: true, status: 204 };
+        }
+
+        return { ok: true, json: async () => ({}) };
+      });
   };
 
   beforeEach(() => {
     sessionStorage.setItem("authToken", "test-token");
     setupDefaultState();
     installFetchMock();
-    alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+    alertSpy = jest.spyOn(window, "alert").mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -190,7 +264,9 @@ describe("Admin Invoices page", () => {
 
   test("shows loading state before data loads", () => {
     fetchSpy.mockRestore();
-    fetchSpy = jest.spyOn(global, "fetch").mockImplementation(() => new Promise(() => {}));
+    fetchSpy = jest
+      .spyOn(global, "fetch")
+      .mockImplementation(() => new Promise(() => { }));
 
     render(<Invoices />);
 
@@ -201,10 +277,16 @@ describe("Admin Invoices page", () => {
     render(<Invoices />);
 
     expect(screen.getByTestId("mock-admin-sidebar")).toBeInTheDocument();
+
     expect(await screen.findByText("Jordan Lee")).toBeInTheDocument();
-    expect(screen.getByText("INV-101")).toBeInTheDocument();
     expect(screen.getByText("Maria Santos")).toBeInTheDocument();
+
+    expect(screen.getByText("2020 Toyota Camry")).toBeInTheDocument();
+    expect(screen.getByText("2018 Honda Civic")).toBeInTheDocument();
+
     expect(screen.getByText("$428.50")).toBeInTheDocument();
+    expect(screen.getByText("Brake Pads")).toBeInTheDocument();
+    expect(screen.getByText("Oil Change")).toBeInTheDocument();
   });
 
   test("supports invoices API returning a raw array", async () => {
@@ -214,7 +296,7 @@ describe("Admin Invoices page", () => {
     render(<Invoices />);
 
     expect(await screen.findByText("Jordan Lee")).toBeInTheDocument();
-    expect(screen.getByText("INV-101")).toBeInTheDocument();
+    expect(screen.getByText("2020 Toyota Camry")).toBeInTheDocument();
   });
 
   test("shows error state when initial fetch fails", async () => {
@@ -223,7 +305,7 @@ describe("Admin Invoices page", () => {
 
     render(<Invoices />);
 
-    expect(await screen.findByText(/Failed to load/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Invoices failed/i)).toBeInTheDocument();
   });
 
   test("shows empty state when no invoices exist", async () => {
@@ -232,12 +314,15 @@ describe("Admin Invoices page", () => {
     render(<Invoices />);
 
     expect(
-      await screen.findByText(/No invoices yet\. Click "Add an invoice" to create one\./i)
+      await screen.findByText(
+        /No invoices yet\. Click "Add an invoice" to create one\./i
+      )
     ).toBeInTheDocument();
   });
 
   test("opens add modal and cancel closes it", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
@@ -255,34 +340,42 @@ describe("Admin Invoices page", () => {
 
   test("alerts if trying to create invoice without selecting an appointment", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
-    const dialog = await screen.findByRole("dialog");
 
-    await user.click(within(dialog).getByRole("button", { name: /create invoice/i }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(
+      within(dialog).getByRole("button", { name: /create invoice/i })
+    );
 
     expect(alertSpy).toHaveBeenCalledWith("Please select an appointment");
   });
 
   test("creates invoice after selecting appointment", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
-    const dialog = await screen.findByRole("dialog");
 
+    const dialog = await screen.findByRole("dialog");
     const combos = within(dialog).getAllByRole("combobox");
+
     await user.selectOptions(combos[0], "3");
-    await user.click(within(dialog).getByRole("button", { name: /create invoice/i }));
+    await user.click(
+      within(dialog).getByRole("button", { name: /create invoice/i })
+    );
 
     await waitFor(() => {
       expect(screen.getByText("Pat Rivera")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("INV-103")).toBeInTheDocument();
+    expect(screen.getByText("2021 Ford Escape")).toBeInTheDocument();
+
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.stringContaining("/api/invoices/"),
       expect.objectContaining({
@@ -296,29 +389,37 @@ describe("Admin Invoices page", () => {
 
   test("prefills line items from appointment and catalog matches", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
-    const dialog = await screen.findByRole("dialog");
 
+    const dialog = await screen.findByRole("dialog");
     const combos = within(dialog).getAllByRole("combobox");
+
     await user.selectOptions(combos[0], "4");
 
-    expect(within(dialog).getByDisplayValue("Oil Change")).toBeInTheDocument();
-    expect(within(dialog).getByDisplayValue("Tire Rotation")).toBeInTheDocument();
+    const serviceInputs = within(dialog).getAllByDisplayValue("Oil Change");
+    expect(serviceInputs.length).toBeGreaterThan(0); expect(
+      within(dialog).getByDisplayValue("Tire Rotation")
+    ).toBeInTheDocument();
     expect(within(dialog).getByText(/Total: \$94.99/i)).toBeInTheDocument();
   });
 
   test("adds a custom line and removes it", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
+
     const dialog = await screen.findByRole("dialog");
 
-    await user.click(within(dialog).getByRole("button", { name: /\+ custom/i }));
+    await user.click(
+      within(dialog).getByRole("button", { name: /\+ custom/i })
+    );
 
     const serviceNameInput = within(dialog).getByPlaceholderText(/Service name/i);
     const costInput = within(dialog).getByPlaceholderText("0.00");
@@ -336,17 +437,19 @@ describe("Admin Invoices page", () => {
 
   test("adds a line from catalog in add modal", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
-    const dialog = await screen.findByRole("dialog");
 
+    const dialog = await screen.findByRole("dialog");
     const combos = within(dialog).getAllByRole("combobox");
+
     await user.selectOptions(combos[2], "21");
 
-    expect(within(dialog).getByDisplayValue("Oil Change")).toBeInTheDocument();
-    expect(within(dialog).getByText(/Total: \$29.99/i)).toBeInTheDocument();
+    const serviceInputs = within(dialog).getAllByDisplayValue("Oil Change");
+    expect(serviceInputs.length).toBeGreaterThan(0); expect(within(dialog).getByText(/Total: \$29.99/i)).toBeInTheDocument();
   });
 
   test("alerts when create invoice request fails", async () => {
@@ -354,23 +457,30 @@ describe("Admin Invoices page", () => {
     installFetchMock({ createOk: false });
 
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
-    const dialog = await screen.findByRole("dialog");
 
+    const dialog = await screen.findByRole("dialog");
     const combos = within(dialog).getAllByRole("combobox");
+
     await user.selectOptions(combos[0], "3");
-    await user.click(within(dialog).getByRole("button", { name: /create invoice/i }));
+    await user.click(
+      within(dialog).getByRole("button", { name: /create invoice/i })
+    );
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith(expect.stringMatching(/Failed to create invoice/i));
+      expect(alertSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/Failed to create invoice/i)
+      );
     });
   });
 
   test("opens edit modal and cancel closes it", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
@@ -378,9 +488,11 @@ describe("Admin Invoices page", () => {
     await user.click(within(row).getByRole("button", { name: /update/i }));
 
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText(/Update invoice/i)).toBeInTheDocument();
-    expect(within(dialog).getByDisplayValue("INV-101")).toBeInTheDocument();
 
+    expect(within(dialog).getByText(/Update invoice/i)).toBeInTheDocument();
+    expect(within(dialog).getByDisplayValue("Jordan Lee")).toBeInTheDocument();
+    const serviceInputs = within(dialog).getAllByDisplayValue("Brake Pads");
+    expect(serviceInputs.length).toBeGreaterThan(0);
     await user.click(within(dialog).getByRole("button", { name: /cancel/i }));
 
     await waitFor(() => {
@@ -390,6 +502,7 @@ describe("Admin Invoices page", () => {
 
   test("updates an invoice status, notes, due date, and lines", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
@@ -407,16 +520,26 @@ describe("Admin Invoices page", () => {
     const notes = dialog.querySelector("textarea");
     await user.type(notes, "Paid in full");
 
-    await user.click(within(dialog).getByRole("button", { name: /\+ custom/i }));
+    await user.click(
+      within(dialog).getByRole("button", { name: /\+ custom/i })
+    );
 
-    const serviceNameInput = within(dialog).getByPlaceholderText(/Service name/i);
-    const costInput = within(dialog).getByPlaceholderText("0.00");
+    const serviceNameInputs = within(dialog).getAllByPlaceholderText(/Service name/i);
+    const costInputs = within(dialog).getAllByPlaceholderText("0.00");
 
+    // grab the EMPTY one (new line)
+    const serviceNameInput = serviceNameInputs.find((el) => el.value === "");
+    const costInput = costInputs.find((el) => el.value === "0");
+
+    await user.clear(serviceNameInput);
     await user.type(serviceNameInput, "Labor");
+
     await user.clear(costInput);
     await user.type(costInput, "500");
 
-    await user.click(within(dialog).getByRole("button", { name: /save changes/i }));
+    await user.click(
+      within(dialog).getByRole("button", { name: /save changes/i })
+    );
 
     await waitFor(() => {
       expect(screen.getAllByText(/Paid/i).length).toBeGreaterThan(0);
@@ -431,7 +554,9 @@ describe("Admin Invoices page", () => {
         }),
       })
     );
-    expect(screen.getByText("$500.00")).toBeInTheDocument();
+
+    expect(screen.getByText("$928.50")).toBeInTheDocument();
+    expect(screen.getByText(/Labor/)).toBeInTheDocument();
   });
 
   test("alerts when update request fails", async () => {
@@ -439,6 +564,7 @@ describe("Admin Invoices page", () => {
     installFetchMock({ updateOk: false });
 
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
@@ -446,15 +572,21 @@ describe("Admin Invoices page", () => {
     await user.click(within(row).getByRole("button", { name: /update/i }));
 
     const dialog = await screen.findByRole("dialog");
-    await user.click(within(dialog).getByRole("button", { name: /save changes/i }));
+
+    await user.click(
+      within(dialog).getByRole("button", { name: /save changes/i })
+    );
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith(expect.stringMatching(/Failed to update invoice/i));
+      expect(alertSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/Failed to update invoice/i)
+      );
     });
   });
 
   test("delete modal cancel closes without removing row", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Maria Santos");
 
@@ -462,7 +594,10 @@ describe("Admin Invoices page", () => {
     await user.click(within(row).getByRole("button", { name: /^delete$/i }));
 
     const dialogs = screen.getAllByRole("dialog");
-    const delDlg = dialogs.find((d) => within(d).queryByText(/delete invoice/i));
+    const delDlg = dialogs.find((d) =>
+      within(d).queryByText(/delete invoice/i)
+    );
+
     expect(delDlg).toBeTruthy();
 
     await user.click(within(delDlg).getByRole("button", { name: /cancel/i }));
@@ -476,6 +611,7 @@ describe("Admin Invoices page", () => {
 
   test("delete confirm removes row", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Maria Santos");
 
@@ -483,12 +619,17 @@ describe("Admin Invoices page", () => {
     await user.click(within(row).getByRole("button", { name: /^delete$/i }));
 
     const dialogs = screen.getAllByRole("dialog");
-    const delDlg = dialogs.find((d) => within(d).queryByText(/delete invoice/i));
+    const delDlg = dialogs.find((d) =>
+      within(d).queryByText(/delete invoice/i)
+    );
+
     expect(delDlg).toBeTruthy();
 
     await user.click(within(delDlg).getByRole("button", { name: /^delete$/i }));
 
-    await waitFor(() => expect(screen.queryByText("Maria Santos")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByText("Maria Santos")).not.toBeInTheDocument()
+    );
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.stringContaining("/api/invoices/102/"),
@@ -506,6 +647,7 @@ describe("Admin Invoices page", () => {
     installFetchMock({ deleteOk: false });
 
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Maria Santos");
 
@@ -513,11 +655,16 @@ describe("Admin Invoices page", () => {
     await user.click(within(row).getByRole("button", { name: /^delete$/i }));
 
     const dialogs = screen.getAllByRole("dialog");
-    const delDlg = dialogs.find((d) => within(d).queryByText(/delete invoice/i));
+    const delDlg = dialogs.find((d) =>
+      within(d).queryByText(/delete invoice/i)
+    );
+
     await user.click(within(delDlg).getByRole("button", { name: /^delete$/i }));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith(expect.stringMatching(/Failed to delete/i));
+      expect(alertSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/Failed to delete/i)
+      );
     });
 
     expect(screen.getByText("Maria Santos")).toBeInTheDocument();
@@ -525,10 +672,12 @@ describe("Admin Invoices page", () => {
 
   test("overlay click closes add modal", async () => {
     const user = userEvent.setup();
+
     render(<Invoices />);
     await screen.findByText("Jordan Lee");
 
     await user.click(screen.getByRole("button", { name: /add an invoice/i }));
+
     const dialog = await screen.findByRole("dialog");
     const overlay = dialog.parentElement;
 
