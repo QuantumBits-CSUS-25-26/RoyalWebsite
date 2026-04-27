@@ -695,9 +695,10 @@ const Invoices = () => {
                   <tr>
                     <th scope="col">Customer</th>
                     <th scope="col">Vehicle</th>
+                    <th scope="col">Appointment Date</th>
                     <th scope="col">Amount</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Due</th>
+                    <th scope="col">Due Date</th>
                     <th scope="col">Services</th>
                     <th scope="col">Notes</th>
                     <th scope="col">Actions</th>
@@ -707,7 +708,7 @@ const Invoices = () => {
                   {invoices.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={8}
+                        colSpan={9}
                         style={{
                           textAlign: "center",
                           padding: 32,
@@ -726,7 +727,8 @@ const Invoices = () => {
                           {inv.appointment?.vehicle
                             ? `${inv.appointment.vehicle.year || ""} ${inv.appointment.vehicle.make || ""} ${inv.appointment.vehicle.model || ""}`
                             : "—"}
-                        </td>                        <td>${formatMoney(inv.amount)}</td>
+                        </td>
+                        <td>{inv.date ? new Date(inv.date).toLocaleDateString() : "—"}</td>                        <td>${formatMoney(inv.amount)}</td>
                         <td>
                           <span
                             className={`admin-invoices-status ${inv.status === "paid" ? "paid" : "unpaid"}`}
