@@ -807,8 +807,8 @@ class AdminCustomerListView(APIView):
 
 class AdminBookAppointmentView(APIView):
     """POST /api/admin/customers/<customer_id>/book-appointment/"""
-    authentication_classes = []  # [CustomJWTAuthentication]  # enable permission check at prod
-    permission_classes = []     # [IsEmployee]               # enable permission check at prod
+    authentication_classes = [CustomJWTAuthentication] 
+    permission_classes = [IsEmployee] 
 
     def post(self, request, customer_id):
         try:
@@ -819,6 +819,9 @@ class AdminBookAppointmentView(APIView):
         vehicle_id = request.data.get('vehicle')
         service_type = request.data.get('service_type')
         scheduled_at = request.data.get('scheduled_at')
+        employee_id = getattr(request.user, "employee_id", None)
+        if not employee_id:
+            return Response({'detail': 'Authenticated user has no employee_id.'}, status=400)
 
         if not vehicle_id or not service_type or not scheduled_at:
             return Response(
