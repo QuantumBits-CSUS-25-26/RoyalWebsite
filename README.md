@@ -4,11 +4,11 @@
 
 ## Synopsis
 
-The Royal Auto & Body Repair Website is a full-stack web application built to bring the shop’s services and operations online. Right now, the business has no website at all, so our goal is to create a modern, easy-to-use platform that improves both the customer experience and the workflow for the shop’s staff.
+The Royal Auto & Body Repair Website is a full-stack web application built to give the business an online presence. This software was created as a modern, easy-to-use platform that improves both the customer experience and staff daily workflow.
 
-On the customer side, the site allows people to browse services, create an account, manage their vehicles, and schedule appointments directly online. For staff, the admin dashboard provides secure tools to view and update customer profiles, track upcoming appointments, manage service descriptions, post shop updates, and handle customer messages, all in one place.
+On the customer side, the site gives cusotomers a quick view of contact and location information, and an easy way to contact the business with any questions they may have. This site also allows users to browse services, create an account, manage their vehicles, schedule appointments, and view news and updates about the business. For staff, the admin dashboard provides secure tools to view and update customer profiles, track upcoming appointments, manage customer invoices, maintain offered services and their descriptions, and handle customer messages, all in one place.
 
-The system uses React on the frontend and Django with a MySQL database on the backend, with reusable UI components and divided client/admin portals to keep everything organized and easy to maintain. Overall, this project modernizes how Royal Auto & Body Repair interacts with its customers and helps streamline the day-to-day operations inside the shop.
+The system combines a React frontend, Django backend, and MySQL database, with reusable UI components and divided client/admin portals to keep everything organized and easy to maintain. Overall, this project modernizes how Royal Auto & Body Repair interacts with its customers and helps streamline the day-to-day operations inside the shop.
 
 ## Features
 
