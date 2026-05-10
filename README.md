@@ -20,12 +20,23 @@ The system combines a React frontend, Django backend, and MySQL database, with r
   - Appropriate links to the rest of the site
 - Includes section for connection to customer reviews
 - Includes small services section
+- Footer displays business information and has a button for the Contact Form
 
-**b. Payment Options Offered**
-- Zelle
-- Cash
-- Debit
-- Credit
+**b. Contact Form**
+- on the footer of the homepage users can access the Contact Form to send messages to the owner
+- The form will prompt the user to fill out their name, phone number, email, and their message
+
+### 2. Creating Customer Profiles
+
+**a. Customer Information**
+- Includes the contact info: name, phone number, and email of customers
+
+**b. Vehicle management**
+- List of work done
+  - Customers should be able to see previous work done on their vehicle
+- Recommend upcoming services
+  - Customers should see a list of possible future services as recommended by the shop
+- Checklist for services
 
 ### 2. Creating Customer Profiles
 
@@ -42,30 +53,52 @@ The system combines a React frontend, Django backend, and MySQL database, with r
 ### 3. Display Services Offered
 
 **a. List of services provided**
-- Oil change
-- Brakes
-- Suspensions
-- Engine tune-up
-- Body work (from partner shop)
-- Transmission
-- Hybrids
+- Shows available list of services on Homepage and Services page
+- available Services configurable from Admin Dashboard
 
 **b. Services and vehicles will be detailed to reflect what customers can expect to request**
 
-**c. Services should reflect an approximate cost of ther service provided**
+**c. Services have an approximate cost of ther service provided**
 
 ### 4. Admin Dashboard
 
 **a. View all list of customers/accounts**
 
 **b. View upcoming appointments**
+- add appointments on Customer's behalf
 
 **c. Edit description of services, or add new services**
 
-**d. Add and edit news/updates**
+**d. Manage Employee Accounts**
+- Add Employees
+- Remove Employees
 
-**e. Customer messages**
-- View and send messages
+**e. Change Business information**
+- Business name, address, phone number, email, and hours are all configurable
+- changes are reflected on site headers and footers displaying business information
+
+**f. Manage Invoices**
+- create and manage invoices for appointments, keeping track of customer name, services rendered, payment status, optional notes, due dates, and cost
+- invoices can also be updated and removed as needed
+
+**g. View on-site Messages**
+- Messages sent from the Contact Form will appear here, seperated in two columns; read and unread
+- Messages display the name and email of the sender
+- Messages content can be copied to clip board
+- Messages can be deleted
+- Unread Messages can be marked as "read" and move them to the appropriate column
+
+**h. Manage Services Offered**
+- All current Services will be listed with their name, short description, and estimated cost
+- Services can be added, removed, or edited
+
+### 5. News Page
+**a. Display recent posts from owner's Facebook page**
+
+### 6. Appointment Page
+**a. Customers can make an appointment on this page**
+
+**b. Customers will be prompted to add their vehicle information, service needed, date and time of the appointment, and their contact information**
 
 ## Tech Stack
 
