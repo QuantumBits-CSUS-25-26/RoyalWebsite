@@ -116,21 +116,37 @@ The Royal Auto & Body Repair website is built using a modern full-stack architec
 RoyalWebsite/
 ├── backend/
 │   ├── backend/            # Django project configuration (settings, urls, wsgi, asgi)
-│   ├── core/               # Main Django app (views, models, admin, etc.)
+│   ├── core/               # Main Django application (views, models, serializers, admin, etc.)
+│   │   └── migrations/     # Database schema migration/version control files
 │   ├── manage.py           # Django management script
-│   └── requirements.txt    # Python dependencies for backend
+│   └── requirements.txt    # Backend Python dependencies
+│
+├── docker/
+│   └── mysql/
+│       └── init.sql        # MySQL initialization script for Docker setup
 │
 ├── frontend/
-│   ├── public/             # Base HTML template and static assets
-│   └── src/
-│       ├── Components/     # Reusable React components
-│       ├── Pages/          # Top-level React pages (routing targets)
-│       ├── images/         # Frontend images (logos, graphics)
-│       ├── App.js          # Main React component
-│       ├── App.css         # Global styles
-│       ├── index.js        # React entry point
-│       └── index.css       # Base CSS styling
+│   ├── public/             # React base HTML template and public static assets
+│   │   └── images/
+│   │       └── services/   # Service images referenced by database records
+│   │
+│   ├── src/
+│   │   ├── Components/     # Reusable React components
+│   │   ├── Pages/          # Top-level routed application pages
+│   │   │   └── AdminPages/ # Admin and employee-only pages
+│   │   ├── images/         # Frontend-only images and graphics
+│   │   ├── context/        # Shared React context providers and state helpers
+│   │   ├── __tests__/      # Frontend test files
+│   │   ├── __mocks__/      # Mock files used during testing
+│   │   ├── Testing/        # Additional frontend testing utilities/files
+│   │   ├── App.js          # Root React component
+│   │   ├── App.css         # Global application styling
+│   │   ├── index.js        # React application entry point
+│   │   └── index.css       # Base CSS styling
+│   │
+│   └── package.json        # Frontend dependencies and React scripts
 │
+├── docker-compose.yml      # Main Docker Compose configuration
 └── README.md               # Project documentation
 ```
 
