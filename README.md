@@ -195,7 +195,7 @@ Some screenshots to showcase the visual theme of the project.
 
 The ERD for our project's handling of database entities.
 
-<img src="frontend/src/images/RoyalERDBetter.jpeg" width="500" />
+<img src="frontend/src/images/RoyalERDbetter.jpeg" width="500" />
 
 ## Roadmap (Based on JIRA)
 
