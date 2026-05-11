@@ -107,6 +107,8 @@ The Royal Auto & Body Repair website is built using a modern full-stack architec
 **Google Reviews API (Free Tier)**  
 - Displays real customer reviews directly on the homepage  
 
+**Facebook Graph API**
+- Displays recent Facebook posts from the business page into the website's news page 
 **Bootstrap CDN**  
 - Provides fast-loading UI components  
 
