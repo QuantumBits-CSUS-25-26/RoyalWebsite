@@ -208,6 +208,67 @@ The ERD for our project's handling of database entities.
 | Sprint 9 | admin dashboard pt2 | 04/04/26 |
 
 ## Developer Instructions
+### System Requirements:
+
+- Docker Desktop (latest stable)
+- Python: v3.11 or newer (recommended: 3.13)
+- Node.js: v18 LTS or newer (npm v9+)
+- Git
+
+### Stack versions used by this project:
+
+- Django: v5.x (with Django REST Framework + SimpleJWT)
+- React: v18.3.1
+- react-router-dom: v7.13.1
+- react-scripts (CRA): v5.0.1
+- @testing-library/react: v16.3.0
+- @testing-library/user-event: v14.6.1
+- MySQL: v8.0 (via Docker image mysql:8.0)
+
+### To set up local runs:
+
+#### Clone the GitHub repository by running the following command:
+
+- git clone <repository-url> RoyalWebsite
+
+#### Move into the project root:
+
+- cd RoyalWebsite
+
+#### Start the MySQL database container with Docker. Make sure Docker Desktop is running, then:
+
+- docker-compose up -d
+
+This launches a MySQL 8.0 container named royal_mysql on port 3306 with database RoyalWebsite (root password: Root). The schema in init.sql is loaded automatically the first time the container is created.
+
+Add a .env file to the backend directory containing any required secrets (Django SECRET_KEY, Facebook tokens, email credentials, etc.). This file will be provided separately.
+Please Note: The .env file contains sensitive information and should not be committed to GitHub.
+
+#### Backend (Django): From the project root open a new terminal and run:
+
+- cd backend
+- pip install -r requirements.txt
+
+#### Apply database migrations:
+
+- python manage.py migrate
+
+#### Start the Django development server:
+
+- python manage.py runserver
+
+The API will be available at http://localhost:8000.
+
+#### Frontend (React): Open another terminal at the project root and run:
+
+- cd frontend
+- npm install
+
+#### Start the React development server:
+
+- npm start
+
+The app will open at http://localhost:3000 and proxies API calls to http://localhost:8000.
 
 ## Testing
 ### System Requirements:
