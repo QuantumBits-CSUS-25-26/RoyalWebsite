@@ -1,0 +1,96 @@
+.app-step-two {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+  margin-top: 20px;
+}
+
+.app-step-two h1 {
+  text-align: center;
+}
+
+.service-card {
+  background-color: rgba(217, 217, 217, 0.8);
+  padding: 28px 28px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+  border: 1px solid rgba(16, 24, 40, 0.04);
+  width: 100%;
+  max-width: 1000px;
+  box-sizing: border-box;
+  color: black;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 24px;
+  max-width: 960px;
+  margin: 20px auto 0 auto;
+}
+
+.service-option {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 10px;
+  min-height: 88px;
+  padding: 18px 20px;
+  text-align: left;
+  color: black;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease, filter 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.service-option:hover {
+  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.32);
+}
+
+.service-option:active {
+  filter: brightness(0.9);
+  transform: translateY(0);
+}
+
+.service-option.selected {
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(16, 24, 40, 0.16);
+}
+
+.service-name {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.service-cost {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.service-message {
+  color: black;
+  font-size: 18px;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-option {
+    min-height: 76px;
+  }
+
+  .service-name {
+    font-size: 20px;
+  }
+
+  .service-cost {
+    font-size: 16px;
+  }
+}

@@ -23,7 +23,7 @@ export default function AdminSideBar() {
                 <Collapse isOpen={isOpen} navbar>
                     <Nav navbar className='adminTopbarNav'>
                         <NavItem><NavLink className='nav-link' to='/admin' end onClick={closeMenu}>Dashboard</NavLink></NavItem>
-                        <NavItem><NavLink className="nav-link" to="/admin/customers" onClick={closeMenu}>Customer List</NavLink></NavItem>
+                        <NavItem><NavLink className="nav-link" to="/admin/customers" onClick={closeMenu}>Customer Management</NavLink></NavItem>
                         <NavItem><NavLink className="nav-link" to="/admin/appointments" onClick={closeMenu}>Appointments</NavLink></NavItem>
                         <NavItem><NavLink className="nav-link" to="/admin/services" onClick={closeMenu}>Services</NavLink></NavItem>
                         <NavItem><NavLink className="nav-link" to="/admin/invoices" onClick={closeMenu}>Invoices</NavLink></NavItem>
@@ -35,7 +35,7 @@ export default function AdminSideBar() {
             <div className='adminNav d-none d-md-flex'>
                 <Navbar className='navbar rounded'>
                     <NavbarBrand className='ms-5 ps-2' href='/'>
-                        <img src={Logo} alt='business logo' style={{ height: '85px', marginLeft: '30px' }} />
+                        <img src={Logo} alt='business logo' style={{ height: '85px'}} />
                     </NavbarBrand>
                     <Container>
                         <Nav vertical>
@@ -49,7 +49,7 @@ export default function AdminSideBar() {
                             <NavItem>
                                 <NavLink className='nav-link' to='/admin/customers'>
                                     <Button type='btn' className='navButton'>
-                                        <FontAwesomeIcon icon={faUsers} /> Customer List
+                                        <FontAwesomeIcon icon={faUsers} /> Customer Management
                                     </Button>
                                 </NavLink>
                             </NavItem>

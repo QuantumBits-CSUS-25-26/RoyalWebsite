@@ -1,5 +1,6 @@
 import imageHoliday from './PlaceHolderNewsImages/Holiday.jpg';
 import imageLift from './PlaceHolderNewsImages/Lift.jpg';
+import React from 'react';
 import './News.css';
 
 
@@ -48,17 +49,55 @@ const NewsItem = ({ entry }) => {
 };
 
 const News = () => {
+  const [fbPosts, setFbPosts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch('api/facebook-posts/')
+      .then(res => res.json())
+      .then(data => {
+        setFbPosts(Array.isArray(data.data) ? data.data : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('Failed to load Facebook posts');
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="news">
-        <div className="newsTitle" style={{ color: 'white' }}>
-          News / Updates
-        </div>
-        <main className="news-list" aria-live="polite">
-          {sampleEntries.map(entry => <NewsItem key={entry.id} entry={entry} />)}
-        </main>
-
+      <div className="newsTitle" style={{ color: 'white' }}>
+        News / Updates
+      </div>
+      <main className="news-list" aria-live="polite">
+        {loading && <div>Loading Facebook posts...</div>}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {/* Facebook posts */}
+        {fbPosts.map(post => (
+          <article className="news-item" key={post.id}>
+            <div className="news-row">
+              <div className="news-date">
+                {post.created_time && new Date(post.created_time).toLocaleDateString()}
+              </div>
+              <h3 className="news-title">Facebook Post</h3>
+            </div>
+            <div className="news-text">
+              <p>{post.message || 'No content'}</p>
+            </div>
+            {post.full_picture && (
+              <div className="news-image">
+                <img src={post.full_picture} alt="Facebook post" />
+              </div>
+            )}
+          </article>
+        ))}
+        {/* Sample entries as fallback */}
+        {fbPosts.length === 0 && !loading && sampleEntries.map(entry => <NewsItem key={entry.id} entry={entry} />)}
+      </main>
     </div>
-  )
+  );
 }
 
 export default News

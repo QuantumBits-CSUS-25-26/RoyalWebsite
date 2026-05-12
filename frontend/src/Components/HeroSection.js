@@ -12,7 +12,8 @@ export default function HeroSection() {
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/business-info/`)
             .then(res => res.json())
-            .then(data => setBusinessInfo(data[0]));
+            .then(data => setBusinessInfo(data[0]))
+            .catch(() => setBusinessInfo(null));
     }, []);
     const style = { backgroundImage: `url(${heroImage})` };
 

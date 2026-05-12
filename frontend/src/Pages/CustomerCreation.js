@@ -1,9 +1,9 @@
 import './Homepage.css';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
+
 import { useState } from 'react';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import axios from "axios";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[0-9\s-.()]{7,15}$/;
 
@@ -64,7 +64,25 @@ const CustomerCreation = () => {
     setValues((s) => ({ ...s, [name]: value }));
     setErrors((s) => ({ ...s, [name]: validateField(name, value) }));
   };
-  const handleSubmit = async (e) => {
+  const sendPayload = async (payloadObj) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/customers/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadObj),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create account');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      return { ok: false, error: error.message };
+    }
+  };
+    const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateAll()) {
@@ -80,22 +98,14 @@ const CustomerCreation = () => {
 
       const res = await sendPayload(p);
 
-      if (res) {
-        navigate("/dashboard");
+      if (res.ok === false) {
+        alert('Account creation failed: ' + res.error);
+      } else {
+        if (res.access) {
+          sessionStorage.setItem('authToken', res.access);
+        }
+        navigate('/dashboard');
       }
-    }
-  };
-  const sendPayload = async (payloadObj) => {
-    try {
-      const response = await axios.post(
-          "http://127.0.0.1:8000/api/customers/register/",
-          payloadObj
-      );
-
-      console.log("Customer created:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating customer:", error);
     }
   };
 
@@ -106,9 +116,9 @@ const CustomerCreation = () => {
           <Col md="8" sm="12">
             <Form className="customerForm fs-3 p-4" onSubmit={handleSubmit} noValidate>
               <div className="my-4"><strong>Sign Up</strong></div>
-              <Row>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+              <Row className="justify-content-center">
+                {/* <Col xs={12} sm={10} md={8} lg={6}> */}
+                  <FormGroup className="my-3 text-start">
                     <Label for="fname">First Name</Label>
                     <Input
                       id="fname"
@@ -122,9 +132,7 @@ const CustomerCreation = () => {
                     />
                     {errors.fname && <div className="text-danger small">{errors.fname}</div>}
                   </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="lname">Last Name</Label>
                     <Input
                       id="lname"
@@ -138,11 +146,7 @@ const CustomerCreation = () => {
                     />
                     {errors.lname && <div className="text-danger small">{errors.lname}</div>}
                   </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="email">Email</Label>
                     <Input
                       id="email"
@@ -155,9 +159,7 @@ const CustomerCreation = () => {
                     />
                     {errors.email && <div className="text-danger small">{errors.email}</div>}
                   </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="phone">Phone Number</Label>
                     <Input
                       id="phone"
@@ -170,11 +172,7 @@ const CustomerCreation = () => {
                     />
                     {errors.phone && <div className="text-danger small">{errors.phone}</div>}
                   </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="password">Password</Label>
                     <Input
                       id="password"
@@ -187,9 +185,7 @@ const CustomerCreation = () => {
                     />
                     {errors.password && <div className="text-danger small">{errors.password}</div>}
                   </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup className="mx-5 px-5 my-3 text-start">
+                  <FormGroup className="my-3 text-start">
                     <Label for="confirmPassword">Confirm Password</Label>
                     <Input
                       id="confirmPassword"
@@ -202,9 +198,9 @@ const CustomerCreation = () => {
                     />
                     {errors.confirmPassword && <div className="text-danger small">{errors.confirmPassword}</div>}
                   </FormGroup>
-                </Col>
+                {/* </Col> */}
               </Row>
-              <Button type="submit" className="btn btn-lg my-4 py-4">
+              <Button type="submit" className="btn btn-lg my-4 py-4 px-5">
                 Sign Up
               </Button>
               <div className="mt-3 mb-4" style={{ fontSize: '1rem' }}>

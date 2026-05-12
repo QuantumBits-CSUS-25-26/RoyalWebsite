@@ -11,13 +11,29 @@ const CustomerReviews = () => {
         const fetchReviews = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}/api/places/reviews`);
+                if (!response.ok) {
+                    console.error('Reviews API error', response.status, response.statusText);
+                    setError('Error fetching reviews');
+                    return;
+                }
+
                 const data = await response.json();
 
-                if (data.status === 'OK') {
+                if (data && data.status === 'OK' && data.result && Array.isArray(data.result.reviews)) {
+                    // Prefer highest-rated and most recent reviews. Sort by rating desc, then time desc.
+                    const sorted = data.result.reviews
+                        .slice()
+                        .sort((a, b) => {
+                            const ra = Number(a.rating) || 0;
+                            const rb = Number(b.rating) || 0;
+                            if (rb !== ra) return rb - ra;
+                            const ta = Number(a.time) || 0;
+                            const tb = Number(b.time) || 0;
+                            return tb - ta;
+                        })
+                        .slice(0, 3);
 
-                    const positiveReviews = data.result.reviews
-
-                    setReviews(positiveReviews);
+                    setReviews(sorted);
                 }
             } catch (err) {
                 setError('Error fetching reviews');
@@ -91,34 +107,32 @@ const CustomerReviews = () => {
         <section className="customer-reviews">
             <h2>Google Maps Customer Feedback</h2>
             <div className="reviews-container">
-                {reviews.map((review, index) => (
-                    <div key={index} className="review-card">
-                        <div className="review-header">
-                            <img
-                                src={review.profile_photo_url}
-                                alt={review.author_name}
-                                className="profile-photo"
-                            />
-                            <div className="reviewer-info">
-                                <div className="stars">
-                                    {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-                                </div>
-                                <p className="review-author">{review.author_name}</p>
-                                <p className="review-time">{review.relative_time_description}</p>
-                            </div>
-                        </div>
-                        <p className="review-text">"{review.text}"</p>
-                    </div>
-                ))}
-            </div>
+                {reviews.map((review, index) => {
+                    const rating = Number(review.rating) || 0;
+                    const filled = Math.max(0, Math.min(5, Math.floor(rating)));
+                    const empty = 5 - filled;
+                    const imgSrc = review && typeof review.profile_photo_url === 'string' ? review.profile_photo_url : null;
+                    const author = review && (review.author_name || review.author) ? (review.author_name || review.author) : `Reviewer ${index + 1}`;
+                    const time = review && review.relative_time_description ? review.relative_time_description : '';
 
-            <div className="appointment-section">
-                <button className="book-appointment-btn">
-                    Book Appointment
-                </button>
-                <a href="#services" className="view-services-link">
-                    View All Services
-                </a>
+                    return (
+                        <div key={index} className="review-card">
+                            <div className="review-header">
+                                {imgSrc ? (
+                                    <img src={imgSrc} alt={author} className="profile-photo" />
+                                ) : null}
+                                <div className="reviewer-info">
+                                    <div className="stars">
+                                        {'★'.repeat(filled)}{'☆'.repeat(empty)}
+                                    </div>
+                                    <p className="review-author">{author}</p>
+                                    {time ? <p className="review-time">{time}</p> : null}
+                                </div>
+                            </div>
+                            <p className="review-text">"{(review && review.text) || ''}"</p>
+                        </div>
+                    );
+                })}
             </div>
         </section>
     );

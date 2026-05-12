@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { API_BASE_URL } from '../config';
 
-const ServicesManagementAdd = ({ isOpen, onClose, onServiceAdded }) => {
+const ServicesManagementAdd = ({ isOpen, onClose, onServiceAdded, services = [] }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -24,6 +24,14 @@ const ServicesManagementAdd = ({ isOpen, onClose, onServiceAdded }) => {
 
         if (!formData.name.trim()) {
             setError('Service name is required.');
+            return;
+        }
+
+        const duplicate = services.find(
+            s => s.name.toLowerCase() === formData.name.trim().toLowerCase()
+        );
+        if (duplicate) {
+            setError('A service with this name already exists. Use the Update button to modify it.');
             return;
         }
 

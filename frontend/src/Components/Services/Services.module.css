@@ -3,6 +3,8 @@
     justify-content: center;
     background-color: #f9fafb;
     min-height: 100vh;
+    font-family: "Poppins", Helvetica, sans-serif;
+    background: url("../../images/HeroImage.jpg") center/cover no-repeat;
 }
 
 .content {
@@ -16,6 +18,9 @@
     flex-direction: column;
     align-items: center;
     gap: 2rem;
+    background-color: rgba(217, 217, 217, 0.8);
+    border-radius: 10px;
+    padding: 2rem;
 }
 
 .textContent {
@@ -23,7 +28,7 @@
 }
 
 .grayBar {
-    background-color: #e5e7eb;
+    background-color: #2f6dab66;
     display: inline-block;
     padding: 0.5rem 1.2rem;
     border-radius: 10px;
@@ -39,7 +44,7 @@
 .description {
     font-size: 1.05rem;
     line-height: 1.8;
-    color: #4b5563;
+    color: #1f2937;
     max-width: 700px;
     margin: 0 auto 2rem;
 }

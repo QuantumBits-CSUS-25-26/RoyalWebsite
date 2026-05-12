@@ -1,30 +1,30 @@
 export const validateContactForm = (values) => {
     const errors = {};
     
-    if (!values.fname) {
-        errors.fname = 'Required';
+    if (!values.first_name) {
+        errors.first_name = 'Required';
 
-    } else if (!/^[\p{L}\s\-'.]+$/u.test(values.fname)) {
-        errors.fname = 'Name can only contain letters, spaces, hyphens, and apostrophes';
+    } else if (!/^[\p{L}\s\-'.]+$/u.test(values.first_name)) {
+        errors.first_name = 'Name can only contain letters, spaces, hyphens, and apostrophes';
     }
 
-    if (!values.lname) {
-        errors.lname = 'Required';
+    if (!values.last_name) {
+        errors.last_name = 'Required';
 
-    } else if (!/^[\p{L}\s\-'.]+$/u.test(values.lname)) {
-        errors.lname = 'Name can only contain letters, spaces, hyphens, and apostrophes';
+    } else if (!/^[\p{L}\s\-'.]+$/u.test(values.last_name)) {
+        errors.last_name = 'Name can only contain letters, spaces, hyphens, and apostrophes';
     }
     
-    if (!values.phone) {
-        errors.phone = 'Required';
+    if (!values.phone_number) {
+        errors.phone_number = 'Required';
     } else {
         // Remove all chars except plus signs and digits, and then check for misplaced or duplicate plus signs
-        const cleanPhone = values.phone.replace(/[^\d+]/g, '');
+        const cleanPhone = values.phone_number.replace(/[^\d+]/g, '');
         
         if (cleanPhone.includes('+')) {
             const plusCount = (cleanPhone.match(/\+/g) || []).length;
             if (plusCount > 1 || !cleanPhone.startsWith('+')) {
-                errors.phone = 'Please enter a valid phone number';
+                errors.phone_number = 'Please enter a valid phone number';
                 return errors; 
             }
         }
@@ -39,18 +39,18 @@ export const validateContactForm = (values) => {
             // International numbers
             const digitsAfterPlus = cleanPhone.slice(1);
             if (digitsAfterPlus.length < 7 || digitsAfterPlus.length > 15) {
-                errors.phone = 'Please enter a valid phone number';
+                errors.phone_number = 'Please enter a valid phone number';
             }
             //fine otherwise
 
         } else if (cleanPhone.length === 7) {
-            errors.phone = 'Please include area code';
+            errors.phone_number = 'Please include area code';
 
         } else if (cleanPhone.length === 10) {
             // 10 digits: valid US number
      
         } else {
-            errors.phone = 'Please enter a valid phone number';
+            errors.phone_number = 'Please enter a valid phone number';
         }
     }
 

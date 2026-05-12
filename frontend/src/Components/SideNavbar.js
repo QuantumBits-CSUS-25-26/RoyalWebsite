@@ -11,15 +11,31 @@ import '../App.css';
 const SideNavbar = () => {
   const { setServiceOpen, openServices } = useUi();
 
+  const isLoggedIn = !!(
+    localStorage.getItem("authToken") ||
+    sessionStorage.getItem("authToken")
+  );
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+
+    window.location.href = "/login";
+  };
 
   return (
-    <div className ="Navbar">
+    <div className ="Navbar d-none d-md-block">
       <Navbar>
         <Container>
           <Nav vertical>
-            <div class ="btn-group">
+            <div className ="btn-group">
               <NavItem>
-                <NavLink className='nav-link' to='/login' onClick={() => setServiceOpen(false)}>
+                <NavLink 
+                  className='nav-link' 
+                  to={isLoggedIn ? '/dashboard' : '/login'} 
+                  onClick={() => setServiceOpen(false)}>
                   <button>
                     <img src={AccountSvg} alt="AccountImage" style={{ height:30, width:30}}/>
                     Account
@@ -60,6 +76,25 @@ const SideNavbar = () => {
                   </button>
                 </NavLink>
               </NavItem>
+
+              {isLoggedIn && (
+                <NavItem>
+                  <NavLink
+                    className="nav-link"
+                    to="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setServiceOpen(false);
+                      handleLogout();
+                    }}
+                >
+                  <button>
+                    <img src={AccountSvg} alt="LogoutIcon" style={{ height: 30, width: 30 }} />
+                    Logout
+                  </button>
+                </NavLink>
+              </NavItem>
+              )}
             </div>
           </Nav>
         </Container>

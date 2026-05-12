@@ -2,12 +2,17 @@
     padding: 2rem;
     background-color: #f9fafb;
     min-height: 100vh;
+    font-family: "Poppins", Helvetica, sans-serif;
+    background: url("../../images/HeroImage.jpg") center/cover no-repeat;
 }
 
 .backLink {
-    color: #2563eb;
+    color: #ffffff;
     text-decoration: none;
     font-weight: 500;
+    background-color: #2f6dab;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
 }
 
 .container {
@@ -17,6 +22,9 @@
     margin-top: 2rem;
     align-items: center;
     justify-content: center;
+    background-color: rgba(217, 217, 217, 0.8);
+    padding: 2rem;
+    border-radius: 16px;
 }
 
 .image {

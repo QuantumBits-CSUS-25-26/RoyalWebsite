@@ -1,0 +1,154 @@
+/* RW-146: View Messages admin page */
+
+.admin-messages-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-messages-content {
+  flex: 1;
+  padding: 16px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-messages-description {
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.messages-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.messages-table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+}
+
+.messages-table thead th {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  padding: 12px 10px;
+  border-bottom: 2px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.messages-table tbody td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #111827;
+  vertical-align: top;
+}
+
+.messages-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.messages-date {
+  white-space: nowrap;
+  color: #6b7280;
+}
+
+.messages-name {
+  font-weight: 500;
+}
+
+.messages-email a,
+.messages-phone a {
+  color: #2F6DAB;
+  text-decoration: none;
+}
+
+.messages-email a:hover,
+.messages-phone a:hover {
+  text-decoration: underline;
+}
+
+.messages-message {
+  max-width: 280px;
+  word-wrap: break-word;
+}
+
+.messages-flag {
+  white-space: nowrap;
+}
+
+/* Card layout for mobile (replaces table) */
+.messages-cards {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .messages-table-wrapper {
+    display: none;
+  }
+
+  .messages-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .message-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  .message-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .message-card-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #111827;
+  }
+
+  .message-card-date {
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .message-card-body p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .message-card-body a {
+    color: #2F6DAB;
+    text-decoration: none;
+  }
+
+  .message-card-text {
+    margin-top: 8px;
+    padding: 8px 0;
+    color: #374151;
+  }
+
+  .message-card-flags {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 12px !important;
+  }
+}

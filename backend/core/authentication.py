@@ -62,3 +62,8 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
 
         user.token_payload = dict(validated.payload)
         return (user, validated.payload)
+
+    def authenticate_header(self, request):
+        # Returning a non-None value here makes DRF respond with 401 on
+        # AuthenticationFailed (instead of the default 403 fallback).
+        return 'Bearer'

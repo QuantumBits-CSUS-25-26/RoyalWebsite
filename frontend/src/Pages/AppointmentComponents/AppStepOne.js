@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import "./AppStepOne.css";
 
-
-const AppStepOne = () => {
-    const [year, setYear] = useState("");
-    const [manufacturer, setManufacturer] = useState("");
-    const [model, setModel] = useState("");
-    const [engine, setEngine] = useState("");
+const AppStepOne = ({ vehicleInfo = {}, onVehicleChange = () => {}, errors = {} }) => {
+    const { year = '', manufacturer = '', model = '', license_plate = '' } = vehicleInfo;
 
     return (
         <div className="app-step-one">
@@ -20,7 +16,7 @@ const AppStepOne = () => {
                         type="text"
                         name="year"
                         value={year}
-                        onChange={(e) => setYear(e.target.value)}
+                        onChange={(e) => onVehicleChange('year', e.target.value)}
                         placeholder="e.g. 2020"
                     />
                 </label>
@@ -31,7 +27,7 @@ const AppStepOne = () => {
                         type="text"
                         name="manufacturer"
                         value={manufacturer}
-                        onChange={(e) => setManufacturer(e.target.value)}
+                        onChange={(e) => onVehicleChange('manufacturer', e.target.value)}
                         placeholder="e.g. Toyota"
                     />
                 </label>
@@ -42,21 +38,26 @@ const AppStepOne = () => {
                         type="text"
                         name="model"
                         value={model}
-                        onChange={(e) => setModel(e.target.value)}
+                        onChange={(e) => onVehicleChange('model', e.target.value)}
                         placeholder="e.g. Camry"
                     />
                 </label>
 
                 <label>
-                    Engine
+                    License Plate
                     <input
                         type="text"
-                        name="engine"
-                        value={engine}
-                        onChange={(e) => setEngine(e.target.value)}
-                        placeholder="e.g. 2.5L I4"
+                        name="license_plate"
+                        value={license_plate}
+                        onChange={(e) => onVehicleChange('license_plate', e.target.value)}
+                        placeholder="e.g. ABC1234"
                     />
                 </label>
+                {errors.license_plate && (
+                    <div className="field-error" style={{color:'red', marginTop:6}}>
+                        {errors.license_plate}
+                    </div>
+                )}
                 </div>
             </div>
         </div>

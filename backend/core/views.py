@@ -1,20 +1,29 @@
 import os
+from pathlib import Path
+import requests
+from urllib import request
 import requests as http_requests  # renamed to avoid clash with DRF request
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.hashers import make_password, check_password
 from dotenv import load_dotenv
+from django.db.models import Q
+from datetime import datetime
+import calendar
+
 
 from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation,PaymentOption
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage, PaymentOption
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
+    EmployeeRegistrationSerializer,
     VehicleSerializer,
     EmployeeProfileSerializer,
     AppointmentSerializer,
@@ -22,8 +31,17 @@ from .serializer import (
     CustomTokenObtainPairSerializer,
     SiteServiceSerializer,
     BusinessInformationSerializer,
+    ServiceRecommendationReadSerializer,
+    AdminCustomerDetailSerializer,
+    InvoiceSerializer,
+    InvoiceReadSerializer,
+    MessageSerializer,
     PaymentOptionSerializer
 )
+from django.utils import timezone
+import datetime
+from django.contrib.auth.hashers import make_password
+import random, time
 from .authentication import (
     CustomJWTAuthentication,
     get_tokens_for_customer,
@@ -31,8 +49,21 @@ from .authentication import (
 )
 
 # Load environment variables
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
+#Facebook Posts View
+class FacebookPostsView(APIView):
+    def get(self, request):
+        page_id = os.getenv("PAGE_ID")
+        access_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+
+        url = f'https://graph.facebook.com/v19.0/{page_id}/posts?fields=message,created_time,id,full_picture,attachments&access_token={access_token}'
+
+        response = http_requests.get(url)
+        data = response.json()
+
+        return JsonResponse(data)
 
 # ══════════════════════════════════════════════════════════════════
 #  Helper permissions
@@ -184,7 +215,46 @@ class EmployeeLoginView(APIView):
             **tokens,
         })
 
+class AdminEmployeeCreateView(APIView):
+    """POST /api/admin/employees/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdmin]
 
+    def post(self, request):
+        serializer = EmployeeRegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        employee = serializer.save()
+        return Response(EmployeeRegistrationSerializer(employee).data, status=status.HTTP_201_CREATED)
+
+class AdminEmployeeDeleteView(APIView):
+    """DELETE /api/admin/employees/<employee_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdmin]
+
+    def delete(self, request, employee_id):
+        try:
+            employee = Employee.objects.get(employee_id=employee_id)
+        except Employee.DoesNotExist:
+            return Response({'detail': 'Employee not found.'}, status=status.HTTP_404_NOT_FOUND)
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class AdminEmployeeEditView(APIView):
+    """PUT /api/admin/employees/<employee_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdmin]
+
+    def put(self, request, employee_id):
+        try:
+            employee = Employee.objects.get(employee_id=employee_id)
+        except Employee.DoesNotExist:
+            return Response({'detail': 'Employee not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = EmployeeRegistrationSerializer(employee, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(EmployeeRegistrationSerializer(employee).data)
+    
 # ══════════════════════════════════════════════════════════════════
 #  Vehicles (customer‑scoped)
 # ══════════════════════════════════════════════════════════════════
@@ -251,54 +321,211 @@ class VehicleDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class CustomerRecommendationsView(APIView):
+    """
+    GET /api/recommendations/ → customer's service recommendations
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomer]
+
+    def get(self, request):
+        recommendations = ServiceRecommendation.objects.filter(
+            customer=request.user
+        ).select_related('vehicle', 'service', 'recommended_by')
+        serializer = ServiceRecommendationReadSerializer(recommendations, many=True)
+        return Response(serializer.data)
+
+
 # ══════════════════════════════════════════════════════════════════
 #  Appointments
 # ══════════════════════════════════════════════════════════════════
 
 class AppointmentListCreateView(APIView):
-    """
-    GET  /api/appointments/   → customer sees own, employee sees all
-    POST /api/appointments/   → create appointment (customer or employee)
-    """
     authentication_classes = [CustomJWTAuthentication]
-    permission_classes = [IsCustomerOrEmployee]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
+        if not isinstance(request.user, (Customer, Employee)):
+            return Response(
+                {'detail': 'Authentication required.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         if isinstance(request.user, Customer):
-            # Customer sees only appointments for their vehicles
             vehicle_ids = request.user.vehicles.values_list('vehicle_id', flat=True)
             qs = Appointment.objects.filter(vehicle_id__in=vehicle_ids)
         else:
-            # Employee sees all
             qs = Appointment.objects.all()
+
+        qs = qs.select_related(
+            'vehicle', 'vehicle__customer', 'employee'
+        ).prefetch_related('lines')
+
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        data = request.data.copy()
+    def _parse_time_to_hour(self, time_value):
+        if time_value is None:
+            raise ValueError('Missing appointment.time')
 
-        # If customer is creating, verify they own the vehicle
-        if isinstance(request.user, Customer):
-            vehicle_id = data.get('vehicle')
-            if not Vehicle.objects.filter(
-                vehicle_id=vehicle_id, customer=request.user,
-            ).exists():
-                return Response(
-                    {'detail': 'Vehicle not found or not yours.'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        # If employee is creating, optionally assign themselves
-        if isinstance(request.user, Employee) and not data.get('employee'):
-            data['employee'] = request.user.employee_id
+        time_str = str(time_value).strip().upper().replace(' ', '')
+
+        for fmt in ("%I%p", "%I:%M%p", "%H", "%H:%M"):
+            try:
+                parsed = datetime.datetime.strptime(time_str, fmt)
+                return parsed.hour
+            except ValueError:
+                continue
+
+        raise ValueError('Invalid appointment.time format')
+
+    def _normalize_nested_payload(self, data):
+        contact = data.get('contact', {}) or {}
+        vehicle = data.get('vehicle', {}) or {}
+        appt = data.get('appointment', {}) or {}
+
+        required = []
+        if not str(contact.get('first_name', '')).strip():
+            required.append('contact.first_name')
+        if not str(contact.get('last_name', '')).strip():
+            required.append('contact.last_name')
+        if not str(contact.get('email', '')).strip():
+            required.append('contact.email')
+        if not str(appt.get('date', '')).strip():
+            required.append('appointment.date')
+        if not str(appt.get('time', '')).strip():
+            required.append('appointment.time')
+
+        if required:
+            return None, Response(
+                {'detail': f'Missing fields: {", ".join(required)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        email = str(contact.get('email')).strip()
+
+        customer, _ = Customer.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': str(contact.get('first_name', '')).strip(),
+                'last_name': str(contact.get('last_name', '')).strip(),
+                'phone': str(contact.get('phone', '')).strip(),
+                'password_hash': make_password(''),
+            }
+        )
+
+        plate = str(vehicle.get('license_plate', '')).strip()
+        make = str(vehicle.get('manufacturer', '')).strip() or 'Unknown'
+        model = str(vehicle.get('model', '')).strip() or 'Unknown'
+
+        try:
+            year_val = int(vehicle.get('year')) if vehicle.get('year') else 0
+        except (TypeError, ValueError):
+            year_val = 0
+
+        vehicle_obj = None
+
+        if plate:
+            vehicle_obj = Vehicle.objects.filter(
+                customer=customer,
+                license_plate__iexact=plate
+            ).first()
+
+        if not vehicle_obj:
+            qs = Vehicle.objects.filter(customer=customer)
+
+            if make and make != 'Unknown':
+                qs = qs.filter(make=make)
+            if model and model != 'Unknown':
+                qs = qs.filter(model=model)
+            if year_val:
+                qs = qs.filter(year=year_val)
+
+            vehicle_obj = qs.first()
+
+        if not vehicle_obj:
+            final_plate = plate or f"TMP{int(time.time())}{random.randint(100, 999)}"
+            vehicle_obj = Vehicle.objects.create(
+                customer=customer,
+                make=make,
+                model=model,
+                year=year_val,
+                license_plate=final_plate,
+            )
+
+        date_str = str(appt.get('date')).strip()
+        try:
+            parsed_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return None, Response(
+                {'detail': 'Invalid appointment.date format, expected YYYY-MM-DD'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            hour = self._parse_time_to_hour(appt.get('time'))
+        except ValueError as exc:
+            return None, Response(
+                {'detail': str(exc)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        naive_dt = datetime.datetime(
+            year=parsed_date.year,
+            month=parsed_date.month,
+            day=parsed_date.day,
+            hour=hour,
+            minute=0,
+            second=0
+        )
+
+        scheduled_at = timezone.make_aware(naive_dt, datetime.timezone.utc)
+
+        normalized = {
+            'vehicle': vehicle_obj.vehicle_id,
+            'scheduled_at': scheduled_at.isoformat(),
+            'service_type': str(data.get('service_type') or 'General Service').strip(),
+        }
+
+        if isinstance(self.request.user, Employee):
+            normalized['employee'] = self.request.user.employee_id
+
+        return normalized, None
+
+    def post(self, request):
+        self.request = request
+        data = request.data.copy() if request.data else {}
+
+        is_nested_payload = 'contact' in data or isinstance(data.get('vehicle'), dict)
+
+        if is_nested_payload:
+            normalized_data, error_response = self._normalize_nested_payload(data)
+            if error_response:
+                return error_response
+            data = normalized_data
+        else:
+            if isinstance(request.user, Customer):
+                vehicle_id = data.get('vehicle')
+                if not Vehicle.objects.filter(
+                    vehicle_id=vehicle_id,
+                    customer=request.user
+                ).exists():
+                    return Response(
+                        {'detail': 'Vehicle not found or not yours.'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            if isinstance(request.user, Employee) and not data.get('employee'):
+                data['employee'] = request.user.employee_id
 
         serializer = AppointmentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(
             AppointmentReadSerializer(serializer.instance).data,
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_201_CREATED
         )
-
 
 class AppointmentDetailView(APIView):
     """
@@ -309,7 +536,9 @@ class AppointmentDetailView(APIView):
 
     def _get_appointment(self, request, appointment_id):
         try:
-            appt = Appointment.objects.get(appointment_id=appointment_id)
+            appt = Appointment.objects.select_related(
+                'vehicle', 'vehicle__customer', 'employee',
+            ).prefetch_related('lines').get(appointment_id=appointment_id)
         except Appointment.DoesNotExist:
             return None
 
@@ -340,7 +569,124 @@ class AppointmentDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         appt.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# ══════════════════════════════════════════════════════════════════
+#  Invoices
+# ══════════════════════════════════════════════════════════════════
+
+class InvoiceListCreateView(APIView):
+    """
+    GET  /api/invoices/   → list invoices
+    POST /api/invoices/   → create invoice
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [permissions.AllowAny]  # TODO: change to IsEmployee or IsAdmin in production
+
+    def get(self, request):
+        qs = Invoice.objects.select_related(
+            'appointment',
+            'appointment__vehicle',
+            'appointment__vehicle__customer',
+            'appointment__employee',
+        ).prefetch_related('lines', 'appointment__lines').all().order_by('-created_at')
+
+        status_filter = request.query_params.get('status')
+        month_filter = request.query_params.get('month')
+        year_filter = request.query_params.get('year')
+        search = request.query_params.get('search', '').strip()
+
+        if status_filter:
+            qs = qs.filter(status__iexact=status_filter)
+
+        if month_filter and month_filter.isdigit():
+            qs = qs.filter(appointment__scheduled_at__month=int(month_filter))
+
+        if year_filter and year_filter.isdigit():
+            qs = qs.filter(appointment__scheduled_at__year=int(year_filter))
+
+        if search:
+            text_q = (
+                Q(appointment__vehicle__customer__first_name__icontains=search) |
+                Q(appointment__vehicle__customer__last_name__icontains=search) |
+                Q(appointment__vehicle__make__icontains=search) |
+                Q(appointment__vehicle__model__icontains=search) |
+                Q(lines__name__icontains=search) |
+                Q(appointment__service_type__icontains=search) |
+                Q(status__icontains=search)
+            )
+            qs = qs.filter(text_q).distinct()
+
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 4))
+
+        start = (page - 1) * page_size
+        end = start + page_size
+
+        total_count = qs.count()
+        invoices = qs[start:end]
+
+        serializer = InvoiceReadSerializer(invoices, many=True)
+
+        return Response({
+            'count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'results': serializer.data,
+        })
+
+    def post(self, request):
+        serializer = InvoiceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            InvoiceReadSerializer(serializer.instance).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class InvoiceDetailView(APIView):
+    """
+    GET / PUT / DELETE  /api/invoices/<invoice_id>/
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [permissions.AllowAny]  # TODO: change to IsEmployee or IsAdmin in production
+
+    def _get_invoice(self, invoice_id):
+        try:
+            return Invoice.objects.select_related(
+                'appointment',
+                'appointment__vehicle',
+                'appointment__vehicle__customer',
+                'appointment__employee',
+            ).prefetch_related('lines', 'appointment__lines').get(invoice_id=invoice_id)
+        except Invoice.DoesNotExist:
+            return None
+
+    def get(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(InvoiceReadSerializer(invoice).data)
+
+    def put(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = InvoiceSerializer(invoice, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(InvoiceReadSerializer(serializer.instance).data)
+
+    def delete(self, request, invoice_id):
+        invoice = self._get_invoice(invoice_id)
+        if not invoice:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        invoice.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
+ 
 # ══════════════════════════════════════════════════════════════════
 #  Business Information
 # ══════════════════════════════════════════════════════════════════
@@ -407,20 +753,230 @@ class BusinessInformationDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
+
 # ══════════════════════════════════════════════════════════════════
 #  Admin-only list views
 # ══════════════════════════════════════════════════════════════════
 
 class AdminCustomerListView(APIView):
-    """GET /api/admin/customers/"""
-    authentication_classes = [CustomJWTAuthentication]
+    """GET /api/admin/customers/ — returns customers with nested vehicles + appointments
+       POST /api/admin/customers/ — creates a new customer
+    """
+    authentication_classes = []  # [CustomJWTAuthentication]
     # permission_classes = [IsEmployee]
 
     def get(self, request):
-        qs = Customer.objects.all().order_by('-created_at')
-        serializer = CustomerProfileSerializer(qs, many=True)
+        qs = Customer.objects.prefetch_related(
+            'vehicles',
+            'vehicles__appointments',
+            'vehicles__appointments__employee',
+        ).all().order_by('-created_at')
+
+        serializer = AdminCustomerDetailSerializer(qs, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        first_name = request.data.get("first_name", "").strip()
+        last_name = request.data.get("last_name", "").strip()
+        email = request.data.get("email", "").strip()
+        phone = request.data.get("phone", "").strip()
+
+        if not first_name:
+            return Response(
+                {"detail": "First name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not last_name:
+            return Response(
+                {"detail": "Last name is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not email:
+            return Response(
+                {"detail": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if Customer.objects.filter(email__iexact=email).exists():
+            return Response(
+                {"detail": "A customer with this email already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+        )
+
+        serializer = AdminCustomerDetailSerializer(customer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class AdminBookAppointmentView(APIView):
+    """POST /api/admin/customers/<customer_id>/book-appointment/"""
+    authentication_classes = [CustomJWTAuthentication] 
+    permission_classes = [IsEmployee] 
+
+    def post(self, request, customer_id):
+        try:
+            customer = Customer.objects.get(customer_id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({'detail': 'Customer not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        vehicle_id = request.data.get('vehicle')
+        service_type = request.data.get('service_type')
+        scheduled_at = request.data.get('scheduled_at')
+        employee_id = getattr(request.user, "employee_id", None)
+        if not employee_id:
+            return Response({'detail': 'Authenticated user has no employee_id.'}, status=400)
+
+        if not vehicle_id or not service_type or not scheduled_at:
+            return Response(
+                {'detail': 'vehicle, service_type, and scheduled_at are required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Verify vehicle belongs to this customer
+        if not Vehicle.objects.filter(vehicle_id=vehicle_id, customer=customer).exists():
+            return Response(
+                {'detail': 'Vehicle not found or does not belong to this customer.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        data = {
+            'vehicle': vehicle_id,
+            'service_type': service_type,
+            'scheduled_at': scheduled_at,
+            'employee': request.user.employee_id,
+        }
+        serializer = AppointmentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # Send notification email to customer
+        from django.core.mail import send_mail
+        from django.conf import settings
+        try:
+            send_mail(
+                subject='Appointment Booked for You',
+                message=(
+                    f'Hi {customer.first_name},\n\n'
+                    f'An appointment has been booked for you.\n\n'
+                    f'Service: {service_type}\n'
+                    f'Scheduled: {scheduled_at}\n\n'
+                    f'Thank you,\nRoyal Auto & Body Repair'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[customer.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass  # email failure should not block the response
+
+        return Response(
+            AppointmentReadSerializer(serializer.instance).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AdminRecommendServicesView(APIView):
+    """POST /api/admin/customers/<customer_id>/recommend-services/"""
+    authentication_classes = []  # [CustomJWTAuthentication]  # enable permission check at prod
+    permission_classes = []     # [IsEmployee]               # enable permission check at prod
+
+    def post(self, request, customer_id):
+        try:
+            customer = Customer.objects.get(customer_id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({'detail': 'Customer not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        vehicle_id = request.data.get('vehicle')
+        service_ids = request.data.get('services', [])
+        note = request.data.get('note', '')
+
+        if not vehicle_id or not service_ids:
+            return Response(
+                {'detail': 'vehicle and services are required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Verify vehicle belongs to this customer
+        try:
+            vehicle = Vehicle.objects.get(vehicle_id=vehicle_id, customer=customer)
+        except Vehicle.DoesNotExist:
+            return Response(
+                {'detail': 'Vehicle not found or does not belong to this customer.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Validate service IDs exist
+        services = SiteService.objects.filter(service_id__in=service_ids, is_active=True)
+        if services.count() != len(service_ids):
+            return Response(
+                {'detail': 'One or more service IDs are invalid.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Create recommendation records
+        recommendations = []
+        for svc in services:
+            rec = ServiceRecommendation.objects.create(
+                customer=customer,
+                vehicle=vehicle,
+                service=svc,
+                recommended_by=request.user if isinstance(request.user, Employee) else None,
+                note=note,
+                status='sent',
+            )
+            recommendations.append(rec)
+
+        # Send notification email
+        from django.core.mail import send_mail
+        from django.conf import settings
+        service_lines = '\n'.join(
+            f'  - {svc.name} (${svc.cost})' if svc.cost else f'  - {svc.name}'
+            for svc in services
+        )
+        try:
+            send_mail(
+                subject='Service Recommendations for Your Vehicle',
+                message=(
+                    f'Hi {customer.first_name},\n\n'
+                    f'We have the following service recommendations for your '
+                    f'{vehicle.year} {vehicle.make} {vehicle.model}:\n\n'
+                    f'{service_lines}\n\n'
+                    f'{("Note: " + note + chr(10) + chr(10)) if note else ""}'
+                    f'Please contact us to schedule an appointment.\n\n'
+                    f'Thank you,\nRoyal Auto & Body Repair'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[customer.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
+        from .serializer import ServiceRecommendationReadSerializer
+        return Response(
+            ServiceRecommendationReadSerializer(recommendations, many=True).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AdminEmployeeListView(APIView):
+    """GET /api/admin/employees/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    def get(self, request):
+        qs = Employee.objects.all().order_by('last_name', 'first_name')
+        serializer = EmployeeProfileSerializer(qs, many=True)
+        return Response(serializer.data)
+    
 
 class AdminAppointmentListView(APIView):
     """GET /api/admin/appointments/"""
@@ -428,9 +984,30 @@ class AdminAppointmentListView(APIView):
     permission_classes = [IsEmployee]
 
     def get(self, request):
-        qs = Appointment.objects.all()
+        qs = Appointment.objects.select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines').all()
         serializer = AppointmentReadSerializer(qs, many=True)
         return Response(serializer.data)
+
+
+class AdminAddVehicleView(APIView):
+    """POST /api/admin/customers/<customer_id>/vehicles/"""
+    authentication_classes = []  # [CustomJWTAuthentication]  # enable permission check at prod
+    permission_classes = []     # [IsEmployee]               # enable permission check at prod
+
+    def post(self, request, customer_id):
+        try:
+            customer = Customer.objects.get(customer_id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({'detail': 'Customer not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        data['customer'] = customer.customer_id
+        serializer = VehicleSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AdminVehicleListView(APIView):
@@ -449,7 +1026,10 @@ class SiteServiceListCreateView(APIView):
     permission_classes = [permissions.AllowAny]  # TODO: restrict to IsAdmin for writes in production
 
     def get(self, request):
-        qs = SiteService.objects.filter(is_active=True)
+        if request.query_params.get('all') == 'true':
+            qs = SiteService.objects.all()
+        else:
+            qs = SiteService.objects.filter(is_active=True)
         serializer = SiteServiceSerializer(qs, many=True)
         return Response(serializer.data)
 
@@ -499,17 +1079,121 @@ class ContactMessageView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        required = ['fname', 'lname', 'email', 'message']
-        missing = [f for f in required if not request.data.get(f)]
-        if missing:
-            return Response(
-                {'detail': f'Missing fields: {", ".join(missing)}'},
-                status=status.HTTP_400_BAD_REQUEST,
+        serializer = MessageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AdminMessageListView(APIView):
+    """GET /api/admin/messages/ — paginated, filterable list for admins.
+
+    Query params:
+      read        true|false - filter by read status
+      search      text - icontains across name, email, phone, message body
+      ordering    -created_at | last_name,first_name | email
+      page        1-based page number (default 1)
+      page_size   items per page, capped at 100 (default 20)
+    """
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    _DEFAULT_PAGE_SIZE = 20
+    _ALLOWED_ORDERINGS = {'-created_at', 'created_at', 'first_name,last_name', 'email'}
+
+    def get(self, request):
+        qs = Messsage.objects.all()
+
+        read_param = request.query_params.get('read')
+        if read_param is not None:
+            qs = qs.filter(read=(read_param.lower() == 'true'))
+
+        search = request.query_params.get('search', '').strip()
+        if search:
+            qs = qs.filter(
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone_number__icontains=search) |
+                Q(message__icontains=search)
             )
-        # TODO: store in a Message model or send email
-        return Response({'detail': 'Message received.'}, status=status.HTTP_201_CREATED)
+
+        ordering = request.query_params.get('ordering', '-created_at')
+        if ordering not in self._ALLOWED_ORDERINGS:
+            ordering = '-created_at'
+        qs = qs.order_by(*ordering.split(','))
+
+        try:
+            page = max(1, int(request.query_params.get('page', 1)))
+            page_size = min(100, max(1, int(
+                request.query_params.get('page_size', self._DEFAULT_PAGE_SIZE)
+            )))
+        except (ValueError, TypeError):
+            page, page_size = 1, self._DEFAULT_PAGE_SIZE
+
+        total = qs.count()
+        offset = (page - 1) * page_size
+        results = qs[offset:offset + page_size]
+
+        return Response({
+            'count': total,
+            'has_next': (page * page_size) < total,
+            'results': MessageSerializer(results, many=True).data,
+        })
 
 
+class AdminMessageDetailView(APIView):
+    """PATCH/DELETE /api/admin/messages/<message_id>/"""
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsEmployee]
+
+    def get_object(self, message_id):
+        try:
+            return Messsage.objects.get(pk=message_id)
+        except Messsage.DoesNotExist:
+            return None
+
+    def patch(self, request, message_id):
+        msg = self.get_object(message_id)
+        if not msg:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = MessageSerializer(msg, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, message_id):
+        msg = self.get_object(message_id)
+        if not msg:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        msg.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AdminDashboardTotalsView(APIView):
+    """GET /api/admin/dashboard-totals/"""
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get(self, request):
+        total_customers = Customer.objects.count()
+        total_appointments = Appointment.objects.count()
+        total_messages = Messsage.objects.count()
+        total_services = SiteService.objects.count()
+        return Response({
+            'total_customers': total_customers,
+            'total_appointments': total_appointments,
+            'total_messages': total_messages,
+            'total_services': total_services,
+        })
+    
+class AdminRecentCustomersView(APIView):
+    """GET /api/admin/recent-customers/"""
+    authentication_classes = [CustomJWTAuthentication]
+
+    def get(self, request):
+        recent_customers = Customer.objects.all().order_by('-created_at')[:5]
+        serializer = CustomerProfileSerializer(recent_customers, many=True)
+        return Response(serializer.data)
 
 @require_GET
 def place_reviews(request):
@@ -571,3 +1255,29 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         tokens = serializer.validated_data
         response = Response(tokens)
         return response
+    
+#customer single vehicle view
+class VehicleServiceHistoryView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsCustomer]
+
+    def get(self, request, vehicle_id):
+        # makes sure the vehicle belongs to the requesting customer
+        try:
+            vehicle = Vehicle.objects.get(vehicle_id=vehicle_id, customer=request.user)
+        except Vehicle.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        appointments = Appointment.objects.filter(vehicle=vehicle).select_related(
+            'vehicle', 'vehicle__customer', 'employee',
+        ).prefetch_related('lines').order_by('-scheduled_at')
+        data = [
+            {
+                'service_type': appt.service_type,
+                'scheduled_at': appt.scheduled_at,
+                'finished_at': appt.finished_at,
+                'cost': appt.cost,
+            }
+            for appt in appointments
+        ]
+        return Response(data)

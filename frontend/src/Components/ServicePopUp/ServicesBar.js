@@ -1,12 +1,22 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUi } from './UiContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../config';
 import '../../App.css';
 
 export default function ServicesBars(){
     const {servicesOpen, setServiceOpen, openServices, scheduleCloseServices} = useUi();
-     const location = useLocation();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [services, setServices] = useState([]);
+
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/api/services/`)
+            .then(res => res.json())
+            .then(data => setServices(data))
+            .catch(err => console.error('Failed to fetch services:', err));
+    }, []);
 
     useEffect(() => {
         setServiceOpen(false);
@@ -30,31 +40,19 @@ export default function ServicesBars(){
                 </header>
                 <div className="services-list">
                     <ul>
-                        <li>
-                            <button className='service-list-buttons'>Brake Work</button>
-                        </li>
-                        <li>
-                            <button className='service-list-buttons'>Body Work</button>
-                        </li>
-                        <li>
-                            <button className='service-list-buttons'>Engine/Transmission</button>
-                        </li>
-                        <li>
-                            <button className='service-list-buttons'>Hybrid Services</button>
-                        </li>
-                        <li>
-                            <button className='service-list-buttons'>Oil Change</button>
-                        </li>
-                        <li>
-                            <button className='service-list-buttons'>
-                                Suspension Work
-                            </button>
-                        </li>
-                        <li>
-                            <button className='service-list-buttons'>
-                                Tune Up
-                            </button>
-                        </li>
+                        {services.map((service) => (
+                            <li key={service.service_id}>
+                                <button
+                                    className='service-list-buttons'
+                                    onClick={() => {
+                                        setServiceOpen(false);
+                                        navigate(`/service/${service.service_id}`);
+                                    }}
+                                >
+                                    {service.name}
+                                </button>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </aside>
