@@ -366,14 +366,14 @@ const CustomerDashboard = () => {
                               <th>Date</th>
                               <th>Cost</th>
                             </tr>
-                          </thead>
-                          <tbody>
+                            </thead>
+                            <tbody>
                             {serviceHistory.map((item, index) => (
-                              <tr key={`sh-${index}`}>
-                                <td>{item.service}</td>
-                                <td>{item.date}</td>
-                                <td>{item.cost}</td>
-                              </tr>
+                                <tr key={`sh-${index}`}>
+                                  <td>{item.service}</td>
+                                  <td>{item.date}</td>
+                                  <td>{item.cost}</td>
+                                </tr>
                             ))}
                             {serviceHistory.length === 0 && (
                               <tr>
@@ -460,13 +460,48 @@ const CustomerDashboard = () => {
                     onClose={() => setShowNewVehicleModal(false)}
                     onVehicleAdded={fetchVehicles}
                   />
+                  
                 </Col>
+                
+                  <div className="payment-section text-center px-5 py-5 mb-5">
+                    <h2 className="payment-title mb-4">WE ACCEPT</h2>
+
+                    {/* Top Row (Cards) */}
+                    <div className="payment-row">
+                      <div className="payment-logo visa">VISA</div>
+                      <div className="payment-logo amex">AMEX</div>
+                      <div className="payment-logo discover">DISCOVER</div>
+                      <div className="payment-logo mastercard">MasterCard</div>
+                    </div>
+
+                    {/* Bottom Row */}
+                    <div className="payment-row mt-4">
+                      <div className="payment-box">
+                        💵
+                        <div>CASH</div>
+                      </div>
+
+                      <div className="payment-box">
+                        💳
+                        <div>CREDIT / DEBIT</div>
+                      </div>
+
+                      <div className="payment-box">
+                        🍏
+                        <div>Apple Pay</div>
+                      </div>
+                      <div className="payment-box">
+                        🅖
+                        <div>Google Pay</div>
+                      </div>
+                    </div>
+                  </div>                
+                
               </Row>
             </Form>
           </Col>
         </Row>
       </div>
-    </div>
   );
 };
 export default CustomerDashboard;

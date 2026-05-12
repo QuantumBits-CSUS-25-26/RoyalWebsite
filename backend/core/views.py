@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage
+from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage, PaymentOption
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -35,7 +35,8 @@ from .serializer import (
     AdminCustomerDetailSerializer,
     InvoiceSerializer,
     InvoiceReadSerializer,
-    MessageSerializer
+    MessageSerializer,
+    PaymentOptionSerializer
 )
 from django.utils import timezone
 import datetime
@@ -110,6 +111,16 @@ class CustomerRegisterView(APIView):
             **tokens,
         }, status=status.HTTP_201_CREATED)
 
+class PaymentOptionView(generics.ListAPIView):
+    """
+    GET /api/payment-options/
+    Returns all active payment options
+    """
+    serializer_class = PaymentOptionSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return PaymentOption.objects.filter(is_active=True)
 
 class CustomerLoginView(APIView):
     """POST /api/customers/login/"""
@@ -1234,7 +1245,6 @@ def place_reviews(request):
         return JsonResponse({"error": "Request to Google Maps API timed out"}, status=504)
     except http_requests.exceptions.RequestException as e:
         return JsonResponse({"error": f"Request failed: {str(e)}"}, status=500)
-
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
