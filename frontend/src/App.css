@@ -1900,6 +1900,9 @@
 .contact-info-s4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .contact-info-header {
@@ -1921,7 +1924,7 @@
 }
 .contact-info-form {
   background-color: rgba(217, 217, 217, 0.8);
-  justify-self: center;
+  justify-self: center; 
   padding: 28px 28px;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);

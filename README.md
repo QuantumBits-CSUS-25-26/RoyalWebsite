@@ -197,16 +197,6 @@ The ERD for our project's handling of database entities.
 
 <img src="frontend/src/images/RoyalERDbetter.jpeg" width="500" />
 
-## Roadmap (Based on JIRA)
-
-| Sprint | Major Stories | Estimated Completion |
-|--------|----------------|-----------------------|
-| Sprint 5 | Customer account creation | 02/07/26 |
-| Sprint 6 | customer account management | 02/21/26 |
-| Sprint 7 | appointments | 03/07/26 |
-| Sprint 8 | admin dashboard pt1 | 03/21/26 |
-| Sprint 9 | admin dashboard pt2 | 04/04/26 |
-
 ## Developer Instructions
 ### System Requirements:
 
