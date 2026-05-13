@@ -4,6 +4,8 @@ import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from "axios";
+import { API_BASE_URL } from "../config";
+
 
 
 const CustomerLogin = () => {
@@ -44,6 +46,10 @@ const CustomerLogin = () => {
     navigate('/account-creation');
   }
 
+    const handleClickEmployeeLogin = () => {
+    navigate('/admin/login');
+  }
+
     const handleClickLogin = async (e) => {
         e.preventDefault();
 
@@ -58,7 +64,7 @@ const CustomerLogin = () => {
 
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/api/customers/login/",
+                `${API_BASE_URL}/api/customers/login/`,
                 {
                     email: email,
                     password: password
@@ -125,6 +131,15 @@ const CustomerLogin = () => {
                   onClick={handleClickNoAcc}
                 >
                   Sign Up
+                </span>
+              </div>
+              <div className="mt-3 mb-4" style={{ fontSize: '1rem' }}>
+                <span style={{ color: '#6c757d' }}>Employee? </span>
+                <span
+                  style={{ color: '#2F6DAB', cursor: 'pointer', fontWeight: 500 }}
+                  onClick={handleClickEmployeeLogin}
+                >
+                  Log In Here
                 </span>
               </div>
             </Form>

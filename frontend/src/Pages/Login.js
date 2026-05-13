@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./Login.css";
 import carImage from "../images/login-car.jpg";
 import logo from "../images/logo.png";
+import { useNavigate } from 'react-router-dom';
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -9,6 +11,9 @@ function Login() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const navigate = useNavigate();
+
 
   // -----------------------------
   // AUTO‑REDIRECT IF ALREADY LOGGED IN
@@ -142,7 +147,12 @@ function Login() {
       <div className="login-page">
         <div className="login-left">
           <div className="login-header">
-            <img src={logo} alt="Royal Auto" className="login-logo" />
+            <img
+              src={logo} 
+              alt="Royal Auto" 
+              className="login-logo" 
+              onClick={() => navigate("/")}  
+            />
             <h2>Royal Auto – Login</h2>
           </div>
 

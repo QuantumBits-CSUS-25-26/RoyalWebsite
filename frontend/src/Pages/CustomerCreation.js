@@ -1,7 +1,7 @@
 import './Homepage.css';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
-
+import { API_BASE_URL } from "../config";
 import { useState } from 'react';
 import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,7 +66,7 @@ const CustomerCreation = () => {
   };
   const sendPayload = async (payloadObj) => {
     try {
-      const response = await fetch('http://localhost:8000/api/customers/register/', {
+      const response = await fetch(`${API_BASE_URL}/api/customers/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payloadObj),

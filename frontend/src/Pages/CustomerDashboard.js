@@ -11,7 +11,8 @@ import { API_BASE_URL } from "../config";
 
 
 const sampleCustomer = [
-  { customer_id: 1,
+  {
+    customer_id: 1,
     first_name: "Trevor",
     last_name: "Gould",
     phone: 9166984779,
@@ -19,14 +20,16 @@ const sampleCustomer = [
   }
 ]
 const sampleVehicle = [
-  { vehicle_id: 2,
+  {
+    vehicle_id: 2,
     make: "Hyundai",
     model: "Sonata",
     year: 2008,
     license_plate: "234bcd",
     customer_id: 1
   },
-  { vehicle_id: 3,
+  {
+    vehicle_id: 3,
     make: "Honda",
     model: "Civic",
     year: 2010,
@@ -35,7 +38,8 @@ const sampleVehicle = [
   }
 ]
 const sampleRecommendations = [
-  { recommendation_id: 1,
+  {
+    recommendation_id: 1,
     note: "Brakes are worn, recommend replacement",
     customer_id: 1,
     service_id: 1,
@@ -79,28 +83,28 @@ const sampleService = [
 
 
 const CustomerDashboard = () => {
-  
+
 
   const parseStoredUser = () => {
-      try {
-          const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
-          return raw ? JSON.parse(raw) : null;
-      } catch (e) {
-          return null;
-      }
+    try {
+      const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
   };
 
   const storedUser = parseStoredUser();
 
   const isAuthorized = (user) => {
-      // if a token exists assume authenticated and allow; stored user may not be saved by login flow
-      const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-      if (!user && token) return true;
-      if (!user) return false;
-      if (user.is_customer || user.is_superuser) return true;
-      if (user.role && (user.role === "customer")) return true;
-      if (Array.isArray(user.roles) && (user.roles.includes("customer"))) return true;
-      return false;
+    // if a token exists assume authenticated and allow; stored user may not be saved by login flow
+    const token = sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    if (!user && token) return true;
+    if (!user) return false;
+    if (user.is_customer || user.is_superuser) return true;
+    if (user.role && (user.role === "customer")) return true;
+    if (Array.isArray(user.roles) && (user.roles.includes("customer"))) return true;
+    return false;
   };
 
 
@@ -143,7 +147,7 @@ const CustomerDashboard = () => {
 
         setProfile(profileData);
         setVehicles(vehiclesData || []);
-  
+
 
         // normalize appointments (backend returns appointment_id)
         const normalized = (apptsData || []).map(a => ({
@@ -154,7 +158,7 @@ const CustomerDashboard = () => {
           vehicle: a.vehicle,
         }));
         setAppointments(normalized);
-        
+
         setRecommendations(recommendsData || []);
 
         const formatCost = (cost) => cost === null || cost === undefined ? '-' : `$${cost}`;
@@ -178,8 +182,8 @@ const CustomerDashboard = () => {
   const handleLogout = async () => {
     try {
       const token =
-          sessionStorage.getItem("authToken") ||
-          localStorage.getItem("authToken");
+        sessionStorage.getItem("authToken") ||
+        localStorage.getItem("authToken");
 
       if (token) {
         await fetch(`${API_BASE_URL}/api/logout/`, {
@@ -232,7 +236,7 @@ const CustomerDashboard = () => {
 
   if (!isAuthorized(storedUser)) return <AuthErrorPage />;
   //*/
-  
+
   return (
     <div className="customerDashboard">
       <div className="content">
@@ -280,7 +284,7 @@ const CustomerDashboard = () => {
                             {appointments.map((a) => (
                               <tr key={`appt-${a.id}`}>
                                 <td>{a.scheduled_at ? a.scheduled_at.split('T')[0] : '-'}</td>
-                                <td>{a.scheduled_at ? a.scheduled_at.split('T')[1]?.slice(0,5) : '-'}</td>
+                                <td>{a.scheduled_at ? a.scheduled_at.split('T')[1]?.slice(0, 5) : '-'}</td>
                                 <td>{a.service_type}</td>
                               </tr>
                             ))}
@@ -343,9 +347,9 @@ const CustomerDashboard = () => {
                               const vehicle = (typeof r.vehicle === "object" && r.vehicle !== null)
                                 ? r.vehicle
                                 : vehicles.find(
-                                    (v) => v.vehicle_id === r.vehicle || v.id === r.vehicle ||
-                                           v.vehicle_id === r.vehicle_id || v.id === r.vehicle_id
-                                  );
+                                  (v) => v.vehicle_id === r.vehicle || v.id === r.vehicle ||
+                                    v.vehicle_id === r.vehicle_id || v.id === r.vehicle_id
+                                );
 
                               const serviceName = r.service_name ||
                                 (typeof r.service === "object" && r.service !== null ? r.service.name : null) ||
@@ -376,14 +380,14 @@ const CustomerDashboard = () => {
                               <th>Date</th>
                               <th>Cost</th>
                             </tr>
-                            </thead>
-                            <tbody>
+                          </thead>
+                          <tbody>
                             {serviceHistory.map((item, index) => (
-                                <tr key={`sh-${index}`}>
-                                  <td>{item.service}</td>
-                                  <td>{item.date}</td>
-                                  <td>{item.cost}</td>
-                                </tr>
+                              <tr key={`sh-${index}`}>
+                                <td>{item.service}</td>
+                                <td>{item.date}</td>
+                                <td>{item.cost}</td>
+                              </tr>
                             ))}
                             {serviceHistory.length === 0 && (
                               <tr>
@@ -399,12 +403,12 @@ const CustomerDashboard = () => {
                           <div className="pagination">
                             <button>&laquo;</button>
                             {[1, 2, 3, 4].map((page) => (
-                                <button
-                                    key={page}
-                                    className={page === 2 ? "active" : ""}
-                                >
-                                  {page}
-                                </button>
+                              <button
+                                key={page}
+                                className={page === 2 ? "active" : ""}
+                              >
+                                {page}
+                              </button>
                             ))}
                             <button>&raquo;</button>
                           </div>
@@ -460,7 +464,7 @@ const CustomerDashboard = () => {
                     vehicles={vehicles}
                     appointments={appointments}
                   />
-                  <Row className="mb-4">
+                  <Row className="mb-5">
                     <Button type="button" className="btn btn-lg py-4" onClick={() => setShowNewVehicleModal(true)}>
                       New Vehicle
                     </Button>
@@ -470,43 +474,42 @@ const CustomerDashboard = () => {
                     onClose={() => setShowNewVehicleModal(false)}
                     onVehicleAdded={fetchVehicles}
                   />
-                  
+                  <Row className="mb-4 mt-5 mx-md-5">
+                    <div className="payment-section text-center py-5 mb-5">
+                      <h2 className="payment-title mb-4">WE ACCEPT</h2>
+
+                      {/* Top Row (Cards) */}
+                      <div className="payment-row">
+                        <div className="payment-logo visa">VISA</div>
+                        <div className="payment-logo amex">AMEX</div>
+                        <div className="payment-logo discover">DISCOVER</div>
+                        <div className="payment-logo mastercard">MasterCard</div>
+                      </div>
+
+                      {/* Bottom Row */}
+                      <div className="payment-row mt-4">
+                        <div className="payment-box">
+                          💵
+                          <div>CASH</div>
+                        </div>
+
+                        <div className="payment-box">
+                          💳
+                          <div>CREDIT / DEBIT</div>
+                        </div>
+
+                        <div className="payment-box">
+                          🍏
+                          <div>Apple Pay</div>
+                        </div>
+                        <div className="payment-box">
+                          🅖
+                          <div>Google Pay</div>
+                        </div>
+                      </div>
+                    </div>
+                  </Row>
                 </Col>
-                
-                  <div className="payment-section text-center px-5 py-5 mb-5">
-                    <h2 className="payment-title mb-4">WE ACCEPT</h2>
-
-                    {/* Top Row (Cards) */}
-                    <div className="payment-row">
-                      <div className="payment-logo visa">VISA</div>
-                      <div className="payment-logo amex">AMEX</div>
-                      <div className="payment-logo discover">DISCOVER</div>
-                      <div className="payment-logo mastercard">MasterCard</div>
-                    </div>
-
-                    {/* Bottom Row */}
-                    <div className="payment-row mt-4">
-                      <div className="payment-box">
-                        💵
-                        <div>CASH</div>
-                      </div>
-
-                      <div className="payment-box">
-                        💳
-                        <div>CREDIT / DEBIT</div>
-                      </div>
-
-                      <div className="payment-box">
-                        🍏
-                        <div>Apple Pay</div>
-                      </div>
-                      <div className="payment-box">
-                        🅖
-                        <div>Google Pay</div>
-                      </div>
-                    </div>
-                  </div>                
-                
               </Row>
             </Form>
           </Col>
