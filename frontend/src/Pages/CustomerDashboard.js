@@ -157,11 +157,13 @@ const CustomerDashboard = () => {
         
         setRecommendations(recommendsData || []);
 
+        const formatCost = (cost) => cost === null || cost === undefined ? '-' : `$${cost}`;
+
         // use recent appointments as service history fallback
         setServiceHistory((normalized || []).slice(0, 5).map(a => ({
           service: a.service_type,
           date: a.scheduled_at ? a.scheduled_at.split('T')[0] : '',
-          cost: a.cost ? `$${a.cost}` : '-',
+          cost: formatCost(a.cost),
         })));
       })
       .catch((err) => {
@@ -334,19 +336,27 @@ const CustomerDashboard = () => {
                           <tbody>
                             {recommendations.length === 0 && (
                               <tr>
-                                <td colSpan={4}>{loading ? 'Loading...' : 'No recommended services'}</td>
+                                <td colSpan={3}>{loading ? 'Loading...' : 'No recommended services'}</td>
                               </tr>
                             )}
                             {recommendations.map((r) => {
-                              const vehicle = (typeof r.vehicle_id === "object" && r.vehicle_id !== null)
-                                ? r.vehicle_id
-                                : vehicles.find((v) => v.vehicle_id === r.vehicle_id || v.id === r.vehicle_id);
-                              const service = sampleService.find((s) => s.service_id === r.service_id);
+                              const vehicle = (typeof r.vehicle === "object" && r.vehicle !== null)
+                                ? r.vehicle
+                                : vehicles.find(
+                                    (v) => v.vehicle_id === r.vehicle || v.id === r.vehicle ||
+                                           v.vehicle_id === r.vehicle_id || v.id === r.vehicle_id
+                                  );
+
+                              const serviceName = r.service_name ||
+                                (typeof r.service === "object" && r.service !== null ? r.service.name : null) ||
+                                sampleService.find((s) => s.service_id === r.service_id || s.service_id === r.service)?.name ||
+                                (r.service ?? r.service_id ?? "-");
+
                               return (
                                 <tr key={`r-${r.recommendation_id}`}>
                                   <td>{vehicle?.model ?? "-"}</td>
                                   <td>{vehicle?.license_plate ?? "-"}</td>
-                                  <td>{service?.name ?? r.service_id ?? "-"}</td>
+                                  <td>{serviceName}</td>
                                 </tr>
                               );
                             })}
@@ -502,6 +512,7 @@ const CustomerDashboard = () => {
           </Col>
         </Row>
       </div>
+    </div>
   );
 };
 export default CustomerDashboard;
