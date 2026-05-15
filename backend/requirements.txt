@@ -4,6 +4,7 @@ djangorestframework-simplejwt
 python-dotenv
 requests
 django-cors-headers
+gunicorn
 
 # sql api drivers:
 #mysqlclient

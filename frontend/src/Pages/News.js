@@ -3,7 +3,7 @@ import imageLift from './PlaceHolderNewsImages/Lift.jpg';
 import React from 'react';
 import './News.css';
 
-
+/*
 const sampleEntries = [
   {
     id: 1,
@@ -20,6 +20,7 @@ const sampleEntries = [
     image: imageLift
   }
 ];
+*/
 
 const NewsItem = ({ entry }) => {
   const { date, title, text, image } = entry;
@@ -93,8 +94,6 @@ const News = () => {
             )}
           </article>
         ))}
-        {/* Sample entries as fallback */}
-        {fbPosts.length === 0 && !loading && sampleEntries.map(entry => <NewsItem key={entry.id} entry={entry} />)}
       </main>
     </div>
   );
