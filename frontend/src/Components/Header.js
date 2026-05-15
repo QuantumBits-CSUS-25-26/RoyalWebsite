@@ -29,15 +29,6 @@ const Header = () => {
     closeAll();
   };
 
-  // IMPORTANT: these IDs must match your /service/:id data
-  const serviceLinks = [
-    { id: "brakes", label: "Brake Work" },
-    { id: "body", label: "Body Work" },
-    { id: "engine-transmission", label: "Engine / Transmission" },
-    { id: "hybrid", label: "Hybrid Services" },
-    { id: "oil-change", label: "Oil Change" },
-    { id: "suspension-tune-up", label: "Suspension Work / Tune Up" },
-  ];
 
   return (
     <>
@@ -92,18 +83,6 @@ const Header = () => {
                 View all services
               </RouterNavLink>
             </NavItem>
-
-            {serviceLinks.map((s) => (
-              <NavItem key={s.id}>
-                <RouterNavLink
-                  className="nav-link"
-                  to={`/service/${s.id}`}
-                  onClick={closeAll}
-                >
-                  {s.label}
-                </RouterNavLink>
-              </NavItem>
-            ))}
           </Nav>
         </OffcanvasBody>
       </Offcanvas>
