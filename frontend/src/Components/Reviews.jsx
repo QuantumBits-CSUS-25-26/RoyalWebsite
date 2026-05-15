@@ -6,6 +6,7 @@ const CustomerReviews = () => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [failedImages, setFailedImages] = useState(new Set());
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -46,39 +47,23 @@ const CustomerReviews = () => {
         fetchReviews();
     }, []);
 
-
-    const staticReviews = [
-        {
-            text: "They treated me kindly and explained everything to me in detail. Great place!",
-            author: "Daniel C.",
-            rating: 5
-        },
-        {
-            text: "Very honest people that made me feel like I could actually trust them. 10/10!",
-            author: "Mabel P.",
-            rating: 5
-        },
-        {
-            text: "Great customer service as send reminders of appointn and are trustworthy people.",
-            author: "Greg H.",
-            rating: 5
-        }
-    ];
+    if (reviews.length === 0 && !loading && !error) {
+        return (
+            <section className="customer-reviews">
+                <h2>Google Maps Customer Feedback</h2>
+                <div className="reviews-container">
+                    <p>No reviews available at this time.</p>
+                </div>
+            </section>
+        );
+    }
 
     if (loading) {
         return (
             <section className="customer-reviews">
                 <h2>Google Maps Customer Feedback</h2>
                 <div className="reviews-container">
-                    {staticReviews.map((review, index) => (
-                        <div key={index} className="review-card">
-                            <div className="stars">
-                                {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-                            </div>
-                            <p className="review-text">"{review.text}"</p>
-                            <p className="review-author">- {review.author}</p>
-                        </div>
-                    ))}
+                    <p>Loading reviews...</p>
                 </div>
             </section>
         );
@@ -89,15 +74,7 @@ const CustomerReviews = () => {
             <section className="customer-reviews">
                 <h2>Google Maps Customer Feedback</h2>
                 <div className="reviews-container">
-                    {staticReviews.map((review, index) => (
-                        <div key={index} className="review-card">
-                            <div className="stars">
-                                {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-                            </div>
-                            <p className="review-text">"{review.text}"</p>
-                            <p className="review-author">- {review.author}</p>
-                        </div>
-                    ))}
+                    <p>{error}</p>
                 </div>
             </section>
         );
@@ -118,8 +95,13 @@ const CustomerReviews = () => {
                     return (
                         <div key={index} className="review-card">
                             <div className="review-header">
-                                {imgSrc ? (
-                                    <img src={imgSrc} alt={author} className="profile-photo" />
+                                {imgSrc && !failedImages.has(index) ? (
+                                    <img 
+                                        src={imgSrc} 
+                                        alt={author} 
+                                        className="profile-photo" 
+                                        onError={() => setFailedImages(prev => new Set([...prev, index]))}
+                                    />
                                 ) : null}
                                 <div className="reviewer-info">
                                     <div className="stars">
