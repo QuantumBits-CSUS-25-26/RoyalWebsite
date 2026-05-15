@@ -47,6 +47,7 @@ from .authentication import (
     get_tokens_for_customer,
     get_tokens_for_employee,
 )
+from django.conf import settings
 
 # Load environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -1200,11 +1201,13 @@ def place_reviews(request):
     """
     Fetch Google Maps place reviews for a business.
     """
-    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    if not api_key:
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY") or settings.GOOGLE_MAPS_API_KEY
+    if not api_key or api_key == "your_google_maps_api_key_here":
         return JsonResponse({"error": "API key not configured"}, status=500)
 
-    place_id = request.GET.get("place_id")
+    place_id = request.GET.get("place_id") or os.getenv("GOOGLE_PLACE_ID") or settings.GOOGLE_PLACE_ID
+    if place_id == "your_google_place_id_here":
+        place_id = None
     business_name = request.GET.get("name", "Royal Auto And Body Repair, Sacramento, CA")
 
     if not place_id:

@@ -174,3 +174,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@royalauto.com')
 
+# ── Google Maps configuration ────────────────────────────────────────
+GOOGLE_MAPS_API_KEY = 'your_google_maps_api_key_here'
+GOOGLE_PLACE_ID = 'your_google_place_id_here'
+
