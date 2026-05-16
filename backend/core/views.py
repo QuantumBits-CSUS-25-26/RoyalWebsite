@@ -9,6 +9,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from dotenv import load_dotenv
 from django.db.models import Q
 from datetime import datetime
+from django.shortcuts import redirect
+import urllib.parse
+from django.conf import settings
 import calendar
 
 
@@ -19,7 +22,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage, PaymentOption
+from .models import Customer, FacebookToken, Vehicle, Employee, Appointment, SiteService, BusinessInformation, ServiceRecommendation, Invoice, Messsage, PaymentOption
 from .serializer import (
     CustomerRegistrationSerializer,
     CustomerProfileSerializer,
@@ -53,17 +56,80 @@ from django.conf import settings
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
+def facebook_callback(request):
+    code = request.GET.get('code')
+    if not code:
+        return JsonResponse({'error': 'No code provided'}, status=400)
+
+    fb_app_id = settings.FACEBOOK_APP_ID
+    fb_app_secret = settings.FACEBOOK_APP_SECRET
+    redirect_uri = 'http://localhost:8000/auth/facebook/callback/'
+
+    # Exchange code for user access token
+    token_url = (
+        f"https://graph.facebook.com/v19.0/oauth/access_token?"
+        f"client_id={fb_app_id}"
+        f"&redirect_uri={redirect_uri}"
+        f"&client_secret={fb_app_secret}"
+        f"&code={code}"
+    )
+    token_response = requests.get(token_url)
+    token_data = token_response.json()
+    access_token = token_data.get('access_token')
+    if not access_token:
+        return JsonResponse({'error': 'Failed to get access token', 'details': token_data}, status=400)
+
+    # Get page access token
+    me_url = f"https://graph.facebook.com/v19.0/me/accounts?access_token={access_token}"
+    me_response = requests.get(me_url)
+    me_data = me_response.json()
+    page_id = settings.PAGE_ID
+    page_token = None
+    for page in me_data.get('data', []):
+        if page['id'] == page_id:
+            page_token = page['access_token']
+            break
+    if not page_token:
+        return JsonResponse({'error': 'Page access token not found', 'details': me_data}, status=400)
+
+    # Save or update the token in the database
+    FacebookToken.objects.update_or_create(
+        page_id=page_id,
+        defaults={'access_token': page_token}
+    )
+
+    return JsonResponse({'success': True, 'page_id': page_id})
+
+def facebook_login(request):
+    fb_app_id = settings.FACEBOOK_APP_ID
+    fb_app_secret = settings.FACEBOOK_APP_SECRET
+    fb_page_access_token = settings.FACEBOOK_PAGE_ACCESS_TOKEN
+    redirect_uri = 'http://localhost:8000/auth/facebook/callback/'  # or your deployed callback
+    scope = 'pages_show_list,pages_read_engagement,pages_read_user_content'
+    state = 'random_string_for_csrf'  # You should generate and validate this
+
+    fb_auth_url = (
+        f"https://www.facebook.com/v19.0/dialog/oauth?"
+        f"client_id={fb_app_id}"
+        f"&redirect_uri={urllib.parse.quote(redirect_uri)}"
+        f"&scope={scope}"
+        f"&response_type=code"
+        f"&state={state}"
+    )
+    return redirect(fb_auth_url)
 #Facebook Posts View
 class FacebookPostsView(APIView):
     def get(self, request):
-        page_id = os.getenv("PAGE_ID")
-        access_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+        page_id = settings.PAGE_ID
+        try:
+            fb_token = FacebookToken.objects.get(page_id=page_id)
+            access_token = fb_token.access_token
+        except FacebookToken.DoesNotExist:
+            return JsonResponse({'error': 'No Facebook token found for this page.'}, status=400)
 
         url = f'https://graph.facebook.com/v19.0/{page_id}/posts?fields=message,created_time,id,full_picture,attachments&access_token={access_token}'
-
-        response = http_requests.get(url)
+        response = requests.get(url)
         data = response.json()
-
         return JsonResponse(data)
 
 # ══════════════════════════════════════════════════════════════════

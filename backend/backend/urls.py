@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.http import JsonResponse
 from core import views
 from rest_framework_simplejwt.views import TokenRefreshView
-from core.views import CustomTokenObtainPairView
+from core.views import CustomTokenObtainPairView, facebook_callback, facebook_login
 
 
 
@@ -18,4 +18,6 @@ urlpatterns = [
     path("api/places/reviews", views.place_reviews, name="place_reviews"),
     path('api/token', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/facebook/', facebook_login, name='facebook_login'),
+    path('auth/facebook/callback/', facebook_callback, name='facebook_callback')
 ]

@@ -23,6 +23,7 @@ def setup_page_token(short_lived_token):
     response = requests.get(url)
     data = response.json()
 
+
     page_id = os.getenv("PAGE_ID")
 
     for page in data.get("data", []):
@@ -35,5 +36,5 @@ def setup_page_token(short_lived_token):
 
 
 if __name__ == "__main__":
-    short_token = 'EAAU2z6ZC17KgBRQyt3gm9dz3Sozd6pBNXs4AJZBDFETzN2sEXaOvNHvaRmyJGvtUEaZAI6XTzLN3FZC0ZAK8DiSN3WRdc53eS4Yn1HUvacQVI2kaufpvlqnX3bqQnDTEOxzOtwzBDj7qdRLtjaiWZAoamTLG8Y6DGIDGTCg8fcZAIeyvJsMwVnjoElhrfXfuVpAvvl1XuJNgXpZAfpEf5pmZCiN0jGfXLguprns1eIbixBjPYDT0nXgViPmCrHVmn14fvyJgiAOj3XSJEn5Iw8XpjIAZDZD'
+    short_token = input("Enter your short-lived user access token: ")
     setup_page_token(short_token)

@@ -32,6 +32,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')     # configure in .env
+# Facebook App settings
+FACEBOOK_APP_ID = os.getenv('FACEBOOK_APP_ID')
+FACEBOOK_APP_SECRET = os.getenv('FACEBOOK_APP_SECRET')
+FACEBOOK_PAGE_ACCESS_TOKEN = os.getenv('FACEBOOK_PAGE_ACCESS_TOKEN')
+PAGE_ID = os.getenv('PAGE_ID')
 
 ALLOWED_HOSTS = []
 

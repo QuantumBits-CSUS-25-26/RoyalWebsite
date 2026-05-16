@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import facebook_callback, facebook_login
 
 urlpatterns = [
     # ── Customer auth ──────────────────────────────────────────
@@ -56,7 +57,8 @@ urlpatterns = [
     # ── Admin Dashboard ───────────────────────────────────
     path('admin/dashboard-totals/', views.AdminDashboardTotalsView.as_view(), name='admin_dashboard_totals'),
     path('admin/recent-customers/', views.AdminRecentCustomersView.as_view(), name='admin_recent_customers'),
-  
+    path('auth/facebook/', facebook_login, name='facebook_login'),
+    path('auth/facebook/callback/', facebook_callback, name='facebook_callback'),
   
     path('api/vehicles/<int:vehicle_id>/service-history/', views.VehicleServiceHistoryView.as_view(), name= 'vehicle_service_history'),
 ]

@@ -2,25 +2,8 @@ import imageHoliday from './PlaceHolderNewsImages/Holiday.jpg';
 import imageLift from './PlaceHolderNewsImages/Lift.jpg';
 import React from 'react';
 import './News.css';
+import { API_BASE_URL } from '../config';
 
-/*
-const sampleEntries = [
-  {
-    id: 1,
-    date: { month: "Nov", day: 10, year: 2025 },
-    title: "Holiday Hours & Specials",
-    text: "We will be open limited hours over the holidays. Book early to secure your appointment and ask about our holiday oil change special.",
-    image: imageHoliday
-  },
-  {
-    id: 2,
-    date: { month: "Oct", day: 6, year: 2025 },
-    title: "New Lift Installed",
-    text: "We installed a new two-post lift to speed up service times and better accommodate SUVs and light trucks.",
-    image: imageLift
-  }
-];
-*/
 
 const NewsItem = ({ entry }) => {
   const { date, title, text, image } = entry;
@@ -55,7 +38,7 @@ const News = () => {
   const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('api/facebook-posts/')
+    fetch(`${API_BASE_URL}/api/facebook-posts/`)
       .then(res => res.json())
       .then(data => {
         setFbPosts(Array.isArray(data.data) ? data.data : []);

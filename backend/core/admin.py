@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Customer, Vehicle, Employee, Appointment, SiteService, ServiceRecommendation
+from .models import Customer, FacebookToken, Vehicle, Employee, Appointment, SiteService, ServiceRecommendation
 
+admin.site.register(FacebookToken)
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):

@@ -5,8 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGaugeSimpleHigh, faUsers, faScrewdriverWrench, faFileInvoiceDollar, faEnvelope, faUsersGear, faAlignLeft } from '@fortawesome/free-solid-svg-icons';
 import { faCalendarCheck } from '@fortawesome/free-regular-svg-icons';
 import { useState } from 'react';
+import { API_BASE_URL } from '../config';
 
-
+function handleFacebookLogin() {
+  window.location.href = `${API_BASE_URL}/auth/facebook/`;
+}
 export default function AdminSideBar() {
 
     const [isOpen, setIsOpen] = useState(false);
@@ -87,6 +90,11 @@ export default function AdminSideBar() {
                                         <FontAwesomeIcon icon={faUsersGear} />Employee Management
                                     </Button>
                                 </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                    <Button type='btn' className='navButton' onClick={handleFacebookLogin}>
+                                        <FontAwesomeIcon icon={faAlignLeft} /> Connect Facebook
+                                    </Button>
                             </NavItem>
                         </Nav>
                     </Container>
