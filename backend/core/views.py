@@ -63,7 +63,7 @@ def facebook_callback(request):
 
     fb_app_id = settings.FACEBOOK_APP_ID
     fb_app_secret = settings.FACEBOOK_APP_SECRET
-    redirect_uri = 'http://localhost:8000/auth/facebook/callback/'
+    redirect_uri = 'https://back.royalautorepair.shop/auth/facebook/callback/'
 
     # Exchange code for user access token
     token_url = (
@@ -104,7 +104,7 @@ def facebook_login(request):
     fb_app_id = settings.FACEBOOK_APP_ID
     fb_app_secret = settings.FACEBOOK_APP_SECRET
     fb_page_access_token = settings.FACEBOOK_PAGE_ACCESS_TOKEN
-    redirect_uri = 'http://localhost:8000/auth/facebook/callback/'  # or your deployed callback
+    redirect_uri = 'https://back.royalautorepair.shop/auth/facebook/callback/'  # or your deployed callback
     scope = 'pages_show_list,pages_read_engagement,pages_read_user_content'
     state = 'random_string_for_csrf'  # You should generate and validate this
 
