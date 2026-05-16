@@ -3,6 +3,7 @@ import "./Login.css";
 import carImage from "../images/login-car.jpg";
 import logo from "../images/logo.png";
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from "../config";
 
 
 function Login() {
@@ -96,7 +97,7 @@ function Login() {
       const csrftoken = getCookie("csrftoken");
       if (csrftoken) headers["X-CSRFToken"] = csrftoken;
 
-      const res = await fetch("/api/login/", {
+      const res = await fetch(`${API_BASE_URL}/api/login/`, {
         method: "POST",
         headers,
         credentials: "include",
